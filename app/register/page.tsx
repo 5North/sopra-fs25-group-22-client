@@ -74,6 +74,7 @@ const Register: React.FC = () => {
           <Input.Password placeholder="Enter password" />
         </Form.Item>
         <Form.Item>
+          {error && <p style={{ color: "red" }}>{error}</p>}
           <Button type="primary" htmlType="submit" className="custom-button">
             Register
           </Button>
