@@ -6,6 +6,7 @@ import useLocalStorage from "@/hooks/useLocalStorage";
 import { User } from "@/types/user";
 import { Button, Form, Input } from "antd";
 import { useState } from "react";
+// import { createUser } from "@/api/registerService";
 
 interface FormFieldProps {
   label: string;
@@ -25,6 +26,11 @@ const Register: React.FC = () => {
 
   const handleRegister = async (values: FormFieldProps) => {
     try {
+      // const resp = await createUser({username: 'xxxeeryy', password: '12sss11'});
+      // // alert("respy")
+      // // alert(JSON.stringify(resp))
+      // // alert(resp)
+
       const response = await apiService.post<User>("/users", values);
 
       if (response.token) {
@@ -32,13 +38,13 @@ const Register: React.FC = () => {
       }
 
       setError("")
-      router.push("/login"); // TODO: update to home after home is built..
+      router.push("/home"); // TODO: update to home after home is built..
     } catch (error) {
       if (error instanceof Error) {
         if(error.message.includes("409")) {
           setError("User already exists!"); // TODO: check if you can utilize the error message from the response...
         } else {
-          alert(`Oopps.. Something went wrong!`);  
+          alert(`Oopps.. Something went wrong!` + error);  
           console.error(`Something went wrong during the registration:\n${error.message} ${JSON.stringify(values)}`);
         }  
       } else {
