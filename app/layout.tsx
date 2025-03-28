@@ -30,6 +30,7 @@ export default function RootLayout({
         <ConfigProvider
           theme={{
             algorithm: theme.defaultAlgorithm,
+            hashed: false,
             token: {
               // general theme options are set in token, meaning all primary elements (button, menu, ...) will have this color
               colorPrimary: "#22426b", // selected input field boarder will have this color as well
@@ -43,7 +44,7 @@ export default function RootLayout({
             // if a component type needs special styling, setting here will override default options set in token
             components: {
               Button: {
-                colorPrimary: "#75bd9d", // this will color all buttons in #75bd9d, overriding the default primaryColor #22426b set in token line 35
+                colorPrimary: "#517db0", // this will color all buttons in #75bd9d, overriding the default primaryColor #22426b set in token line 35
                 algorithm: true, // enable algorithm (redundant with line 33 but here for demo purposes)
                 controlHeight: 38,
               },

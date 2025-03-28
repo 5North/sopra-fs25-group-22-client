@@ -1,11 +1,11 @@
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #000000;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
+    --background: #000000;
     --foreground: #ededed;
   }
 }
@@ -41,16 +41,16 @@ a {
   }
 }
 
-.login-container {
+.register-container {
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background-color: rgb(41, 44, 59);
+  background-color: rgb(0, 0, 0);
 }
 
-.login-button {
-  width: 100%;
+.custom-button {
+  width: 50%;
 }
 
 .card-container {
