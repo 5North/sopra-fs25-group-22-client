@@ -6,10 +6,10 @@ import useLocalStorage from "@/hooks/useLocalStorage";
 // import { User } from "@/types/user";
 import { Button, Form } from "antd";
 
-interface FormFieldProps {
-  label: string;
-  value: string;
-}
+// interface FormFieldProps {
+//   label: string;
+//   value: string;
+// }
 
 const Home: React.FC = () => {
   const router = useRouter();
