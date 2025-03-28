@@ -45,6 +45,8 @@ const Register: React.FC = () => {
         console.error("An unknown error occurred during registration.");
       }
     }
+
+    // TODO: set token missing atm
   };
 
   return (
