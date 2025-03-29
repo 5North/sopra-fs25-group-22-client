@@ -49,6 +49,27 @@ a {
   background-color: rgb(0, 0, 0);
 }
 
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: rgb(0, 0, 0);
+
+}
+
+.auth-wrapper {
+  width: fit-content;
+}
+
+.auth-link {
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+  padding-left: 10px; 
+  margin-top: -8px; 
+}
+
 .custom-button {
   width: 50%;
 }
