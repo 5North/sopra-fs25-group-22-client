@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation"; // use NextJS router for navigation
 import { useApi } from "@/hooks/useApi";
 import useLocalStorage from "@/hooks/useLocalStorage";
-import { User } from "@/types/user";
+// import { User } from "@/types/user";
 import { Button, Form, Input } from "antd";
 import { useState } from "react";
 
@@ -14,7 +14,7 @@ interface FormFieldProps {
 
 const Login: React.FC = () => {
   const router = useRouter();
-  const apiService = useApi();
+  // const apiService = useApi();
   const [form] = Form.useForm();
   const {
     set: setToken, 
@@ -24,6 +24,8 @@ const Login: React.FC = () => {
 
   const handleLogin = async (values: FormFieldProps) => {
     try {
+
+      // to get header as response
       const response = await fetch("http://localhost:8080/login", {
       method: "POST",
       headers: {
