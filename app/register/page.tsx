@@ -1,12 +1,10 @@
 "use client"; 
 
 import { useRouter } from "next/navigation";
-import { useApi } from "@/hooks/useApi";
 import useLocalStorage from "@/hooks/useLocalStorage";
-import { User } from "@/types/user";
 import { Button, Form, Input } from "antd";
 import { useState } from "react";
-// import { createUser } from "@/api/registerService";
+import { createUser } from "@/api/registerService";
 
 interface FormFieldProps {
   label: string;
@@ -15,7 +13,6 @@ interface FormFieldProps {
 
 const Register: React.FC = () => {
   const router = useRouter();
-  const apiService = useApi();
   const [form] = Form.useForm();
 
   const {
@@ -23,36 +20,34 @@ const Register: React.FC = () => {
   } = useLocalStorage<string>("token", ""); 
 
   const [error, setError] = useState("");
+  let response: Response;
 
   const handleRegister = async (values: FormFieldProps) => {
     try {
-      // const resp = await createUser({username: 'xxxeeryy', password: '12sss11'});
-      // // alert("respy")
-      // // alert(JSON.stringify(resp))
-      // // alert(resp)
-
-      const response = await apiService.post<User>("/users", values);
-
-      if (response.token) {
-        setToken(response.token);
+      response = await createUser(values);
+  
+      // TODO: make response check reusable
+      if (!response.ok) {
+        if (response.status === 409) {
+          setError("User already exists!");
+        } else {
+          throw new Error(`Unexpected error: ${response.status}`);
+        }
+        return;
       }
-
-      setError("")
-      router.push("/home"); // TODO: update to home after home is built..
+  
+      const token = response.headers.get("Token");
+      setToken(token ? token : "");
+      setError("");
+      router.push("/home"); 
     } catch (error) {
       if (error instanceof Error) {
-        if(error.message.includes("409")) {
-          setError("User already exists!"); // TODO: check if you can utilize the error message from the response...
-        } else {
           alert(`Oopps.. Something went wrong!` + error);  
-          console.error(`Something went wrong during the registration:\n${error.message} ${JSON.stringify(values)}`);
-        }  
+          console.error(`Something went wrong during the registration:\n${error.message} ${JSON.stringify(values)}`); 
       } else {
-        console.error("An unknown error occurred during registration.");
+        console.error("An unknown error occurred during user registration.");
       }
     }
-
-    // TODO: set token missing atm
   };
 
   return (
