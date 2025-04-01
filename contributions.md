@@ -55,10 +55,8 @@ reason).
 | **@5North** | 29.03.2025   | https://github.com/5North/sopra-fs25-group-22-server/commit/ff4a554e9745d5f2ec48c67f96cf2bdca90ef5e8 | Change login endpoint method to require POSTDTOs as input | Allows for greater consistency within the controller and aligns with the client |
 | **@5North** | 29.03.2025   | https://github.com/5North/sopra-fs25-group-22-server/commit/73aab6313cb57da734e9672745b77b1fa8a2acb9 | Expose custom token header to all origins | Allows the client to access the token header value |
 | **@5North** | 31.03.2025   | https://github.com/5North/sopra-fs25-group-22-server/commit/5f8f9ed2dbafd65adc1e456f24ebed25eb5fa394 | Add base implementation of Card and Suit classes, plus tests | Allows the server to have necessary representations of  the card deck and to test them. |
-| **[@githubUser3]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
-|                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
-| **[@githubUser4]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
-|                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
+| **@Seydi89**| 28.03.2025   | https://github.com/5North/sopra-fs25-group-22-client/commit/b3fec0ae1619a4e04114ccad5e0c987efb99e35f | Registration UI basics | Registration basics |
+| **@Seydi89**| 28.03.2025   | https://github.com/5North/sopra-fs25-group-22-client/commit/515dd914d0354e82d4e6949252ac5db9242798c8 | Home page and logout | Dummy homepage for logout |
 
 ---
 
