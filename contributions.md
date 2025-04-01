@@ -38,12 +38,12 @@ reason).
 |                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
 | **Student**        | **Date** | **Link to Commit** | **Description**                          | **Relevance**                       |
 |--------------------|----------|--------------------|------------------------------------------|-------------------------------------|
-| **@sbenzo99**      | 27.03    | https://github.com/5North/sopra-fs25-group-22-server/commit/944795fe4f3cf9674c4e01073b33a2e7b1581402               | Create a new POST endpoint (e.g. /users/)| Essential for user creation         |
-| **@sbenzo99**      | 27.03    | https://github.com/5North/sopra-fs25-group-22-server/commit/64363f782a3829b7fad52c5cb8b99acc2b5d5564                | Logic to check if Username exists already| Prevents duplicate usernames        |
-| **@sbenzo99**      | 28.03    | https://github.com/5North/sopra-fs25-group-22-server/commit/9e090c085461296a03c9be2a2ca1afd1eff051d8                 | Generate a session token (registration)  | Enables secure session management   |
-| **@sbenzo99**      | 28.03    | https://github.com/5North/sopra-fs25-group-22-server/commit/944795fe4f3cf9674c4e01073b33a2e7b1581402                 | Save the user in the UserRepository      | Ensures persistent storage of user  |
-| **@sbenzo99**      | 31.03    | https://github.com/5North/sopra-fs25-group-22-server/commit/1573cfd84bf3936a7a4f7517a37b2829ccbc8bad                | method to shuffle the Deck correctly     | Must be done to play regularily     |
-| **@sbenzo99**      | 31.03    | (https://github.com/5North/sopra-fs25-group-22-server/commit/1573cfd84bf3936a7a4f7517a37b2829ccbc8bad)                | Implement the Deck and Card class        | Providesstructure for card game(s)  |
+| **@sbenzo99**      | 27.03    | https://github.com/5North/sopra-fs25-group-22-server/commit/944795fe4f3cf9674c4e01073b33a2e7b1581402               | Create a new POST endpoint (e.g. /users/) #6| Essential for user creation         |
+| **@sbenzo99**      | 27.03    | https://github.com/5North/sopra-fs25-group-22-server/commit/64363f782a3829b7fad52c5cb8b99acc2b5d5564                | Logic to check if Username exists already #7| Prevents duplicate usernames        |
+| **@sbenzo99**      | 28.03    | https://github.com/5North/sopra-fs25-group-22-server/commit/9e090c085461296a03c9be2a2ca1afd1eff051d8                 | Generate a session token (registration) #8 | Enables secure session management   |
+| **@sbenzo99**      | 28.03    | https://github.com/5North/sopra-fs25-group-22-server/commit/944795fe4f3cf9674c4e01073b33a2e7b1581402                 | Save the user in the UserRepository    #9  | Ensures persistent storage of user  |
+| **@sbenzo99**      | 31.03    | https://github.com/5North/sopra-fs25-group-22-server/commit/1573cfd84bf3936a7a4f7517a37b2829ccbc8bad                | method to shuffle the Deck correctly   #92  | Must be done to play regularily     |
+| **@sbenzo99**      | 31.03    | (https://github.com/5North/sopra-fs25-group-22-server/commit/1573cfd84bf3936a7a4f7517a37b2829ccbc8bad)                | Implement the Deck and Card class    #91    | Providesstructure for card game(s)  |
 | **[@githubUser3]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
 |                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
 | **[@githubUser4]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
