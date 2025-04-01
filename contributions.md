@@ -34,8 +34,8 @@ reason).
 
 | **Student**        | **Date** | **Link to Commit** | **Description**                 | **Relevance**                       |
 | ------------------ | -------- | ------------------ | ------------------------------- | ----------------------------------- |
-| **[@shellmychakkaith]** | [30.05.25]   | [https://github.com/5North/sopra-fs25-group-22-client/commit/1b61142a9e6efd768c683837beda2017644efce3 | [login functionality] | [For registered users to access the application] |
-|                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
+| **@shellmychakkaith** | 30.05   | [https://github.com/5North/sopra-fs25-group-22-client/commit/1b61142a9e6efd768c683837beda2017644efce3 | login functionality | registered users can log in|
+|                    | 30.05   |  | Redirection to homepage | Only registered/logged in users can access application |
 | **Student**        | **Date** | **Link to Commit** | **Description**                          | **Relevance**                       |
 |--------------------|----------|--------------------|------------------------------------------|-------------------------------------|
 | **@sbenzo99**      | 27.03    | https://github.com/5North/sopra-fs25-group-22-server/commit/944795fe4f3cf9674c4e01073b33a2e7b1581402               | Create a new POST endpoint (e.g. /users/) #6| Essential for user creation         |
