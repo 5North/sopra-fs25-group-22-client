@@ -38,6 +38,7 @@ const Home: React.FC = () => {
 
   return (
     <div className="login-container">
+<<<<<<< HEAD
       <Form
         form={form}
         name="login"
@@ -53,6 +54,69 @@ const Home: React.FC = () => {
           </Button>
         </Form.Item>
       </Form>
+=======
+      <div className="auth-wrapper">
+        <h1 style={{ color: "white", textAlign: "center", marginBottom: "1.5rem" }}>
+          Scopa for Beginners
+        </h1>
+  
+        <Form
+          form={form}
+          name="home"
+          size="large"
+          layout="vertical"
+          style={{ width: "100%" }}
+        >
+          <Form.Item>
+            <Button
+              className="custom-button"
+              onClick={() => router.push("/lobbies")}
+            >
+              Start a Game
+            </Button>
+          </Form.Item>
+  
+          <Form.Item>
+            <Button
+              className="custom-button"
+              onClick={() => router.push("/join")}
+            >
+              Join a Game
+            </Button>
+          </Form.Item>
+  
+          <Form.Item>
+            <Button
+              className="custom-button"
+              onClick={() => router.push("/scoreboard")}
+            >
+              Scoreboard
+            </Button>
+          </Form.Item>
+  
+          <Form.Item>
+            <Button
+              className="custom-button"
+              onClick={() => router.push("/rules")}
+            >
+              Rules
+            </Button>
+          </Form.Item>
+  
+          <Form.Item style={{ textAlign: "right" }}>
+            <Button
+              onClick={handleLogout}
+              type="primary"
+              htmlType="submit"
+              className="custom-button"
+              style={{ fontSize: "0.75rem", padding: "0.25rem 1rem" }}
+            >
+              Logout
+            </Button>
+          </Form.Item>
+        </Form>
+      </div>
+>>>>>>> ee0814e (Homepage implementation see #11)
     </div>
   );
 };
