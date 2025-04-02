@@ -1,48 +1,39 @@
 "use client"; // For components that need React hooks and browser APIs, SSR (server side rendering) has to be disabled. Read more here: https://nextjs.org/docs/pages/building-your-application/rendering/server-side-rendering
 
 import { useRouter } from "next/navigation"; // use NextJS router for navigation
-// import { useApi } from "@/hooks/useApi";
 import useLocalStorage from "@/hooks/useLocalStorage";
-// import { User } from "@/types/user";
 import { Button, Form } from "antd";
-
-// interface FormFieldProps {
-//   label: string;
-//   value: string;
-// }
+import { logoutUser } from "@/api/registerService";
 
 const Home: React.FC = () => {
   const router = useRouter();
-  // const apiService = useApi();
   const [form] = Form.useForm();
 
   const {
     clear: clearToken, 
+    value: token
   } = useLocalStorage<string>("token", ""); 
 
+  let response: Response;
+  
   const handleLogout = async () => {
-    // TODO:
-    // try {
-    //   // Call the API service and let it handle JSON serialization and error handling
-    //   const response = await apiService.post<User>("/users", values);
-
-    //   // Use the useLocalStorage hook that returned a setter function (setToken in line 41) to store the token if available
-    //   if (response.token) {
-    //     clearToken();
-    //   }
-
-    //   // Navigate to the user overview
-    //   router.push("/users");
-    // } catch (error) {
-    //   if (error instanceof Error) {
-    //     alert(`Something went wrong during the login:\n${error.message}`);
-    //   } else {
-    //     console.error("An unknown error occurred during login.");
-    //   }
-    // }
-    // TODO: Call logout
-    clearToken();
-    router.push("/login");
+    try {
+      response = await logoutUser(token);
+    
+      if (!response.ok) {
+        throw new Error(`Unexpected error: ${response.status}`);
+      }
+    
+      clearToken();  
+      router.push("/login");
+    } catch (error) {
+      if (error instanceof Error) {
+        alert(`Oopps.. Something went wrong!` + error);  
+        console.error(`Something went wrong during the registration:\n${error.message} ${JSON.stringify(error)}`); 
+      } else {
+        console.error("An unknown error occurred during user registration.");
+      }
+    }  
   };
 
   return (
@@ -62,7 +53,7 @@ const Home: React.FC = () => {
           <Form.Item>
             <Button
               className="custom-button"
-              onClick={() => router.push("/lobbies/start")}
+              onClick={() => router.push("/lobbies")}
             >
               Start a Game
             </Button>
@@ -71,7 +62,7 @@ const Home: React.FC = () => {
           <Form.Item>
             <Button
               className="custom-button"
-              onClick={() => router.push("/lobbies/join")}
+              onClick={() => router.push("/join")}
             >
               Join a Game
             </Button>
@@ -99,7 +90,7 @@ const Home: React.FC = () => {
             <Button
               onClick={handleLogout}
               type="primary"
-              htmlType="button"
+              htmlType="submit"
               className="custom-button"
               style={{ fontSize: "0.75rem", padding: "0.25rem 1rem" }}
             >

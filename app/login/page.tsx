@@ -1,11 +1,10 @@
 "use client"; // For components that need React hooks and browser APIs, SSR (server side rendering) has to be disabled. Read more here: https://nextjs.org/docs/pages/building-your-application/rendering/server-side-rendering
 
 import { useRouter } from "next/navigation"; // use NextJS router for navigation
-// import { useApi } from "@/hooks/useApi";
 import useLocalStorage from "@/hooks/useLocalStorage";
-// import { User } from "@/types/user";
 import { Button, Form, Input } from "antd";
 import { useState } from "react";
+import { login } from "@/api/registerService";
 
 interface FormFieldProps {
   label: string;
@@ -14,7 +13,6 @@ interface FormFieldProps {
 
 const Login: React.FC = () => {
   const router = useRouter();
-  // const apiService = useApi();
   const [form] = Form.useForm();
   const {
     set: setToken, 
@@ -24,15 +22,7 @@ const Login: React.FC = () => {
 
   const handleLogin = async (values: FormFieldProps) => {
     try {
-
-      // to get header as response
-      const response = await fetch("http://localhost:8080/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(values),
-    });
+      const response = await login(values);
 
     if (!response.ok) {
       if (response.status === 403) {
