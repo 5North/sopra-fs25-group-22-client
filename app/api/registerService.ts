@@ -18,6 +18,32 @@ export const logoutUser = async (token: string):Promise<Response> => {
   });
 };
 
+export const createLobby = async (token: string, lobbyData: object): Promise<Response> => {
+  return fetch(getApiDomain() + "/lobbies", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Token": token,
+    },
+    body: JSON.stringify(lobbyData),
+  });
+};
+
+export const joinLobby = async (
+  token: string,
+  lobbyPIN: string,
+  joinData: object //in case needed
+): Promise<Response> => {
+  return fetch(getApiDomain() + `/lobbies/${lobbyPIN}/join`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Token": token,
+    },
+    body: JSON.stringify(joinData),
+  });
+}
+
 export const postValuesToPath = async (path: string, values: object):Promise<Response> => {
   return fetch(getApiDomain() + path, {
     method: "POST",

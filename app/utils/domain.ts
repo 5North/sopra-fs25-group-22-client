@@ -9,6 +9,5 @@ export function getApiDomain(): string {
   const prodUrl = process.env.NEXT_PUBLIC_PROD_API_URL ||
     "https://sopra-fs25-group-22-server.oa.r.appspot.com";
   const devUrl = "http://localhost:8080";
-  //const devUrl = "http://localhost:3001";
   return isProduction() ? prodUrl : devUrl;
 }
