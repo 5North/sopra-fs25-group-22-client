@@ -7,8 +7,8 @@ import { useState } from "react";
 import { login } from "@/api/registerService";
 
 interface FormFieldProps {
-  label: string;
-  value: string;
+  username: string;
+  password: string;
 }
 
 const Login: React.FC = () => {
@@ -40,6 +40,7 @@ const Login: React.FC = () => {
     }
 
     setToken(token); 
+    localStorage.setItem("username", values.username); 
     setError("");
     router.push("/home");
   } catch (error) {

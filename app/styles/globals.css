@@ -59,7 +59,13 @@ a {
 }
 
 .auth-wrapper {
-  width: fit-content;
+    width: 400px; 
+    background-color: transparent;
+    padding: 2rem;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .auth-link {
