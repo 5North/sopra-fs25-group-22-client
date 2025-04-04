@@ -11,10 +11,17 @@ interface Player {
   host?: boolean;
 }
 
+interface Lobby {
+  lobbyId: string | number;
+  PIN: string | number;
+  players: Player[]
+  roomName?: string | "";
+}
+
 const LobbyPage: React.FC = () => {
   const router = useRouter();
   const [error, setError] = useState("");
-  const [lobby, setLobby] = useState<any>(null);
+  const [lobby, setLobby] = useState<Lobby | null>(null);
 
   // Retrieve the user's token from local storage via your custom hook.
   const { value: token } = useLocalStorage<string>("token", "");
@@ -43,18 +50,18 @@ const LobbyPage: React.FC = () => {
         setLobby(data);
       
 
-        // --- MOCK RESPONSE (for testing) ---
-        //const data = {
+        // // --- MOCK RESPONSE (for testing) ---
+        // const data = {
         //  lobbyId: 1,
         //  PIN: 1234,
         //  players: [
         //    { username: "shellmy", host: true },
         //    { username: "ha", host: false }
         //  ]
-        //};
+        // };
 
-        setLobby(data);
-      } catch (err: any) {
+        // setLobby(data);
+      } catch (err) {
         setError("An error occurred while creating the lobby.");
         console.error("Lobby creation error:", err);
       }
