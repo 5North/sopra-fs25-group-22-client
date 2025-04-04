@@ -43,11 +43,27 @@ a {
 
 .register-container {
   display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  /* Other styles */
+  background-image: linear-gradient(rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.9)), url("/images/cards.jpg");
+  background-size: cover;
+  background-position: center;
+  min-height: 100vh;
+  background-color: rgb(0, 0, 0);
+}
+
+/* .home-container {
+  background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url("/images/cards.jpg");
+  background-size: cover;
+  background-position: center;
+  display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
   background-color: rgb(0, 0, 0);
-}
+} */
 
 .login-container {
   display: flex;
@@ -86,4 +102,28 @@ a {
   align-items: center;
   min-height: 100vh;
   background-color: rgb(41, 44, 59);
+}
+
+.team-wrapper {
+  display: flex;
+  flex-direction: row;
+  gap: 4rem;
+  justify-content: center;
+  align-items: flex-start;
+  flex-wrap: wrap; /* optional: helps with responsiveness */
+  margin-top: 2rem;
+}
+
+.team-box {
+  background-color: #2F2F2F;
+  border-radius: 12px;
+  padding: 2rem;
+  text-align: center;
+  color: #fff;
+  min-width: 300px;
+}
+
+.custom-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.0; /* Optional: Reduces opacity to make it look more disabled */
 }

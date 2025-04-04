@@ -37,7 +37,7 @@ const Home: React.FC = () => {
   };
 
   return (
-    <div className="login-container">
+    <div className="register-container">
       <div className="auth-wrapper">
         <h1 style={{ color: "white", textAlign: "center", marginBottom: "1.5rem" }}>
           Scopa for Beginners
@@ -55,7 +55,7 @@ const Home: React.FC = () => {
               className="custom-button"
               onClick={() => router.push("/lobbies")}
             >
-              Start a Game
+            🧹Start a Game
             </Button>
           </Form.Item>
   
@@ -64,7 +64,7 @@ const Home: React.FC = () => {
               className="custom-button"
               onClick={() => router.push("/join")}
             >
-              Join a Game
+            👇Join a Game
             </Button>
           </Form.Item>
   
@@ -73,7 +73,7 @@ const Home: React.FC = () => {
               className="custom-button"
               onClick={() => router.push("/scoreboard")}
             >
-              Scoreboard
+            🏅Scoreboard
             </Button>
           </Form.Item>
   
@@ -82,7 +82,7 @@ const Home: React.FC = () => {
               className="custom-button"
               onClick={() => router.push("/rules")}
             >
-              Rules
+            📜Rules
             </Button>
           </Form.Item>
   
@@ -94,7 +94,7 @@ const Home: React.FC = () => {
               className="custom-button"
               style={{ fontSize: "0.75rem", padding: "0.25rem 1rem" }}
             >
-              Logout
+            👋Logout
             </Button>
           </Form.Item>
         </Form>

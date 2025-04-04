@@ -61,7 +61,7 @@ const Login: React.FC = () => {
     
 
   return (
-    <div className="login-container">
+    <div className="register-container">
       <div className="auth-wrapper">
         <Form
           form={form}
@@ -88,7 +88,7 @@ const Login: React.FC = () => {
           <Form.Item>
           {error && <p style={{ color: "red" }}>{error}</p>}
             <Button type="primary" htmlType="submit" className="custom-button">
-              Login
+            ♣️ Login
             </Button>
           </Form.Item>
         </Form>
