@@ -3,8 +3,12 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "antd";
-//import { createLobby } from "@/api/registerService";
+import { createLobby } from "@/api/registerService";
 import useLocalStorage from "@/hooks/useLocalStorage";
+import { stompClient } from "@/api/stompHelper";
+import { Client, IMessage, StompSubscription } from "@stomp/stompjs";
+import SockJS from "sockjs-client";
+import { getApiDomain } from "@/utils/domain";
 
 interface Player {
   username: string;
@@ -26,6 +30,8 @@ const LobbyPage: React.FC = () => {
   // Retrieve the user's token from local storage via your custom hook.
   const { value: token } = useLocalStorage<string>("token", "");
 
+  let socketMessage;
+
   useEffect(() => {
     const autoCreateLobby = async () => {
       setError("");
@@ -37,28 +43,18 @@ const LobbyPage: React.FC = () => {
 
       try {
 
-        // const response = await createLobby(token, {}); //TODO how should the user that is hosting be sent to backend
-        // if (!response.ok) {
-        //   if (response.status === 400) {
-        //     setError("Invalid input or missing data.");
-        //   } else {
-        //     setError("Failed to create lobby. Please try again.");
-        //   }
-        //   return;
-        // }
-        // const data = await response.json();
-        // setLobby(data);
-
-
-        // // // --- MOCK RESPONSE (for testing) ---
-        const data = {
-          lobbyId: 1,
-          PIN: 1234,
-          players: [
-            { username: "shellmy", host: true },
-            { username: "ha", host: false }
-          ]
-        };
+        const response = await createLobby(token, {}); //TODO how should the user that is hosting be sent to backend
+        if (!response.ok) {
+          if (response.status === 400) {
+            setError("Invalid input or missing data.");
+          } else {
+            setError("Failed to create lobby. Please try again.");
+          }
+          return;
+        }
+        const data = await response.json();
+        console.log(data)
+        setLobby(data);
 
         setLobby(data);
       } catch (err) {
@@ -69,6 +65,8 @@ const LobbyPage: React.FC = () => {
 
     autoCreateLobby();
   }, [token]);
+
+  stompClient.activate();
 
   const handleBack = () => {
     router.push("/home");
@@ -105,7 +103,11 @@ const LobbyPage: React.FC = () => {
         </h2>
         <h1 style={{ marginBottom: "1rem", opacity: 0.8 }}>♠️ ♥️ ♦️ ♣️ </h1>
       </div>
-
+      
+      <h1 style={{ marginBottom: "1rem"}}> STOMP thing: </h1>
+      <pre className="bg-gray-100 p-2 mt-2 rounded">
+        {socketMessage ? JSON.stringify(socketMessage, null, 2) : 'Waiting for message...'}
+      </pre>
       <div className="team-wrapper">
         <div className="team-box">
         <h3> Team 1 </h3>
