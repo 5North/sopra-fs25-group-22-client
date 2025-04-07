@@ -64,8 +64,12 @@ reason).
 
 | **Student**        | **Date** | **Link to Commit** | **Description**                 | **Relevance**                       |
 | ------------------ | -------- | ------------------ | ------------------------------- | ----------------------------------- |
-| **[@githubUser1]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
-|                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
+| **@sbenzo99** | 05.04   | https://github.com/5North/sopra-fs25-group-22-server/commit/a806465a487cb037c925a4f2ce60d135c0fa2e21, https://github.com/5North/sopra-fs25-group-22-server/commit/c43e75b62177b97cf8fc9e52d17ea3d8cfb3ec1b | Player class | It handles the logic of playing cards and collect card for player |
+| **@sbenzo99**   | 05.04   | https://github.com/5North/sopra-fs25-group-22-server/commit/a9d90d3f3806d3a1731a8fac9570c444b317389d, https://github.com/5North/sopra-fs25-group-22-server/commit/824074063fe83b7ed4e06af094fbd24aaa860fb0, https://github.com/5North/sopra-fs25-group-22-server/commit/3b785e9eba011811290846db2fe52e779eec1b40 | Table Class | Implement logic of capture and handle cards on table |
+| **@sbenzo99** | 05/06.04   | https://github.com/5North/sopra-fs25-group-22-server/commit/77fdc39844aa8604eca310e7511ef0176cd21cda, https://github.com/5North/sopra-fs25-group-22-server/commit/7bdb93fa6ddd85ff2da62938ea571b971f8e3c05 |GameSession Class | Logic to handle single turn between player and table |
+| **@sbenzo99** | 05.06.04 | https://github.com/5North/sopra-fs25-group-22-server/commit/f7587f60372e021dda13abe65e590dcb531fff40, https://github.com/5North/sopra-fs25-group-22-server/commit/5c464bce142ad5412588ca55200771d7b5319a53 | Calculate result and update user statistics | show the result and in beckend directly update for persistence layer |
+| **@sbenzo99** | 05.06  | https://github.com/5North/sopra-fs25-group-22-server/commit/c7faae668857461c3cff3c6b51ca2a06db77b3bd, https://github.com/5North/sopra-fs25-group-22-server/commit/2b8936d31e17fe8267eb86a42e86d52c03ddbc47, https://github.com/5North/sopra-fs25-group-22-server/commit/0aec3a7d14ffc8f5df4df234adcc4cddddf0c9cf| Various refactoring (Card and Deck, add Tie Coutn to user for draw results, Ids as Long type everywhere | reduce technical debt |
+| **@sbenzo99** |05.06| Every link of the above contributions of sbenzo99 | Testing of Player, table, Result, GameSession and statistics update | Self explaining relevance |
 | **[@githubUser2]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
 |                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
 | **[@githubUser3]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
