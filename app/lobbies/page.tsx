@@ -24,9 +24,9 @@ const LobbyPage: React.FC = () => {
   const router = useRouter();
   const [error, setError] = useState("");
   const [lobby, setLobby] = useState<Lobby | null>(null);
+  const [players, setPlayers] = useState([])
   const stompClientRef = useRef<Client | null>(null);
 
-  // Retrieve the user's token from local storage via your custom hook.
   const { value: token } = useLocalStorage<string>("token", "");
 
   useEffect(() => {
@@ -39,8 +39,7 @@ const LobbyPage: React.FC = () => {
       }
 
       try {
-
-        const response = await createLobby(token, {}); //TODO how should the user that is hosting be sent to backend
+        const response = await createLobby(token, {}); 
         if (!response.ok) {
           if (response.status === 400) {
             setError("Invalid input or missing data.");
@@ -53,34 +52,28 @@ const LobbyPage: React.FC = () => {
         console.log(data)
         setLobby(data);
 
-        // setLobby(data);
       } catch (err) {
         setError("An error occurred while creating the lobby.");
         console.error("Lobby creation error:", err);
       }
-
-
     };
 
     autoCreateLobby();
   }, [token]);
 
-    useEffect(() => {
-    if (lobby && lobby.PIN) {
-      // Only create the WebSocket client and subscribe when lobby.PIN is available
+  useEffect(() => {
+    if (lobby) {
       const client = new Client({
         brokerURL: getWsDomain() + `/lobby?token=${token}`,
         reconnectDelay: 2000,
         onConnect: () => {
           console.log("Connected to STOMP");
 
-          // Subscribe to the specific lobby PIN topic
-          client.subscribe(`/topic/lobby/${lobby.PIN}`, (message: IMessage) => {
+          client.subscribe(`/topic/lobby/${lobby.lobbyId}`, (message: IMessage) => {
             const data = JSON.parse(message.body);
             console.log("Received lobby update:", data);
+            // TODO: Each time received an update add the user 
 
-            // You can handle the data here, e.g., updating the lobby state
-            // setLobby(data); // Example of updating lobby on data change
           });
         },
         onStompError: (frame) => {
@@ -91,7 +84,6 @@ const LobbyPage: React.FC = () => {
       stompClientRef.current = client;
       client.activate();
 
-      // Cleanup on component unmount
       return () => {
         if (stompClientRef.current) {
           stompClientRef.current.deactivate();
@@ -169,12 +161,5 @@ const LobbyPage: React.FC = () => {
     </div>
   );
 };
-
-// TODO: if players < 4 then shoe start game disabled; ow enable #22 - Do // 4
-// TODO: start game button click -> action #23 - Wait
-// TODO: dummy game page to redirect -> #24 - Do // 3
-// TODO: Update the join UI to show the current lobby details (PIN, and player list) after a successful join #19 - wait 
-// TODO: Connect the client to the web socket channel of the lobby that is joined #20 - wait
-// TODO: Display the pin and the usernames of the players that are in the lobby and in which team they are #14 - Do // 1
 
 export default LobbyPage;

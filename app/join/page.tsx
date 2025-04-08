@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "antd";
 import { Client } from "@stomp/stompjs";
 import useLocalStorage from "@/hooks/useLocalStorage";
-import { getApiDomain, getWsDomain } from "@/utils/domain";
+import { getWsDomain } from "@/utils/domain";
 
 const JoinGamePage: React.FC = () => {
   const router = useRouter();
@@ -38,9 +38,8 @@ const JoinGamePage: React.FC = () => {
       return;
     }
     setPIN(lobbyPIN)
-    // alert(lobbyPIN)
     const clientObj = new Client({
-      brokerURL: getWsDomain() + `/lobby?token=${token}`, // TODO: fix the url strings
+      brokerURL: getWsDomain() + `/lobby?token=${token}`,
       reconnectDelay: 2000,
       onConnect: () => {
         console.log("Connected to STOMP");
@@ -68,7 +67,6 @@ const JoinGamePage: React.FC = () => {
     setClient(clientObj);
     console.log("Activating STOMP connection...");
     clientObj.activate();
-    // TODO: need to deactivate somewhere
   };
 
   const handleBack = () => {

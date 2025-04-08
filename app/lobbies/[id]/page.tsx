@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { Client, IMessage } from "@stomp/stompjs";
@@ -21,13 +21,11 @@ interface Lobby {
 const LobbyPage: React.FC = () => {
   const pathname = usePathname()
   const router = useRouter();
-  const [lobby, setLobby] = useState<Lobby | null>(null);
   const { value: token } = useLocalStorage<string>("token", "");
   const stompClientRef = useRef<Client | null>(null);
 
-  // Connect and subscribe when the component mounts
   useEffect(() => {
-    const lobbyPIN = pathname; // Replace this with dynamic PIN if needed
+    const lobbyPIN = pathname; 
 
     const client = new Client({
       brokerURL: getWsDomain() + `/lobby?token=${token}`,
@@ -39,7 +37,7 @@ const LobbyPage: React.FC = () => {
           const data = JSON.parse(message.body);
           console.log("Received lobby update:", data);
         
-          /// TODO
+          /// ?? may be not needed
         });
       },
       onStompError: (frame) => {
@@ -51,7 +49,6 @@ const LobbyPage: React.FC = () => {
     client.activate();
 
     return () => {
-      // Clean up connection on unmount
       if (stompClientRef.current) {
         stompClientRef.current.deactivate();
       }
