@@ -10,7 +10,8 @@ import { getWsDomain } from "@/utils/domain";
 const JoinGamePage: React.FC = () => {
   const router = useRouter();
   const [digits, setDigits] = useState(["", "", "", ""]);
-  const [isFull, setIsFull] = useState(false);
+  const isFull = false;
+  // const [isFull, setIsFull] = useState(false);
   const [joinError, setJoinError] = useState("");
   const [lobbyPINtoJoin, setPIN] = useState("");
   const { value: token } = useLocalStorage<string>("token", "");
@@ -29,7 +30,7 @@ const JoinGamePage: React.FC = () => {
         client.deactivate();
       }
     };
-  }, [lobbyPINtoJoin, token]);
+  }, [lobbyPINtoJoin, token, client]);
   
   const handleJoin = async () => {
     const lobbyPIN = digits.join("");

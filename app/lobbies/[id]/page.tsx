@@ -1,26 +1,26 @@
 "use client";
 
 import React, { useEffect, useRef } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { Client, IMessage } from "@stomp/stompjs";
 import { getWsDomain } from "@/utils/domain";
 
-interface Player {
-  username: string;
-  status: string;
-}
+// interface Player {
+//   username: string;
+//   status: string;
+// }
 
-interface Lobby {
-  lobbyId: string | number;
-  PIN: string | number;
-  players: Player[]
-  roomName?: string | "";
-}
+// interface Lobby {
+//   lobbyId: string | number;
+//   PIN: string | number;
+//   players: Player[]
+//   roomName?: string | "";
+// }
 
 const LobbyPage: React.FC = () => {
   const pathname = usePathname()
-  const router = useRouter();
+  // const router = useRouter();
   const { value: token } = useLocalStorage<string>("token", "");
   const stompClientRef = useRef<Client | null>(null);
 
@@ -53,11 +53,11 @@ const LobbyPage: React.FC = () => {
         stompClientRef.current.deactivate();
       }
     };
-  }, [token]);
+  }, [pathname, token]);
 
-  const handleBack = () => {
-    router.push("/home");
-  };
+  // const handleBack = () => {
+  //   router.push("/home");
+  // };
 
   return (
     <div className="register-container">
