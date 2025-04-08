@@ -24,7 +24,6 @@ const LobbyPage: React.FC = () => {
   const router = useRouter();
   const [error, setError] = useState("");
   const [lobby, setLobby] = useState<Lobby | null>(null);
-  const [players, setPlayers] = useState([])
   const stompClientRef = useRef<Client | null>(null);
 
   const { value: token } = useLocalStorage<string>("token", "");
