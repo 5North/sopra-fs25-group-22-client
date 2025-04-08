@@ -11,3 +11,7 @@ export function getApiDomain(): string {
   const devUrl = "http://localhost:8080";
   return isProduction() ? prodUrl : devUrl;
 }
+
+export function getWsDomain(): string {
+  return getApiDomain().replace("http", "ws")
+}
