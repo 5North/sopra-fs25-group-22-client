@@ -27,6 +27,8 @@ const LobbyPage: React.FC = () => {
   const stompClientRef = useRef<Client | null>(null);
 
   const { value: token } = useLocalStorage<string>("token", "");
+  const { value: username } = useLocalStorage<string>("username", ""); 
+
 
   useEffect(() => {
     const autoCreateLobby = async () => {
@@ -39,6 +41,7 @@ const LobbyPage: React.FC = () => {
 
       try {
         const response = await createLobby(token, {}); 
+        
         if (!response.ok) {
           if (response.status === 400) {
             setError("Invalid input or missing data.");
@@ -49,7 +52,7 @@ const LobbyPage: React.FC = () => {
         }
         const data = await response.json();
         console.log(data)
-        setLobby(data);
+        setLobby({ ...data, players: data.players ?? [] });
 
       } catch (err) {
         setError("An error occurred while creating the lobby.");
@@ -71,7 +74,24 @@ const LobbyPage: React.FC = () => {
           client.subscribe(`/topic/lobby/${lobby.lobbyId}`, (message: IMessage) => {
             const data = JSON.parse(message.body);
             console.log("Received lobby update:", data);
+
             // TODO: Each time received an update add the user 
+            if (data.status === "subscribed") {
+                setLobby((prevLobby) => {
+                  if (!prevLobby) return prevLobby;
+            
+                  // Avoid adding duplicate players
+                  const alreadyJoined = prevLobby.players.some(
+                    (p) => p.username === data.username
+                  );
+                  if (alreadyJoined) return prevLobby;
+            
+                  return {
+                    ...prevLobby,
+                    players: [...prevLobby.players, { username: data.username }],
+                  };
+                });
+              }
 
           });
         },
@@ -95,6 +115,18 @@ const LobbyPage: React.FC = () => {
     router.push("/home");
   };
 
+  const handleStartGame = () => {
+    if (!lobby) return; 
+
+    stompClientRef.current?.publish({
+      destination: `/app/start/${lobby.lobbyId}`,
+      body: JSON.stringify({ command: "start" }),
+    });
+  
+    router.push(`/game/${lobby.lobbyId}`);
+  };
+  
+
   if (error) {
     return (
       <div className="register-container">
@@ -117,6 +149,14 @@ const LobbyPage: React.FC = () => {
     );
   }
 
+//DEBUG
+  console.log("Local username:", username);
+  console.log("Lobby players:", lobby.players);
+  const isHost = !!lobby.players?.find(
+  (p) => p.username === username && p.host === true
+);
+console.log("isHost:", isHost);
+
   return (
     <div className="register-container">
       <div>
@@ -129,34 +169,40 @@ const LobbyPage: React.FC = () => {
 
       <div className="team-wrapper">
         <div className="team-box">
-          <h3> Team 1 </h3>
-          {lobby.players?.length > 0 && (
-            <div style={{ marginTop: "1rem" }}>
-              {lobby.players.map((player: Player, idx: number) => (
-                <p key={idx}>
-                  {player.username}
-                  {player.host ? " (Host)" : ""} joined
+            <h3> Team 1 </h3>
+            {Array.isArray(lobby.players) && lobby.players
+            .filter((_, i) => i % 2 === 0)
+            .map((player, idx) => (
+                <p key={`t1-${idx}`}>
+                {player.username}
+                {player.host ? " (Host)" : ""} joined
                 </p>
-              ))}
-            </div>
-          )}
+            ))}
         </div>
         <div className="team-box">
-          <h3> Team 2 </h3>
-          {lobby.players?.length > 0 && (
-            <div style={{ marginTop: "1rem" }}>
-              {lobby.players.map((player: Player, idx: number) => (
-                <p key={idx}>
-                  {player.username}
-                  {player.host ? " (Host)" : ""} joined
+            <h3> Team 2 </h3>
+            {Array.isArray(lobby.players) && lobby.players
+            .filter((_, i) => i % 2 === 1)
+            .map((player, idx) => (
+                <p key={`t2-${idx}`}>
+                {player.username}
+                {player.host ? " (Host)" : ""} joined
                 </p>
-              ))}
-            </div>
-          )}
+            ))}
         </div>
-      </div>
+        </div>
+
       <h2 style={{ marginBottom: "6rem" }}>🏁</h2>
-      <div><Button type="primary" htmlType="submit" className="custom-button" disabled={lobby.players?.length !== 4}>♣️Start Game</Button></div>
+      {lobby.players && lobby.players.length === 4 && 
+      lobby.players.some((p) => p.username === username && p.host) && (
+        <Button
+            type="primary"
+            className="custom-button"
+            onClick={handleStartGame}
+        >
+            ♣️Start Game
+        </Button>
+        )}
     </div>
   );
 };
