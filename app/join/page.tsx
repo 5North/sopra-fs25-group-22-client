@@ -14,6 +14,7 @@ const JoinGamePage: React.FC = () => {
   const [joinError, setJoinError] = useState("");
   const [lobbyPINtoJoin, setPIN] = useState("");
   const { value: token } = useLocalStorage<string>("token", "");
+  const [client, setClient] = useState<Client | null>(null);
 
   const handleInputChange = (index: number, value: string) => {
     const newDigits = [...digits];
@@ -22,11 +23,13 @@ const JoinGamePage: React.FC = () => {
   };
 
   useEffect(() => {
+    return () => {
+      if (client) {
+        console.log("Deactivating STOMP connection...");
+        client.deactivate();
+      }
+    };
   }, [lobbyPINtoJoin, token]);
-   
-  // TODO: What happens to return () => {
-  //     client.deactivate();
-  //   };
   
   const handleJoin = async () => {
     const lobbyPIN = digits.join("");
@@ -36,27 +39,25 @@ const JoinGamePage: React.FC = () => {
     }
     setPIN(lobbyPIN)
     // alert(lobbyPIN)
-    const client = new Client({
+    const clientObj = new Client({
       brokerURL: getWsDomain() + `/lobby?token=${token}`, // TODO: fix the url strings
       reconnectDelay: 2000,
       onConnect: () => {
         console.log("Connected to STOMP");
   
-        client.subscribe("/user/queue/reply", (message) => {
+        clientObj.subscribe("/user/queue/reply", (message) => {
+          const data = JSON.parse(message.body);
           console.log("Reply message:", message.body);
+          if (!data.success) {
+            setJoinError(data.message);
+          } else {
+            router.push("/lobbies/" + lobbyPIN);
+          }
         });
   
-        client.subscribe(`/topic/lobby/${lobbyPIN}`, (message) => {
-          const data = JSON.parse(message.body);
-          console.log("Lobby subscription message:", data);
+        clientObj.subscribe(`/topic/lobby/${lobbyPIN}`, (message) => {
+          console.log("Lobby subscription message:", message.body);
           
-          if (!data.success) {
-            setJoinError(data.message || "Failed to join lobby");
-            // Reply message: {"success":true,"message":"Lobby joined successfully"}
-            // Reply message: {"success":false,"message":"No lobby with id null found"}
-          } else {
-            // router.push(`/lobbies/${lobbyPIN}`); // if you want to navigate upon success
-          }
         });
       },
       onStompError: (frame) => {
@@ -64,10 +65,10 @@ const JoinGamePage: React.FC = () => {
       },
     });
   
+    setClient(clientObj);
     console.log("Activating STOMP connection...");
-    client.activate();
+    clientObj.activate();
     // TODO: need to deactivate somewhere
-    router.push("/lobbies/" + lobbyPIN);
   };
 
   const handleBack = () => {
