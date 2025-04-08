@@ -1,14 +1,12 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "antd";
 import { createLobby } from "@/api/registerService";
 import useLocalStorage from "@/hooks/useLocalStorage";
-import { stompClient } from "@/api/stompHelper";
-import { Client, IMessage, StompSubscription } from "@stomp/stompjs";
-import SockJS from "sockjs-client";
-import { getApiDomain } from "@/utils/domain";
+import { Client, IMessage } from "@stomp/stompjs";
+import { getWsDomain } from "@/utils/domain";
 
 interface Player {
   username: string;
@@ -26,11 +24,10 @@ const LobbyPage: React.FC = () => {
   const router = useRouter();
   const [error, setError] = useState("");
   const [lobby, setLobby] = useState<Lobby | null>(null);
+  const stompClientRef = useRef<Client | null>(null);
 
   // Retrieve the user's token from local storage via your custom hook.
   const { value: token } = useLocalStorage<string>("token", "");
-
-  let socketMessage;
 
   useEffect(() => {
     const autoCreateLobby = async () => {
@@ -56,17 +53,52 @@ const LobbyPage: React.FC = () => {
         console.log(data)
         setLobby(data);
 
-        setLobby(data);
+        // setLobby(data);
       } catch (err) {
         setError("An error occurred while creating the lobby.");
         console.error("Lobby creation error:", err);
       }
+
+
     };
 
     autoCreateLobby();
   }, [token]);
 
-  stompClient.activate();
+    useEffect(() => {
+    if (lobby && lobby.PIN) {
+      // Only create the WebSocket client and subscribe when lobby.PIN is available
+      const client = new Client({
+        brokerURL: getWsDomain() + `/lobby?token=${token}`,
+        reconnectDelay: 2000,
+        onConnect: () => {
+          console.log("Connected to STOMP");
+
+          // Subscribe to the specific lobby PIN topic
+          client.subscribe(`/topic/lobby/${lobby.PIN}`, (message: IMessage) => {
+            const data = JSON.parse(message.body);
+            console.log("Received lobby update:", data);
+
+            // You can handle the data here, e.g., updating the lobby state
+            // setLobby(data); // Example of updating lobby on data change
+          });
+        },
+        onStompError: (frame) => {
+          console.error("STOMP error:", frame.headers["message"]);
+        },
+      });
+
+      stompClientRef.current = client;
+      client.activate();
+
+      // Cleanup on component unmount
+      return () => {
+        if (stompClientRef.current) {
+          stompClientRef.current.deactivate();
+        }
+      };
+    }
+  }, [lobby, token]);
 
   const handleBack = () => {
     router.push("/home");
@@ -96,21 +128,17 @@ const LobbyPage: React.FC = () => {
 
   return (
     <div className="register-container">
-      <div>          
+      <div>
         <h1 style={{ marginBottom: "1rem", opacity: 0.8 }}>♠️ ♥️ ♦️ ♣️ </h1>
         <h2 style={{ margin: "1rem 0" }}>
           Game ID: {lobby.PIN ?? lobby.lobbyId} 🔗
         </h2>
         <h1 style={{ marginBottom: "1rem", opacity: 0.8 }}>♠️ ♥️ ♦️ ♣️ </h1>
       </div>
-      
-      <h1 style={{ marginBottom: "1rem"}}> STOMP thing: </h1>
-      <pre className="bg-gray-100 p-2 mt-2 rounded">
-        {socketMessage ? JSON.stringify(socketMessage, null, 2) : 'Waiting for message...'}
-      </pre>
+
       <div className="team-wrapper">
         <div className="team-box">
-        <h3> Team 1 </h3>
+          <h3> Team 1 </h3>
           {lobby.players?.length > 0 && (
             <div style={{ marginTop: "1rem" }}>
               {lobby.players.map((player: Player, idx: number) => (
@@ -123,7 +151,7 @@ const LobbyPage: React.FC = () => {
           )}
         </div>
         <div className="team-box">
-        <h3> Team 2 </h3>
+          <h3> Team 2 </h3>
           {lobby.players?.length > 0 && (
             <div style={{ marginTop: "1rem" }}>
               {lobby.players.map((player: Player, idx: number) => (
@@ -136,7 +164,7 @@ const LobbyPage: React.FC = () => {
           )}
         </div>
       </div>
-      <h2 style={{ marginBottom: "6rem"}}>🏁</h2>
+      <h2 style={{ marginBottom: "6rem" }}>🏁</h2>
       <div><Button type="primary" htmlType="submit" className="custom-button" disabled={lobby.players?.length !== 4}>♣️Start Game</Button></div>
     </div>
   );

@@ -1,15 +1,19 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "antd";
-import { joinLobby } from "@/api/registerService"; 
+import { Client } from "@stomp/stompjs";
+import useLocalStorage from "@/hooks/useLocalStorage";
+import { getApiDomain, getWsDomain } from "@/utils/domain";
 
 const JoinGamePage: React.FC = () => {
   const router = useRouter();
   const [digits, setDigits] = useState(["", "", "", ""]);
   const [isFull, setIsFull] = useState(false);
   const [joinError, setJoinError] = useState("");
+  const [lobbyPINtoJoin, setPIN] = useState("");
+  const { value: token } = useLocalStorage<string>("token", "");
 
   const handleInputChange = (index: number, value: string) => {
     const newDigits = [...digits];
@@ -17,65 +21,53 @@ const JoinGamePage: React.FC = () => {
     setDigits(newDigits);
   };
 
+  useEffect(() => {
+  }, [lobbyPINtoJoin, token]);
+   
+  // TODO: What happens to return () => {
+  //     client.deactivate();
+  //   };
+  
   const handleJoin = async () => {
     const lobbyPIN = digits.join("");
     if (lobbyPIN.length !== 4) {
       alert("Please enter a 4-digit Game ID.");
       return;
     }
-
-    //TODO verify if backend needs username or if token is enough
-    const username = localStorage.getItem("username");
-    if (!username) {
-        alert("Username not found. Please log in again.");
-        return;
-      }
-
-
-    try {
-      const token = localStorage.getItem("token"); 
-      if (!token) {
-        alert("User not authenticated");
-        return;
-      }
-
-      // Call the joinLobby function from registerService.ts
-      const response = await joinLobby(token, lobbyPIN, {
-        username //TODO modify username depending what backend needs
-      });
-
-      // MOCK API
-      //const response = new Response(
-      //  JSON.stringify({ message: "join successful" }),
-      //  {
-      //    status: 200,
-      //    headers: { "Content-Type": "application/json" },
-      //  }
-      //);
-
-      // Check if the lobby is full 
-      if (response.status === 409) {
-        setIsFull(true);
-        return;
-      }
-
-      if (response.status === 404) {
-        setJoinError("GameRoom does not exist");
-        return;
-      }
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        setJoinError(errorData.error || "An error occurred while joining the lobby.");
-        return;
-      }
-
-      // If join is successful, navigate to the lobby page
-      router.push(`/lobbies/${lobbyPIN}`);
-    } catch (error) {
-      console.error("Error joining lobby:", error);
-      setJoinError("An unexpected error occurred.");
-    }
+    setPIN(lobbyPIN)
+    // alert(lobbyPIN)
+    const client = new Client({
+      brokerURL: getWsDomain() + `/lobby?token=${token}`, // TODO: fix the url strings
+      reconnectDelay: 2000,
+      onConnect: () => {
+        console.log("Connected to STOMP");
+  
+        client.subscribe("/user/queue/reply", (message) => {
+          console.log("Reply message:", message.body);
+        });
+  
+        client.subscribe(`/topic/lobby/${lobbyPIN}`, (message) => {
+          const data = JSON.parse(message.body);
+          console.log("Lobby subscription message:", data);
+          
+          if (!data.success) {
+            setJoinError(data.message || "Failed to join lobby");
+            // Reply message: {"success":true,"message":"Lobby joined successfully"}
+            // Reply message: {"success":false,"message":"No lobby with id null found"}
+          } else {
+            // router.push(`/lobbies/${lobbyPIN}`); // if you want to navigate upon success
+          }
+        });
+      },
+      onStompError: (frame) => {
+        console.error("STOMP error:", frame.headers["message"]);
+      },
+    });
+  
+    console.log("Activating STOMP connection...");
+    client.activate();
+    // TODO: need to deactivate somewhere
+    router.push("/lobbies/" + lobbyPIN);
   };
 
   const handleBack = () => {
@@ -153,6 +145,7 @@ const JoinGamePage: React.FC = () => {
         </Button>
         <Button
           onClick={handleBack}
+          disabled={digits.join("").length !== 4}
           style={{
             position: "absolute",
             bottom: "1rem",
@@ -209,6 +202,7 @@ const JoinGamePage: React.FC = () => {
         )}
       <Button
         type="primary"
+        disabled={!token || digits.some((d) => d === "")}
         onClick={handleJoin}
         style={{
           width: "150px",
