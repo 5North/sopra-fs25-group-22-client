@@ -60,7 +60,7 @@ reason).
 
 ---
 
-## Contributions Week 2 - [Begin Date] to [End Date]
+## Contributions Week 2 - [02.04.25] to [08.04.25]
 
 | **Student**        | **Date** | **Link to Commit** | **Description**                 | **Relevance**                       |
 | ------------------ | -------- | ------------------ | ------------------------------- | ----------------------------------- |
@@ -70,8 +70,8 @@ reason).
 | **@sbenzo99** | 05.06.04 | https://github.com/5North/sopra-fs25-group-22-server/commit/f7587f60372e021dda13abe65e590dcb531fff40, https://github.com/5North/sopra-fs25-group-22-server/commit/5c464bce142ad5412588ca55200771d7b5319a53 | Calculate result and update user statistics | show the result and in beckend directly update for persistence layer |
 | **@sbenzo99** | 05.06  | https://github.com/5North/sopra-fs25-group-22-server/commit/c7faae668857461c3cff3c6b51ca2a06db77b3bd, https://github.com/5North/sopra-fs25-group-22-server/commit/2b8936d31e17fe8267eb86a42e86d52c03ddbc47, https://github.com/5North/sopra-fs25-group-22-server/commit/0aec3a7d14ffc8f5df4df234adcc4cddddf0c9cf| Various refactoring (Card and Deck, add Tie Coutn to user for draw results, Ids as Long type everywhere | reduce technical debt |
 | **@sbenzo99** |05.06| Every link of the above contributions of sbenzo99 | Testing of Player, table, Result, GameSession and statistics update | Self explaining relevance |
-| **[@githubUser2]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
-|                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
+| **@shellmychakkaith** | 02.04   | 7ff87a134e9190f0f6b13295e6dba6093e0885ab | implementation of homepage| all options the user has |
+|                    | 03.04   | bc3c547fee61f78b32473099e45bc368407dd51d | User is able to create or join a lobby | ] |
 | **[@githubUser3]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
 |                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
 | **[@githubUser4]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
