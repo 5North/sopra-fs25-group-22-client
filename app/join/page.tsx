@@ -12,7 +12,7 @@ const JoinGamePage: React.FC = () => {
   const [digits, setDigits] = useState(["", "", "", ""]);
   const isFull = false;
   const [joinError, setJoinError] = useState("");
-  const [lobbyPINtoJoin, setPIN] = useState("");
+  //const [lobbyPINtoJoin, setPIN] = useState("");
   const { value: token } = useLocalStorage<string>("token", "");
   const [client, setClient] = useState<Client | null>(null);
 
@@ -38,7 +38,7 @@ const JoinGamePage: React.FC = () => {
       alert("Please enter a 4-digit Game ID.");
       return;
     }
-    setPIN(lobbyPIN);
+    //setPIN(lobbyPIN);
     const clientObj = new Client({
       brokerURL: getWsDomain() + `/lobby?token=${token}`,
       reconnectDelay: 2000,
