@@ -63,7 +63,8 @@ const LobbyPage: React.FC = () => {
   }, [token]);
 
   useEffect(() => {
-    if (lobby) {
+    if (!lobby) return;
+    
       const client = new Client({
         brokerURL: getWsDomain() + `/lobby?token=${token}`,
         reconnectDelay: 2000,
@@ -107,7 +108,7 @@ const LobbyPage: React.FC = () => {
           stompClientRef.current.deactivate();
         }
       };
-    }
+    
   }, [lobby, token]);
 
   const handleBack = () => {
