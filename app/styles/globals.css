@@ -47,11 +47,12 @@ a {
   justify-content: center;
   align-items: center;
   /* Other styles */
-  background-image: linear-gradient(rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.9)), url("/images/cards.jpg");
+  background-image: linear-gradient(rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.9)), url("/images/cards.jpg") !important;
   background-size: cover;
   background-position: center;
   min-height: 100vh;
   background-color: rgb(0, 0, 0);
+ 
 }
 
 /* .home-container {

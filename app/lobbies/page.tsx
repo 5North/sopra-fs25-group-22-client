@@ -10,7 +10,6 @@ import { getWsDomain } from "@/utils/domain";
 
 interface Player {
   username: string;
-  host?: boolean;
 }
 
 interface Lobby {
@@ -152,10 +151,7 @@ const LobbyPage: React.FC = () => {
 //DEBUG
   console.log("Local username:", username);
   console.log("Lobby players:", lobby.players);
-  const isHost = !!lobby.players?.find(
-  (p) => p.username === username && p.host === true
-);
-console.log("isHost:", isHost);
+
 
   return (
     <div className="register-container">
@@ -175,7 +171,7 @@ console.log("isHost:", isHost);
             .map((player, idx) => (
                 <p key={`t1-${idx}`}>
                 {player.username}
-                {player.host ? " (Host)" : ""} joined
+                joined
                 </p>
             ))}
         </div>
@@ -186,7 +182,7 @@ console.log("isHost:", isHost);
             .map((player, idx) => (
                 <p key={`t2-${idx}`}>
                 {player.username}
-                {player.host ? " (Host)" : ""} joined
+                joined
                 </p>
             ))}
         </div>
@@ -194,7 +190,7 @@ console.log("isHost:", isHost);
 
       <h2 style={{ marginBottom: "6rem" }}>🏁</h2>
       {lobby.players && lobby.players.length === 4 && 
-      lobby.players.some((p) => p.username === username && p.host) && (
+      lobby.players.some((p) => p.username === username) && (
         <Button
             type="primary"
             className="custom-button"
