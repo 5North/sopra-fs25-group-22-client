@@ -38,24 +38,25 @@ const JoinGamePage: React.FC = () => {
       alert("Please enter a 4-digit Game ID.");
       return;
     }
-    //setPIN(lobbyPIN);
+  
+    console.log("Current token:", token);
+    console.log("Joining lobby with Pin:", lobbyPIN);
+  
     const clientObj = new Client({
       brokerURL: getWsDomain() + `/lobby?token=${token}`,
       reconnectDelay: 2000,
       onConnect: () => {
         console.log("Connected to STOMP");
-        console.log(lobbyPIN);
-
-        // Subscribe to the reply queue to get the personal join response
+  
+        // Subscribe to the personal reply queue for the join response
         clientObj.subscribe("/user/queue/reply", (message) => {
           const data = JSON.parse(message.body);
-          console.log("Message from server queue:", data);
+          console.log("Reply from server:", data);
           if (!data.success) {
             setJoinError(data.message);
-            // Optionally, deactivate client since join failed.
             clientObj.deactivate();
+            console.log("Client deactivated due to join failure.");
           } else {
-            // On success, navigate to the lobbies page.
             router.push("/lobbies/" + lobbyPIN);
           }
         });
