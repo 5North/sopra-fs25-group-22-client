@@ -16,12 +16,14 @@ export interface Card {
   }
   
   export interface GameSessionState {
-    gameId: string | number;
-    players: PlayerState[];
-    table: TableState;
-    currentPlayerIndex: number;
-    lastGetterIndex: number;
-    turnCounter: number;
-    // Optionally, add any extra fields like isGameOver flag.
+    gameId: number;
+    tableCards: Card[];
+    players: {
+        userId: number;
+        handSize: number;
+        scopaCount: number;
+    }[];
+    currentPlayerId: number;
+    // TODO CHEck Optionally, add any extra fields like isGameOver flag.
   }
   

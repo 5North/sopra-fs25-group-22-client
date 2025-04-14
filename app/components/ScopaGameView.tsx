@@ -8,16 +8,16 @@ import { GameSessionState, Card } from "@/models/GameSession";
 interface ScopaGameViewProps {
   gameSession: GameSessionState;
   currentUserId: number;
+  myHand: Card[];
   onCardClick: (card: Card) => void;
 }
 
 const ScopaGameView: React.FC<ScopaGameViewProps> = ({
   gameSession,
   currentUserId,
+  myHand,
   onCardClick,
 }) => {
-  // Identify current user’s state.
-  const myPlayerData = gameSession.players.find((p) => p.userId === currentUserId);
   // All opponents
   const opponents = gameSession.players.filter((p) => p.userId !== currentUserId);
 
@@ -31,7 +31,7 @@ const ScopaGameView: React.FC<ScopaGameViewProps> = ({
           <>
             <p>Opponent (ID: {opponents[0].userId})</p>
             <div style={{ display: "flex" }}>
-              {opponents[0].hand.map((_, idx) => (
+            {Array.from({ length: opponents[0].handSize }).map((_, idx) => (
                 <CardBackComponent key={idx} />
               ))}
             </div>
@@ -45,7 +45,7 @@ const ScopaGameView: React.FC<ScopaGameViewProps> = ({
           <>
             <p>Opponent (ID: {opponents[1].userId})</p>
             <div style={{ display: "flex", flexDirection: "column" }}>
-              {opponents[1].hand.map((_, idx) => (
+            {Array.from({ length: opponents[1].handSize }).map((_, idx) => (
                 <CardBackComponent key={idx} />
               ))}
             </div>
@@ -59,7 +59,7 @@ const ScopaGameView: React.FC<ScopaGameViewProps> = ({
           <>
             <p>Opponent (ID: {opponents[2].userId})</p>
             <div style={{ display: "flex", flexDirection: "column" }}>
-              {opponents[2].hand.map((_, idx) => (
+            {Array.from({ length: opponents[2].handSize }).map((_, idx) => (
                 <CardBackComponent key={idx} />
               ))}
             </div>
@@ -71,7 +71,7 @@ const ScopaGameView: React.FC<ScopaGameViewProps> = ({
       <div className="table-area">
         <h3>Table</h3>
         <div style={{ display: "flex", flexWrap: "wrap" }}>
-          {gameSession.table.cards.map((card, index) => (
+          {gameSession.tableCards.map((card, index) => (
             <CardComponent key={index} card={card} />
           ))}
         </div>
@@ -81,14 +81,26 @@ const ScopaGameView: React.FC<ScopaGameViewProps> = ({
       <div className="my-hand-area">
         <h3>My Hand</h3>
         <div style={{ display: "flex", flexWrap: "wrap" }}>
-          {myPlayerData &&
-            myPlayerData.hand.map((card, index) => (
-              <CardComponent
-                key={index}
-                card={card}
+        {myHand.map((card, index) => (
+            <div key={index} style={{ marginRight: "4px" }}>
+              {/* Here we show the actual card, clickable */}
+              <div
+                style={{
+                  width: "40px",
+                  height: "60px",
+                  backgroundColor: "white",
+                  color: "black",
+                  border: "1px solid #ccc",
+                  borderRadius: "3px",
+                  textAlign: "center",
+                  cursor: "pointer",
+                }}
                 onClick={() => onCardClick(card)}
-              />
-            ))}
+              >
+                {card.value} {card.suit}
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>

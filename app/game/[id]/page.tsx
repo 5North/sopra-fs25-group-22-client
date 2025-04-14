@@ -1,194 +1,255 @@
 "use client";
-  
-import { useState, useEffect} from "react";
-import { useParams } from "next/navigation";
-// import { Client } from "@stomp/stompjs";     -------> removed for dummy purpose
-// import useLocalStorage from "@/hooks/useLocalStorage";
-// import { getWsDomain } from "@/utils/domain";
+
+import { useEffect, useRef, useState } from "react";
+import { useParams, useRouter } from "next/navigation";
+import { Client, IMessage } from "@stomp/stompjs";
 import ScopaGameView from "@/components/ScopaGameView";
-import { GameSessionState, Card } from "@/models/GameSession";
+import { GameSessionState, Card } from "@/models/GameSession"; // Ensure this model file is up-to-date
+import { getWsDomain } from "@/utils/domain";
+import useLocalStorage from "@/hooks/useLocalStorage";
+
+
+// Define a simple initial state for loading before receiving real updates.
+const initialGameState: GameSessionState = {
+  gameId: 0,          // an empty string for now
+  tableCards: [],      // an empty array of cards
+  players: [],         // an empty array of players
+  currentPlayerId: 0,  // default ID (e.g., 0) or -1, etc.
+};
+
+interface MoveAnimationData {
+    playerId: number;
+    playedCard: Card;
+    capturedCards: Card[];
+  }
 
 export default function GamePage() {
-  const { id } = useParams(); // capture game ID from URL
-  // const { value: token } = useLocalStorage("token", "");    -------> removed for dummy purpose
-  const [gameState, setGameState] = useState<GameSessionState | null>(null);
-  // const stompClientRef = useRef<Client | null>(null);        -------> removed for dummy purpose
+  const { id } = useParams(); // game id from URL
+  const router = useRouter();
+  const [gameState, setGameState] = useState<GameSessionState>(initialGameState);
+  const [error, setError] = useState<string | null>(null);
+  const [captureOptions, setCaptureOptions] = useState<Card[][]>([]);
+  const [myHand, setMyHand] = useState<Card[]>([]);
+  const [moveAnimation, setMoveAnimation] = useState<MoveAnimationData | null>(null);
+  const stompClientRef = useRef<Client | null>(null);
+  const { value: token } = useLocalStorage<string>("token", "");
+  
 
-  // ============= DUMMY =======================================================================
-  const dummyGameState: GameSessionState = {
-    gameId: id ? id.toString() : "123",
-    players: [
-      {
-        userId: 111,
-        hand: [
-          { suit: "DENARI", value: 7 },
-          { suit: "COPPE", value: 5 },
-          { suit: "SPADE", value: 3 },
-        ],
-        treasure: [],
-        scopaCount: 0,
-      },
-      {
-        userId: 222,
-        hand: [
-          { suit: "BASTONI", value: 2 },
-          { suit: "DENARI", value: 9 },
-          { suit: "COPPE", value: 1 },
-        ],
-        treasure: [],
-        scopaCount: 0,
-      },
-      {
-        userId: 333,
-        hand: [
-          { suit: "SPADE", value: 10 },
-          { suit: "DENARI", value: 4 },
-          { suit: "BASTONI", value: 6 },
-        ],
-        treasure: [],
-        scopaCount: 0,
-      },
-      {
-        userId: 444,
-        hand: [
-          { suit: "COPPE", value: 8 },
-          { suit: "SPADE", value: 2 },
-          { suit: "DENARI", value: 3 },
-        ],
-        treasure: [],
-        scopaCount: 0,
-      },
-    ],
-    table: {
-      cards: [
-        { suit: "BASTONI", value: 5 },
-        { suit: "SPADE", value: 7 },
-        { suit: "COPPE", value: 1 },
-        { suit: "DENARI", value: 10 },
-      ],
-    },
-    currentPlayerIndex: 0,
-    lastGetterIndex: -1,
-    turnCounter: 0,
+  const getCurrentUserId = (): number | null => {
+    if (typeof window !== "undefined") {
+      const userStr = localStorage.getItem("user");
+      if (userStr) {
+        try {
+          const user = JSON.parse(userStr);
+          return user.id;
+        } catch (err) {
+          console.error("Error parsing user info:", err);
+        }
+      }
+    }
+    return null;
   };
 
+  const currentUserId = getCurrentUserId() || 0;
 
-  // Immediately load the dummy data
+  // STEP 1: Basic setup for STOMP client connection on the game topic.
   useEffect(() => {
-    setGameState(dummyGameState);
-    // to eventually connect to the WebSocket,  add  code here
-    // for now skip so we can see the UI right away.
-  });
-  // ============= DUMMY =======================================================================
-
- /*
-
-  // Establish WebSocket connection
-  useEffect(() => {
-    if (!id || !token) return;
-    
-    // Create and configure the STOMP client.
+    if (!id) {
+      setError("No game ID specified");
+      return;
+    }
+    // Create STOMP client; replace getWsDomain() with your own domain logic if needed.
     const client = new Client({
-      brokerURL: getWsDomain() + `/game?token=${token}`, 
+      brokerURL: getWsDomain() + `/lobby?token=${token}`, 
       reconnectDelay: 2000,
       onConnect: () => {
         console.log("Connected to game WebSocket");
 
-        // Subscribe to topic for receiving game state updates.
-        client.subscribe(`/topic/game/${id}`, (message) => {
+        // Subscribe to public game state updates
+        client.subscribe(`/topic/game/${id}`, (message: IMessage) => {
           try {
             const data: GameSessionState = JSON.parse(message.body);
-            console.log("Game update received:", data);
-            setGameState(data);
-          } catch (error) {
-            console.error("Error parsing game update:", error);
+            console.log("Public game state update:", data);
+            setGameState({
+                ...gameState,
+                gameId: parseInt(id as string, 10),
+                tableCards: data.tableCards, // Assumed property names
+                players: data.players,
+                currentPlayerId: data.currentPlayerId,
+              });
+          } catch (err) {
+            console.error("Error processing game state update", err);
           }
         });
+
+        // Private subscription for messages such as capture options or hand updates.
+        client.subscribe("/user/queue/reply", (message: IMessage) => {
+            try {
+              const payload = JSON.parse(message.body);
+              console.log("Private message received:", payload);
+  
+              // Check if payload is a capture options message.
+              // assume a capture options message is an array of arrays.
+              if (Array.isArray(payload) && payload.length > 0 && Array.isArray(payload[0])) {
+                setCaptureOptions(payload);
+                console.log("Capture options updated:", payload);
+
+              }
+              if (payload.userId === currentUserId && payload.handCards) {
+                setMyHand(payload.handCards);
+                console.log("My hand updated:", payload.handCards);
+              }
+              // handle other types of private messages here.
+            } catch (err) {
+              console.error("Error processing private message:", err);
+            }
+          });
+
+        // Subscription for move broadcasts
+          client.subscribe(`/topic/move/${id}`, (message: IMessage) => {
+            try {
+              const moveData: MoveAnimationData = JSON.parse(message.body);
+              console.log("Received move broadcast:", moveData);
+              // Set the move animation state to trigger display in the UI.
+              setMoveAnimation(moveData);
+              setTimeout(() => {
+                setMoveAnimation(null);
+              }, 3000);
+            } catch (err) {
+              console.error("Error processing move broadcast:", err);
+            }
+          });
       },
       onStompError: (frame) => {
         console.error("STOMP error:", frame.headers["message"]);
+        setError("WebSocket connection error.");
       },
     });
 
     stompClientRef.current = client;
     client.activate();
 
+    // Clean up on unmount.
     return () => {
       if (stompClientRef.current) {
         stompClientRef.current.deactivate();
       }
     };
-  }, [id, token]);
-  */
+  }, [id, gameState]);
 
-  // Event handler for when a player clicks a card.
+  // STEP 1: Handler for playing a card (without capture options)
   const handleCardClick = (card: Card) => {
-    console.log("Card clicked:", card);
-    const currentUser = { userId: 111 }; // -----------------------> DUmmy
-    if (!gameState) return;
-
-    // Identify which player is the current user (e.g., userId 111).
-    const myPlayerIndex = gameState.players.findIndex(p => p.userId === currentUser.userId);
-    if (myPlayerIndex === -1) return;
-
-    // Create a copy of the existing game state so we can mutate it.
-    const newGameState = structuredClone(gameState); // or deep copy manually
-
-    // Remove the card from the user's hand.
-    const myHand = newGameState.players[myPlayerIndex].hand;
-    const cardIndex = myHand.findIndex(
-        c => c.suit === card.suit && c.value === card.value
-    );
-    if (cardIndex !== -1) {
-        myHand.splice(cardIndex, 1);
-    }
-
-    // For now, add this card to the table (simulate playing the card to the table).
-    newGameState.table.cards.push(card);
-
-    // change currentPlayerIndex to the next player.
-    newGameState.currentPlayerIndex = (newGameState.currentPlayerIndex + 1) % newGameState.players.length;
-    newGameState.turnCounter++;
-
-    // Update the state.
-    setGameState(newGameState);
-    };
-    // const payload = { -------------> removed for dummy version
-    //  action: "PLAY_CARD",
-    //  gameId: id,
-    //  userId: currentUser.userId,
-    //  card: card,
-      // Optionally include 'selectedOption' for capture options.
-    //};
-
-    /*if (stompClientRef.current && stompClientRef.current.active) {
-      stompClientRef.current.publish({
-        destination: `/app/game/${id}`,
-        body: JSON.stringify(payload),
-      });
-      console.log("Published PLAY_CARD payload:", payload);
-    } else {
-      console.error("WebSocket connection is not active");
-    }
+    if (!id) return;
+    // Construct payload for a card play without capture options
+    const payload = JSON.stringify({
+      "gameId/lobbyID": id,
+      card: {
+        suit: card.suit,
+        value: card.value,
+      },
+    });
+    console.log("Publishing played card payload:", payload);
+    // Publish the payload to the backend endpoint (adjust destination if needed)
+    stompClientRef.current?.publish({
+      destination: `/app/playCard`,
+      body: payload,
+    });
   };
-  */
 
-  // For testing: if gameState hasn't arrived, you might add a dummy state.
-  if (!gameState) {
+    // Handler for when a capture option is selected.
+  const handleCaptureOptionClick = (chosenOption: Card[]) => {
+    if (!id) return;
+    // Clear capture options from UI as a user selection is about to be made.
+    setCaptureOptions([]);
+    const payload = JSON.stringify({
+      gameId: id,
+      chosenOption: chosenOption,
+    });
+    console.log("Publishing capture option payload:", payload);
+    stompClientRef.current?.publish({
+      destination: `/app/chooseCapture`,
+      body: payload,
+    });
+  };
+
+  // Renders the capture options UI.
+  const renderCaptureOptions = () => {
+    if (captureOptions.length === 0) return null;
+    return (
+      <div style={{ backgroundColor: "rgba(0,0,0,0.8)", padding: "1rem", position: "absolute", top: "10%", left: "50%", transform: "translateX(-50%)", borderRadius: "8px" }}>
+        <h3 style={{ color: "#fff" }}>Choose your capture option:</h3>
+        {captureOptions.map((option, idx) => (
+          <div key={idx}
+              style={{ display: "flex", cursor: "pointer", marginBottom: "0.5rem", border: "1px solid #fff", padding: "0.5rem" }}
+              onClick={() => handleCaptureOptionClick(option)}>
+            {option.map((card, cardIdx) => (
+              <div key={cardIdx} style={{ margin: "0 0.5rem", color: "#fff" }}>
+                {card.value} {card.suit}
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
+    );
+  };
+
+
+  const renderMoveAnimation = () => {
+    if (!moveAnimation) return null;
+    return (
+      <div style={{
+        position: "absolute",
+        top: "50%",
+        left: "50%",
+        transform: "translate(-50%, -50%)",
+        backgroundColor: "rgba(0,0,0,0.8)",
+        padding: "1rem",
+        borderRadius: "8px",
+        color: "#fff",
+        zIndex: 1000,
+      }}>
+        <h3>Move Animation</h3>
+        <p>Player {moveAnimation.playerId} played:</p>
+        <div style={{ marginBottom: "0.5rem" }}>
+          {moveAnimation.playedCard.value} {moveAnimation.playedCard.suit}
+        </div>
+        {moveAnimation.capturedCards.length > 0 && (
+          <>
+            <p>and captured:</p>
+            <div style={{ display: "flex" }}>
+              {moveAnimation.capturedCards.map((card, idx) => (
+                <div key={idx} style={{ marginRight: "4px" }}>
+                  {card.value} {card.suit}
+                </div>
+              ))}
+            </div>
+          </>
+        )}
+      </div>
+    );
+  };
+
+  if (error) {
     return (
       <div style={{ color: "#fff", textAlign: "center", padding: "2rem" }}>
-        Loading game...
+        <h2>Error</h2>
+        <p>{error}</p>
       </div>
     );
   }
 
   return (
     <div style={{ backgroundColor: "black", minHeight: "100vh" }}>
+      {/* Render game view with the current state and card click handler */}
+      {renderCaptureOptions()}
+      {renderMoveAnimation()}
       <ScopaGameView
         gameSession={gameState}
-        currentUserId={111}  // ------------------------------------> for dummy purpose: currentUser.userId
+        currentUserId={currentUserId} 
+        myHand={myHand}
         onCardClick={handleCardClick}
       />
     </div>
   );
 }
+
