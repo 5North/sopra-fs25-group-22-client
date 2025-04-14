@@ -24,7 +24,7 @@ const getUsername = (): string => {
     const stored = localStorage.getItem("username") || "";
     try {
       return JSON.parse(stored);
-    } catch (err) {
+    } catch {
       return stored;
     }
   };
@@ -81,7 +81,7 @@ const LobbyPage: React.FC = () => {
     };
 
     autoCreateLobby();
-  }, [token]);
+  }, []);
 
   useEffect(() => {
     if (!lobby) return;

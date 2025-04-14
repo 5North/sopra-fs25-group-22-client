@@ -1,6 +1,6 @@
 "use client";
   
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect} from "react";
 import { useParams } from "next/navigation";
 // import { Client } from "@stomp/stompjs";     -------> removed for dummy purpose
 // import useLocalStorage from "@/hooks/useLocalStorage";
@@ -78,7 +78,7 @@ export default function GamePage() {
     setGameState(dummyGameState);
     // to eventually connect to the WebSocket,  add  code here
     // for now skip so we can see the UI right away.
-  }, []);
+  });
   // ============= DUMMY =======================================================================
 
  /*
