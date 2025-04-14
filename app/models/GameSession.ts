@@ -6,7 +6,6 @@ export interface Card {
   export interface PlayerState {
     userId: number;
     hand: Card[];
-    // Optionally include treasure, scopaCount if you need to display them.
     treasure?: Card[];
     scopaCount?: number;
   }
@@ -24,6 +23,5 @@ export interface Card {
         scopaCount: number;
     }[];
     currentPlayerId: number;
-    // TODO CHEck Optionally, add any extra fields like isGameOver flag.
   }
   

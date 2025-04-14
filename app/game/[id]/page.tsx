@@ -4,17 +4,17 @@ import { useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Client, IMessage } from "@stomp/stompjs";
 import ScopaGameView from "@/components/ScopaGameView";
-import { GameSessionState, Card } from "@/models/GameSession"; // Ensure this model file is up-to-date
+import { GameSessionState, Card } from "@/models/GameSession"; 
 import { getWsDomain } from "@/utils/domain";
 import useLocalStorage from "@/hooks/useLocalStorage";
 
 
-// Define a simple initial state for loading before receiving real updates.
+// simple initial state for loading before receiving real updates.
 const initialGameState: GameSessionState = {
-  gameId: 0,          // an empty string for now
-  tableCards: [],      // an empty array of cards
-  players: [],         // an empty array of players
-  currentPlayerId: 0,  // default ID (e.g., 0) or -1, etc.
+  gameId: 0,          // 
+  tableCards: [],      
+  players: [],         
+  currentPlayerId: 0,  
 };
 
 interface MoveAnimationData {
@@ -24,8 +24,8 @@ interface MoveAnimationData {
   }
 
 export default function GamePage() {
-  const { id } = useParams(); // game id from URL
-  const router = useRouter();
+  const { id } = useParams(); 
+  //const router = useRouter();
   const [gameState, setGameState] = useState<GameSessionState>(initialGameState);
   const [error, setError] = useState<string | null>(null);
   const [captureOptions, setCaptureOptions] = useState<Card[][]>([]);
@@ -52,13 +52,13 @@ export default function GamePage() {
 
   const currentUserId = getCurrentUserId() || 0;
 
-  // STEP 1: Basic setup for STOMP client connection on the game topic.
+  // Basic setup for STOMP client connection on the game topic.
   useEffect(() => {
     if (!id) {
       setError("No game ID specified");
       return;
     }
-    // Create STOMP client; replace getWsDomain() with your own domain logic if needed.
+    // Create STOMP client
     const client = new Client({
       brokerURL: getWsDomain() + `/lobby?token=${token}`, 
       reconnectDelay: 2000,
@@ -73,7 +73,7 @@ export default function GamePage() {
             setGameState({
                 ...gameState,
                 gameId: parseInt(id as string, 10),
-                tableCards: data.tableCards, // Assumed property names
+                tableCards: data.tableCards, 
                 players: data.players,
                 currentPlayerId: data.currentPlayerId,
               });
@@ -89,7 +89,6 @@ export default function GamePage() {
               console.log("Private message received:", payload);
   
               // Check if payload is a capture options message.
-              // assume a capture options message is an array of arrays.
               if (Array.isArray(payload) && payload.length > 0 && Array.isArray(payload[0])) {
                 setCaptureOptions(payload);
                 console.log("Capture options updated:", payload);
@@ -137,10 +136,10 @@ export default function GamePage() {
     };
   }, [id, gameState]);
 
-  // STEP 1: Handler for playing a card (without capture options)
+  //  Handler for playing a card (without capture options)
   const handleCardClick = (card: Card) => {
     if (!id) return;
-    // Construct payload for a card play without capture options
+    // payload for a card play without capture options
     const payload = JSON.stringify({
       "gameId/lobbyID": id,
       card: {
@@ -149,7 +148,7 @@ export default function GamePage() {
       },
     });
     console.log("Publishing played card payload:", payload);
-    // Publish the payload to the backend endpoint (adjust destination if needed)
+    // Publish the payload to the backend endpoint
     stompClientRef.current?.publish({
       destination: `/app/playCard`,
       body: payload,
@@ -159,7 +158,7 @@ export default function GamePage() {
     // Handler for when a capture option is selected.
   const handleCaptureOptionClick = (chosenOption: Card[]) => {
     if (!id) return;
-    // Clear capture options from UI as a user selection is about to be made.
+    // Clear capture options from UI as a user selection is made.
     setCaptureOptions([]);
     const payload = JSON.stringify({
       gameId: id,
