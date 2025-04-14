@@ -81,7 +81,7 @@ const LobbyPage: React.FC = () => {
     };
 
     autoCreateLobby();
-  }, []);
+  }, [token]);
 
   useEffect(() => {
     if (!lobby) return;
