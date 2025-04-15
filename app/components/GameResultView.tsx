@@ -13,7 +13,7 @@ const GameResultView: React.FC<GameResultViewProps> = ({ result }) => {
       <h2>Game Over</h2>
       <p>Your outcome: <strong>{result.outcome}</strong></p>
       <p>Your Total Score: {result.myTotal}</p>
-      <p>Opponent's Total Score: {result.otherTotal}</p>
+      <p>Opponents Total Score: {result.otherTotal}</p>
       <h3>Your Breakdown</h3>
       <p>Carte Result: {result.myCarteResult}</p>
       <p>Denari Result: {result.myDenariResult}</p>
