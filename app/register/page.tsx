@@ -79,7 +79,7 @@ const Register: React.FC = () => {
         </Form.Item>
         <Form.Item>
           {error && <p style={{ color: "red" }}>{error}</p>}
-          <Button type="primary" htmlType="submit" className="custom-button">
+          <Button type="primary" htmlType="submit" className="custom-button" >
           ♣️ Register
           </Button>
         </Form.Item>

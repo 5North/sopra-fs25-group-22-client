@@ -104,20 +104,22 @@ export default function GamePage() {
             }
           });
 
-        // Subscription for move broadcasts
-          client.subscribe(`/topic/move/${id}`, (message: IMessage) => {
-            try {
-              const moveData: MoveAnimationData = JSON.parse(message.body);
-              console.log("Received move broadcast:", moveData);
-              // Set the move animation state to trigger display in the UI.
-              setMoveAnimation(moveData);
-              setTimeout(() => {
-                setMoveAnimation(null);
-              }, 3000);
-            } catch (err) {
-              console.error("Error processing move broadcast:", err);
-            }
-          });
+
+        setMoveAnimation(null);  
+        // // Subscription for move broadcasts
+        //   client.subscribe(`/topic/move/${id}`, (message: IMessage) => {
+        //     try {
+        //       const moveData: MoveAnimationData = JSON.parse(message.body);
+        //       console.log("Received move broadcast:", moveData);
+        //       // Set the move animation state to trigger display in the UI.
+        //       setMoveAnimation(moveData);
+        //       setTimeout(() => {
+        //         setMoveAnimation(null);
+        //       }, 3000);
+        //     } catch (err) {
+        //       console.error("Error processing move broadcast:", err);
+        //     }
+        //   });
       },
       onStompError: (frame) => {
         console.error("STOMP error:", frame.headers["message"]);
@@ -134,7 +136,7 @@ export default function GamePage() {
         stompClientRef.current.deactivate();
       }
     };
-  }, [id, gameState]);
+  }, [token, id, currentUserId, gameState]);
 
   //  Handler for playing a card (without capture options)
   const handleCardClick = (card: Card) => {

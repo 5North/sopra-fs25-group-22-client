@@ -139,12 +139,17 @@ const LobbyPage: React.FC = () => {
   const handleStartGame = () => {
     if (!lobby) return; 
 
+    console.log("handle start game called..")
+    if(!stompClientRef.current) {
+      console.log("STOMP REF NOT EXISTING!!!");
+    }
+
     stompClientRef.current?.publish({
-      destination: `/app/start/${lobby.lobbyId}`,
-      body: JSON.stringify({ command: "start" }),
+      destination: `/app/startGame/${String(lobby.lobbyId)}`,
+      body: '',
     });
   
-    router.push(`/game/${lobby.lobbyId}`);
+    // router.push(`/game/${lobby.lobbyId}`);
   };
   
 
@@ -193,7 +198,7 @@ const LobbyPage: React.FC = () => {
             .map((player, idx) => (
                 <p key={`t1-${idx}`}>
                 {player.username}
-                joined
+                 joined
                 </p>
             ))}
         </div>
@@ -204,7 +209,7 @@ const LobbyPage: React.FC = () => {
             .map((player, idx) => (
                 <p key={`t2-${idx}`}>
                 {player.username}
-                joined
+                 joined
                 </p>
             ))}
         </div>
@@ -217,9 +222,7 @@ const LobbyPage: React.FC = () => {
             type="primary"
             className="custom-button"
             onClick={handleStartGame}
-        >
-            ♣️Start Game
-        </Button>
+        >♣️Start Game</Button>
         )}
     </div>
   );
