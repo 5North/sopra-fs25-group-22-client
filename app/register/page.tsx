@@ -1,4 +1,4 @@
-"use client"; 
+"use client";
 
 import { useRouter } from "next/navigation";
 import useLocalStorage from "@/hooks/useLocalStorage";
@@ -17,15 +17,17 @@ const Register: React.FC = () => {
 
   const {
     set: setToken,
-  } = useLocalStorage<string>("token", ""); 
+  } = useLocalStorage<string>("token", "");
 
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   let response: Response;
 
   const handleRegister = async (values: FormFieldProps) => {
+    setLoading(true);
     try {
       response = await createUser(values);
-  
+
       // TODO: make response check reusable
       if (!response.ok) {
         if (response.status === 409) {
@@ -35,19 +37,21 @@ const Register: React.FC = () => {
         }
         return;
       }
-  
+
       const token = response.headers.get("Token");
       setToken(token ? token : "");
       localStorage.setItem("username", values.username);
       setError("");
-      router.push("/home"); 
+      router.push("/home");
     } catch (error) {
       if (error instanceof Error) {
-          alert(`Oopps.. Something went wrong!` + error);  
-          console.error(`Something went wrong during the registration:\n${error.message} ${JSON.stringify(values)}`); 
+        alert(`Oopps.. Something went wrong!` + error);
+        console.error(`Something went wrong during the registration:\n${error.message} ${JSON.stringify(values)}`);
       } else {
         console.error("An unknown error occurred during user registration.");
       }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -79,8 +83,8 @@ const Register: React.FC = () => {
         </Form.Item>
         <Form.Item>
           {error && <p style={{ color: "red" }}>{error}</p>}
-          <Button type="primary" htmlType="submit" className="custom-button" >
-          ♣️ Register
+          <Button type="primary" htmlType="submit" className="custom-button" loading={loading}>
+            ♣️ Register
           </Button>
         </Form.Item>
       </Form>

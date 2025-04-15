@@ -44,7 +44,7 @@ export default function RootLayout({
             // if a component type needs special styling, setting here will override default options set in token
             components: {
               Button: {
-                colorPrimary: "#517db0", // this will color all buttons in #75bd9d, overriding the default primaryColor #22426b set in token line 35
+                colorPrimary: "#344739", // this will color all buttons in #75bd9d, overriding the default primaryColor #22426b set in token line 35
                 algorithm: true, // enable algorithm (redundant with line 33 but here for demo purposes)
                 controlHeight: 38,
               },

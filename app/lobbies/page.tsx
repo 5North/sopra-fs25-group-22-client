@@ -149,7 +149,7 @@ const LobbyPage: React.FC = () => {
       body: '',
     });
   
-    // router.push(`/game/${lobby.lobbyId}`);
+    router.push(`/game/${lobby.lobbyId}`);
   };
   
 
@@ -222,6 +222,7 @@ const LobbyPage: React.FC = () => {
             type="primary"
             className="custom-button"
             onClick={handleStartGame}
+            style={{ width: "fit-content", alignSelf: "center" }}
         >♣️Start Game</Button>
         )}
     </div>

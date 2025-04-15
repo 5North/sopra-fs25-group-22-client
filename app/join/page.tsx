@@ -161,7 +161,7 @@ const JoinGamePage: React.FC = () => {
 
   // Regular join UI
   return (
-    <div style={containerStyle}>
+    <div style={containerStyle} className="register-container">
       <h1 style={{ fontSize: "2rem", marginBottom: "1rem" }}>
         Scopa for Beginners
       </h1>
