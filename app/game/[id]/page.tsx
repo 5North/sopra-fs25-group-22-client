@@ -4,7 +4,9 @@ import { useEffect, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 import { Client, IMessage } from "@stomp/stompjs";
 import ScopaGameView from "@/components/ScopaGameView";
+import GameResultView from "@/components/GameResultView";
 import { GameSessionState, Card } from "@/models/GameSession"; 
+import { GameResultDTO } from "@/models/GameResult";
 import { getWsDomain } from "@/utils/domain";
 import useLocalStorage from "@/hooks/useLocalStorage";
 
@@ -31,6 +33,7 @@ export default function GamePage() {
   const [captureOptions, setCaptureOptions] = useState<Card[][]>([]);
   const [myHand, setMyHand] = useState<Card[]>([]);
   const [moveAnimation, setMoveAnimation] = useState<MoveAnimationData | null>(null);
+  const [gameResult, setGameResult] = useState<GameResultDTO | null>(null);
   const stompClientRef = useRef<Client | null>(null);
   const { value: token } = useLocalStorage<string>("token", "");
   
@@ -118,6 +121,17 @@ export default function GamePage() {
               console.error("Error processing move broadcast:", err);
             }
           });
+
+          // Subscription for game result broadcast
+          client.subscribe(`/topic/gameresult/${id}`, (message: IMessage) => {
+            try {
+              const resultData: GameResultDTO = JSON.parse(message.body);
+              console.log("Received game result:", resultData);
+              setGameResult(resultData);
+            } catch (err) {
+              console.error("Error processing game result:", err);
+            }
+          });
       },
       onStompError: (frame) => {
         console.error("STOMP error:", frame.headers["message"]);
@@ -134,7 +148,7 @@ export default function GamePage() {
         stompClientRef.current.deactivate();
       }
     };
-  }, [id, gameState]);
+  }, [id, gameState, token, currentUserId]);
 
   //  Handler for playing a card (without capture options)
   const handleCardClick = (card: Card) => {
@@ -248,6 +262,7 @@ export default function GamePage() {
         myHand={myHand}
         onCardClick={handleCardClick}
       />
+      {gameResult && <GameResultView result={gameResult} />}
     </div>
   );
 }
