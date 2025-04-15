@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+//import { useEffect, useState } from "react";
 import { Collapse } from "antd";
-import useLocalStorage from "@/hooks/useLocalStorage";
+//import useLocalStorage from "@/hooks/useLocalStorage";
 
 const { Panel } = Collapse;
 
@@ -11,7 +11,7 @@ const ScopaInstructions: React.FC = () => {
     <div className="register-container" style={{ paddingBottom: "2rem" }}>
 
       <h2 style={{ textAlign: "center", color: "#fff", marginBottom: "2rem" }}>
-        Hi, it's great to see you're curious about how to play Scopa! 🤓
+        Hi, its great to see youre curious about how to play Scopa! 🤓
       </h2>
 
       <Collapse

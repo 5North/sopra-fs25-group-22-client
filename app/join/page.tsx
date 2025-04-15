@@ -11,9 +11,8 @@ const JoinGamePage: React.FC = () => {
   const router = useRouter();
   const [digits, setDigits] = useState(["", "", "", ""]);
   const isFull = false;
-  // const [isFull, setIsFull] = useState(false);
   const [joinError, setJoinError] = useState("");
-  const [lobbyPINtoJoin, setPIN] = useState("");
+  //const [lobbyPINtoJoin, setPIN] = useState("");
   const { value: token } = useLocalStorage<string>("token", "");
   const [client, setClient] = useState<Client | null>(null);
 
@@ -24,13 +23,14 @@ const JoinGamePage: React.FC = () => {
   };
 
   useEffect(() => {
+    // Cleanup: if client exists, deactivate STOMP connection on unmount
     return () => {
       if (client) {
         console.log("Deactivating STOMP connection...");
         client.deactivate();
       }
     };
-  }, [lobbyPINtoJoin, token, client]);
+  }, [client]);
   
   const handleJoin = async () => {
     const lobbyPIN = digits.join("");
@@ -38,26 +38,27 @@ const JoinGamePage: React.FC = () => {
       alert("Please enter a 4-digit Game ID.");
       return;
     }
-    setPIN(lobbyPIN)
+  
+    console.log("Current token:", token);
+    console.log("Joining lobby with Pin:", lobbyPIN);
+  
     const clientObj = new Client({
       brokerURL: getWsDomain() + `/lobby?token=${token}`,
       reconnectDelay: 2000,
       onConnect: () => {
         console.log("Connected to STOMP");
   
+        // Subscribe to the personal reply queue for the join response
         clientObj.subscribe("/user/queue/reply", (message) => {
           const data = JSON.parse(message.body);
-          console.log("Reply message:", message.body);
+          console.log("Reply from server:", data);
           if (!data.success) {
             setJoinError(data.message);
+            clientObj.deactivate();
+            console.log("Client deactivated due to join failure.");
           } else {
             router.push("/lobbies/" + lobbyPIN);
           }
-        });
-  
-        clientObj.subscribe(`/topic/lobby/${lobbyPIN}`, (message) => {
-          console.log("Lobby subscription message:", message.body);
-          
         });
       },
       onStompError: (frame) => {
@@ -78,7 +79,7 @@ const JoinGamePage: React.FC = () => {
     router.push("/lobbies");
   };
 
-  // Container style used for both states (full screen, black background)
+  // Common container style
   const containerStyle: React.CSSProperties = {
     width: "100vw",
     height: "100vh",
@@ -93,14 +94,13 @@ const JoinGamePage: React.FC = () => {
     padding: "2rem",
   };
 
-  // If the lobby is full, display the "Game Room Full" state
+  // If lobby is full, display the "Game Room Full" state
   if (isFull) {
     return (
       <div style={containerStyle}>
         <h1 style={{ fontSize: "2rem", marginBottom: "1rem" }}>
           Scopa for Beginners
         </h1>
-        {/* Display the 4 entered digits as read-only */}
         <div
           style={{
             display: "flex",
@@ -159,14 +159,13 @@ const JoinGamePage: React.FC = () => {
     );
   }
 
- 
+  // Regular join UI
   return (
     <div style={containerStyle}>
       <h1 style={{ fontSize: "2rem", marginBottom: "1rem" }}>
         Scopa for Beginners
       </h1>
       <p style={{ marginBottom: "1rem" }}>Enter Game ID</p>
-      {/* Container for the 4-digit inputs */}
       <div
         style={{
           display: "flex",
@@ -195,11 +194,11 @@ const JoinGamePage: React.FC = () => {
           />
         ))}
       </div>
-        {joinError && (
+      {joinError && (
         <p style={{ color: "red", marginBottom: "1rem", fontSize: "1rem" }}>
-            {joinError}
+          {joinError}
         </p>
-        )}
+      )}
       <Button
         type="primary"
         disabled={!token || digits.some((d) => d === "")}
@@ -229,5 +228,6 @@ const JoinGamePage: React.FC = () => {
 };
 
 export default JoinGamePage;
+
 
 

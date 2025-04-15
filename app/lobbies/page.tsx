@@ -16,8 +16,19 @@ interface Lobby {
   lobbyId: string | number;
   PIN: string | number;
   players: Player[]
-  roomName?: string | "";
 }
+
+// Utility to get username from localStorage:
+const getUsername = (): string => {
+    if (typeof window === "undefined") return "";
+    const stored = localStorage.getItem("username") || "";
+    try {
+      return JSON.parse(stored);
+    } catch {
+      return stored;
+    }
+  };
+
 
 const LobbyPage: React.FC = () => {
   const router = useRouter();
@@ -26,7 +37,7 @@ const LobbyPage: React.FC = () => {
   const stompClientRef = useRef<Client | null>(null);
 
   const { value: token } = useLocalStorage<string>("token", "");
-  const { value: username } = useLocalStorage<string>("username", ""); 
+  const username = getUsername();
 
 
   useEffect(() => {
@@ -50,8 +61,18 @@ const LobbyPage: React.FC = () => {
           return;
         }
         const data = await response.json();
-        console.log(data)
-        setLobby({ ...data, players: data.players ?? [] });
+        console.log("Lobby created:", data);
+
+        // Build initialPlayers array; if players are missing, create an empty array
+        const initialPlayers: Player[] = data.players && data.players.length > 0
+          ? data.players
+          : [];
+        // Add the host if not already present
+        if (!initialPlayers.some((player: Player) => player.username === username)) {
+          initialPlayers.push({ username });
+        }
+
+        setLobby({ ...data, players: initialPlayers });
 
       } catch (err) {
         setError("An error occurred while creating the lobby.");
@@ -60,10 +81,11 @@ const LobbyPage: React.FC = () => {
     };
 
     autoCreateLobby();
-  }, [token]);
+  }, [token, username]);
 
   useEffect(() => {
-    if (lobby) {
+    if (!lobby) return;
+
       const client = new Client({
         brokerURL: getWsDomain() + `/lobby?token=${token}`,
         reconnectDelay: 2000,
@@ -75,7 +97,7 @@ const LobbyPage: React.FC = () => {
             console.log("Received lobby update:", data);
 
             // TODO: Each time received an update add the user 
-            if (data.status === "subscribed") {
+            if (data.status == "subscribed") {
                 setLobby((prevLobby) => {
                   if (!prevLobby) return prevLobby;
             
@@ -107,7 +129,7 @@ const LobbyPage: React.FC = () => {
           stompClientRef.current.deactivate();
         }
       };
-    }
+    
   }, [lobby, token]);
 
   const handleBack = () => {
