@@ -3,7 +3,7 @@
 import React, { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import useLocalStorage from "@/hooks/useLocalStorage";
-import { Client, IMessage } from "@stomp/stompjs";
+import { Client } from "@stomp/stompjs";
 import { getWsDomain } from "@/utils/domain";
 import { useRouter } from "next/navigation";
 
