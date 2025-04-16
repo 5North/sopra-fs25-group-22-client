@@ -57,20 +57,14 @@ const JoinGamePage: React.FC = () => {
             clientObj.deactivate();
             console.log("Client deactivated due to join failure.");
           } else {
-            //router.push("/lobbies/" + lobbyPIN);
+            console.log("from user queue...")
+            router.push("/lobbies/" + lobbyPIN);
           }
         });
 
         clientObj.subscribe(`/topic/lobby/${lobbyPIN}`, (message) => {
           const data = JSON.parse(message.body);
           console.log("Reply from server for lobby:", data);
-          if (!data.success) {
-            setJoinError(data.message);
-            clientObj.deactivate();
-            console.log("Client deactivated due to join failure.");
-          } else {
-            router.push("/lobbies/" + lobbyPIN);
-          }
         });
       },
       onStompError: (frame) => {
