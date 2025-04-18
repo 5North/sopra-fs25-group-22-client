@@ -34,32 +34,15 @@ const LobbyPage: React.FC = () => {
       reconnectDelay: 2000,
       onConnect: () => {
         console.log("Connected to STOMP");
-
-        console.log("attempt to subscribe to games");
-        // client.subscribe(`/app/startGame/${lobbyPIN}`, (message:IMessage) => {
-        //   console.log("Connected to Start Game...");
-        //   const data = JSON.parse(message.body);
-
-        //   console.log("received...: " + JSON.stringify(data));
-        //   if (data.lobbyId == Number(lobbyPIN)) {
-        //     router.push(`/game/${lobbyPIN}`);
-        //     // console.log("Client deactivated due to join failure.");
-        //   }
-        // });
-        client.subscribe(`/topic/lobby/${lobbyPIN}`, (message) => {
+        const pin = lobbyPIN.substring(lobbyPIN.length-4, lobbyPIN.length);
+        console.log(`path is: /topic/lobby/${pin}`)
+        client.subscribe(`/topic/lobby/${pin}`, (message) => {
           const data = JSON.parse(message.body);
           console.log("Reply from server for lobby topic:", data);
-        });
-
-        client.subscribe("/user/queue/reply", (message) => {
-          const data = JSON.parse(message.body);
-          console.log("Reply from queue:", data);
-          if (JSON.stringify(data).includes("handCards")) {
-            console.log("Client deactivated due to join failure.");
-            router.push("/game/" + lobbyPIN.substring(lobbyPIN.length-5, lobbyPIN.length-1));
+          if (data.success == true && data.message == "Starting game") {
+            router.push("/game/" + pin);
           }
         });
-
       },
       onStompError: (frame) => {
         console.error("STOMP error:", frame.headers["message"]);

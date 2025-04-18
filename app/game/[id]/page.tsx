@@ -64,7 +64,6 @@ export default function GamePage() {
       reconnectDelay: 2000,
       onConnect: () => {
         console.log("Connected to game WebSocket");
-
         // Subscribe to public game state updates
         client.subscribe(`/topic/game/${id}`, (message: IMessage) => {
           try {
@@ -105,6 +104,12 @@ export default function GamePage() {
           });
 
 
+          console.log(`path is... /app/updateGame/${id}`);
+          client.publish({
+            destination: `/app/updateGame/${id}`,
+            body: '',
+            headers: {userId: `${currentUserId}`},
+          });
         setMoveAnimation(null);  
         // // Subscription for move broadcasts
         //   client.subscribe(`/topic/move/${id}`, (message: IMessage) => {
