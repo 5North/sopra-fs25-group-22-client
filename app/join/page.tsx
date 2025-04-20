@@ -57,8 +57,14 @@ const JoinGamePage: React.FC = () => {
             clientObj.deactivate();
             console.log("Client deactivated due to join failure.");
           } else {
+            console.log("from user queue...")
             router.push("/lobbies/" + lobbyPIN);
           }
+        });
+
+        clientObj.subscribe(`/topic/lobby/${lobbyPIN}`, (message) => {
+          const data = JSON.parse(message.body);
+          console.log("Reply from server for lobby:", data);
         });
       },
       onStompError: (frame) => {
@@ -161,7 +167,7 @@ const JoinGamePage: React.FC = () => {
 
   // Regular join UI
   return (
-    <div style={containerStyle}>
+    <div style={containerStyle} className="register-container">
       <h1 style={{ fontSize: "2rem", marginBottom: "1rem" }}>
         Scopa for Beginners
       </h1>

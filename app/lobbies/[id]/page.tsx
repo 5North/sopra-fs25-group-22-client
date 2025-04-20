@@ -3,8 +3,9 @@
 import React, { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import useLocalStorage from "@/hooks/useLocalStorage";
-import { Client, IMessage } from "@stomp/stompjs";
+import { Client } from "@stomp/stompjs";
 import { getWsDomain } from "@/utils/domain";
+import { useRouter } from "next/navigation";
 
 // interface Player {
 //   username: string;
@@ -19,25 +20,28 @@ import { getWsDomain } from "@/utils/domain";
 // }
 
 const LobbyPage: React.FC = () => {
+  const router = useRouter();
   const pathname = usePathname()
   // const router = useRouter();
   const { value: token } = useLocalStorage<string>("token", "");
   const stompClientRef = useRef<Client | null>(null);
 
   useEffect(() => {
-    const lobbyPIN = pathname; 
+    const lobbyPIN = pathname;
 
     const client = new Client({
       brokerURL: getWsDomain() + `/lobby?token=${token}`,
       reconnectDelay: 2000,
       onConnect: () => {
         console.log("Connected to STOMP");
-
-        client.subscribe(`/topic/lobby/${lobbyPIN}`, (message: IMessage) => {
+        const pin = lobbyPIN.substring(lobbyPIN.length-4, lobbyPIN.length);
+        console.log(`path is: /topic/lobby/${pin}`)
+        client.subscribe(`/topic/lobby/${pin}`, (message) => {
           const data = JSON.parse(message.body);
-          console.log("Received lobby update:", data);
-        
-          /// ?? may be not needed
+          console.log("Reply from server for lobby topic:", data);
+          if (data.success == true && data.message == "Starting game") {
+            router.push("/game/" + pin);
+          }
         });
       },
       onStompError: (frame) => {
@@ -47,17 +51,12 @@ const LobbyPage: React.FC = () => {
 
     stompClientRef.current = client;
     client.activate();
-
     return () => {
       if (stompClientRef.current) {
         stompClientRef.current.deactivate();
       }
     };
-  }, [pathname, token]);
-
-  // const handleBack = () => {
-  //   router.push("/home");
-  // };
+  }, [router, pathname, token]);
 
   return (
     <div className="register-container">

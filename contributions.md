@@ -73,8 +73,37 @@ reason).
 | **@5North**        | 04.04   | https://github.com/5North/sopra-fs25-group-22-server/commit/ec4b814d29140cad0868ec7ee697e9faf4cd7c96, https://github.com/5North/sopra-fs25-group-22-server/commit/bbc5f81d3ed2f091e5583b0b6b0203c3653de4e3, https://github.com/5North/sopra-fs25-group-22-server/commit/29977b0c2db3b6c85d8b1dd78b29a2159745cd7d, https://github.com/5North/sopra-fs25-group-22-server/commit/063b271f252b2ea7f330ac204c47ba0914c3f3c5, https://github.com/5North/sopra-fs25-group-22-server/commit/1a932e2a8a5eb1c094fc6258310cc7b959bd4391 | Implement lobby in the backend, includes repository, entity, services and REST endpoint to create lobby | It allows the server to support the creation of lobbies to play games in them, the core logic to joining them and assign to them a random 4 digits id.|
 | **@5North**        | 04.04   | https://github.com/5North/sopra-fs25-group-22-server/commit/0057eb9c40322a3e0d12cb009661851538e1af5b, https://github.com/5North/sopra-fs25-group-22-server/commit/a9eadf52a9af8b7091e66463a14e3d78f025272f | Test the lobby implementation extensively                                                                        | Allows the extensive test of the aforementioned implementation to ensure it always works correctly. |
 | **@5North**        | 03.04-08.04  | https://github.com/5North/sopra-fs25-group-22-server/commit/f05ba0599f09029ec643d60591b915481ec8b376, https://github.com/5North/sopra-fs25-group-22-server/commit/4d24620f1975a8b0017ac89d41f34c24cf566715, https://github.com/5North/sopra-fs25-group-22-server/commit/2f5815dd21b8da826e40aea6fde81a0d287108a0, https://github.com/5North/sopra-fs25-group-22-server/commit/ed041957e6b8d40b46e1588821bebb022e369fab, https://github.com/5North/sopra-fs25-group-22-server/commit/e82dc879985a6d1cbb2154ada8e88f6f3487d841, https://github.com/5North/sopra-fs25-group-22-server/commit/aedae7adca6739d4959a9982e6e07eac53406aa8, https://github.com/5North/sopra-fs25-group-22-server/commit/9db6fa37c3c9aa2b82ead533f1271d3d00008d57, https://github.com/5North/sopra-fs25-group-22-server/commit/d319f2cbf809f450ba0d4da56ff18ba627b24288, https://github.com/5North/sopra-fs25-group-22-server/commit/63ff7256f66afd7543d160aac2cbec9c29485f11, https://github.com/5North/sopra-fs25-group-22-server/commit/7023f208e0d45d036db168d9f1b26466d350e983, https://github.com/5North/sopra-fs25-group-22-server/commit/0677fa73bb8066e6ef3af504fb083f90b29f41b0 | Implement websockets and wsServices, enable stomp and add some tests. Includes basic ability to connect and an event listener that make the user join the lobby on lobby subscription. It then sent a notification to the user and broadcast the new user to the lobby. It also implement an authentication for ws using the token. | It allows the client to connect via ws and join a lobby by subscribing to it. It also will allow in the future to send messages to broadcast to the right lobby or to a specific user. |
-| **@shellmychakkaith** | 02.04   | 7ff87a134e9190f0f6b13295e6dba6093e0885ab | implementation of homepage| all options the user has |
-|                    | 03.04   | bc3c547fee61f78b32473099e45bc368407dd51d | User is able to create or join a lobby | ] |
+| **@shellmychakkaith** | 02.04   | https://github.com/5North/sopra-fs25-group-22-client/commit/7ff87a134e9190f0f6b13295e6dba6093e0885ab | implementation of homepage| all options the user has |
+|                    | 03.04   | https://github.com/5North/sopra-fs25-group-22-client/commit/bc3c547fee61f78b32473099e45bc368407dd51d| User is able to create or join a lobby |  |
+| **@Seydi89** | 04.04.2025   | https://github.com/5North/sopra-fs25-group-22-client/commit/eb4c42d899c018ce5e0a4fb3ab9b7746490b2a2b | #14,#22 and game styling | game styling and some lobby page implementation |
+| **@Seydi89** | 08.04.2025  | https://github.com/5North/sopra-fs25-group-22-client/commit/b484068bf8133dfedc8e2d2bfb3d738ae6aa98be | buggy versions on #19 and #20 | ui websocket connection |
+
+---
+
+## Contributions Week 3 - 09.04.25 to 15.04.25
+
+| **Student**        | **Date**                     | **Link to Commit**                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | **Description**                                                  | **Relevance**                                                                                                                                                   |
+|--------------------|------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **@5North**        | 10.04.25, 11.04.25, 14.04.25 | [382a004](https://github.com/5North/sopra-fs25-group-22-server/commit/382a0043872d3d36ef4435e09f53f226d69be9e0), [8a05566](https://github.com/5North/sopra-fs25-group-22-server/commit/8a05566c707eaab011297c1735536c532305e2d8), [c62e2a3](https://github.com/5North/sopra-fs25-group-22-server/commit/c62e2a3a632d2d17087faad926a62aa686ecc4bc),[31e425e](https://github.com/5North/sopra-fs25-group-22-server/commit/31e425e6f122d359427bdcdd00811cdf29867112), [e051227](https://github.com/5North/sopra-fs25-group-22-server/commit/e0512271e490cbdb4989df1266354399e38f757a) | Implementing controller for stomp messages                       | Allows the server to receive the messages sent over ws by the client, to call methods to manage the game flow and eventually send back responses to the client. |
+| **@5North**        | 14.04.25                     | [31e425e](https://github.com/5North/sopra-fs25-group-22-server/commit/31e425e6f122d359427bdcdd00811cdf29867112), [e051227](https://github.com/5North/sopra-fs25-group-22-server/commit/e0512271e490cbdb4989df1266354399e38f757a)                                                                                                                                                                                                                                                                                                                                                   | Refactoring MessageController and GameService, adding some logic | The code is better structured and tidier, which allowed to catch minor logic flaws and make it more robust, maintainable and organic.                           |
+| **@shellmychakkaith** | 12.04                     |   https://github.com/5North/sopra-fs25-group-22-client/commit/9dacdc16853c3f155b3b6155fbd0da3c743f6e01                                                                                                                                                                                                                                                                                                                                                                                                                                          | Made modifications so users can join with host; redirection to game page                                  | Users are able to join the game, and if there are 4 players all get redirected to the game itself                                                                                                                            |
+|                    | 14.04                       | https://github.com/5North/sopra-fs25-group-22-client/commit/84e6204466d9a20b99727f09d836f41b5f132545                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                | Implementation of components; Game logic first implementation                                  | the users only see their owm hand, and see the back of other cards, frontend implements updates from gamelogic                                                                                                                              |
+| **@Seydi89** | 15.04.2024                      | https://github.com/5North/sopra-fs25-group-22-client/commit/279ce4bef681e399a4c96b124c8a1d76454c4ad2                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |#23, #24, #20                                  | game start connections and messaging                                                                                                                             |
+| **@Seydi89** | 15.04.2024               | https://github.com/5North/sopra-fs25-group-22-client/commit/1ed1fc7b009a447c0752adf62869d9aa4142d327                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | bug fixes and style improvements                  | Bug fixes                                                                                                                             |
+| **@sbenzo99** |13.04| https://github.com/5North/sopra-fs25-group-22-server/pull/117/commits/a3fc9097b56c44a624cff773ca3b0fe062f9eb92, https://github.com/5North/sopra-fs25-group-22-server/pull/117/commits/f8cb7add7684b916861b24ddc4799c5b361be2d7, https://github.com/5North/sopra-fs25-group-22-server/pull/117/commits/a3fc9097b56c44a624cff773ca3b0fe062f9eb92 | Game Service Implementation to Manage the game flow| TO be able to communicate betweeen client and game session |
+| **@sbenzo99** |13.04| https://github.com/5North/sopra-fs25-group-22-server/pull/117/commits/38ab6777bba9e0c4f0b6bc38f1772aefaa915bf4 | Test Game Service, MessageController, Mappers DTO and Integration| self explaining |
+
+
+---
+
+## Contributions Week 4 - 16.04.25 to 22.04.25
+
+| **Student**        | **Date** | **Link to Commit** | **Description**                 | **Relevance**                       |
+| ------------------ | -------- | ------------------ | ------------------------------- | ----------------------------------- |
+| **[@githubUser1]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
+|                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
+| **[@githubUser2]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
+|                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
 | **[@githubUser3]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
 |                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
 | **[@githubUser4]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
@@ -82,24 +111,30 @@ reason).
 
 ---
 
-## Contributions Week 3 - [Begin Date] to [End Date]
-
-_Continue with the same table format as above._
-
----
-
-## Contributions Week 4 - [Begin Date] to [End Date]
-
-_Continue with the same table format as above._
-
----
-
 ## Contributions Week 5 - [Begin Date] to [End Date]
 
-_Continue with the same table format as above._
+| **Student**        | **Date** | **Link to Commit** | **Description**                 | **Relevance**                       |
+| ------------------ | -------- | ------------------ | ------------------------------- | ----------------------------------- |
+| **[@githubUser1]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
+|                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
+| **[@githubUser2]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
+|                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
+| **[@githubUser3]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
+|                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
+| **[@githubUser4]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
+|                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
 
 ---
 
 ## Contributions Week 6 - [Begin Date] to [End Date]
 
-_Continue with the same table format as above._
+| **Student**        | **Date** | **Link to Commit** | **Description**                 | **Relevance**                       |
+| ------------------ | -------- | ------------------ | ------------------------------- | ----------------------------------- |
+| **[@githubUser1]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
+|                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
+| **[@githubUser2]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
+|                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
+| **[@githubUser3]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
+|                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
+| **[@githubUser4]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
+|                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |

@@ -67,7 +67,6 @@ export default function GamePage() {
       reconnectDelay: 2000,
       onConnect: () => {
         console.log("Connected to game WebSocket");
-
         // Subscribe to public game state updates
         client.subscribe(`/topic/game/${id}`, (message: IMessage) => {
           try {
@@ -107,19 +106,12 @@ export default function GamePage() {
             }
           });
 
-        // Subscription for move broadcasts
-          client.subscribe(`/topic/move/${id}`, (message: IMessage) => {
-            try {
-              const moveData: MoveAnimationData = JSON.parse(message.body);
-              console.log("Received move broadcast:", moveData);
-              // Set the move animation state to trigger display in the UI.
-              setMoveAnimation(moveData);
-              setTimeout(() => {
-                setMoveAnimation(null);
-              }, 3000);
-            } catch (err) {
-              console.error("Error processing move broadcast:", err);
-            }
+
+          console.log(`path is... /app/updateGame/${id}`);
+          client.publish({
+            destination: `/app/updateGame/${id}`,
+            body: '',
+            headers: {userId: `${currentUserId}`},
           });
 
           // Subscription for game result broadcast
@@ -132,6 +124,22 @@ export default function GamePage() {
               console.error("Error processing game result:", err);
             }
           });
+
+        setMoveAnimation(null);  
+        // // Subscription for move broadcasts
+        //   client.subscribe(`/topic/move/${id}`, (message: IMessage) => {
+        //     try {
+        //       const moveData: MoveAnimationData = JSON.parse(message.body);
+        //       console.log("Received move broadcast:", moveData);
+        //       // Set the move animation state to trigger display in the UI.
+        //       setMoveAnimation(moveData);
+        //       setTimeout(() => {
+        //         setMoveAnimation(null);
+        //       }, 3000);
+        //     } catch (err) {
+        //       console.error("Error processing move broadcast:", err);
+        //     }
+        //   });
       },
       onStompError: (frame) => {
         console.error("STOMP error:", frame.headers["message"]);
