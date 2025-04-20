@@ -3,11 +3,10 @@ export interface Card {
     value: number;
   }
   
-  export interface PlayerState {
+  export interface Player {
+    handSize: number;
+    scopaCount: number;
     userId: number;
-    hand: Card[];
-    treasure?: Card[];
-    scopaCount?: number;
   }
   
   export interface TableState {

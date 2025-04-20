@@ -3,7 +3,7 @@
 import React from "react";
 import CardComponent from "./CardComponent";
 import CardBackComponent from "./CardBackComponent";
-import { GameSessionState, Card } from "@/models/GameSession";
+import { GameSessionState, Card, Player } from "@/models/GameSession";
 
 interface ScopaGameViewProps {
   gameSession: GameSessionState;
@@ -19,7 +19,12 @@ const ScopaGameView: React.FC<ScopaGameViewProps> = ({
   onCardClick,
 }) => {
   // All opponents
-  const opponents = gameSession.players.filter((p) => p.userId !== currentUserId);
+  console.log("game session in scopa view: ", gameSession);
+  let opponents:Player[] = [];
+
+if (gameSession.players) {
+  opponents = gameSession.players.filter((p) => p.userId !== currentUserId);
+}
 
   return (
     <div className="game-board">
@@ -68,14 +73,16 @@ const ScopaGameView: React.FC<ScopaGameViewProps> = ({
       </div>
 
       {/* Center Table */}
-      <div className="table-area">
-        <h3>Table</h3>
-        <div style={{ display: "flex", flexWrap: "wrap" }}>
-          {gameSession.tableCards.map((card, index) => (
-            <CardComponent key={index} card={card} />
-          ))}
-        </div>
-      </div>
+      {gameSession.tableCards && (
+  <div className="table-area">
+    <h3>Table</h3>
+    <div style={{ display: "flex", flexWrap: "wrap" }}>
+      {gameSession.tableCards.map((card, index) => (
+        <CardComponent key={index} card={card} />
+      ))}
+    </div>
+  </div>
+)}
 
       {/* Current User’s Hand */}
       <div className="my-hand-area">

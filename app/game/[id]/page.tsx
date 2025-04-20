@@ -68,21 +68,21 @@ export default function GamePage() {
       onConnect: () => {
         console.log("Connected to game WebSocket");
         // Subscribe to public game state updates
-        client.subscribe(`/topic/game/${id}`, (message: IMessage) => {
-          try {
-            const data: GameSessionState = JSON.parse(message.body);
-            console.log("Public game state update:", data);
-            setGameState({
-                ...gameState,
-                gameId: parseInt(id as string, 10),
-                tableCards: data.tableCards, 
-                players: data.players,
-                currentPlayerId: data.currentPlayerId,
-              });
-          } catch (err) {
-            console.error("Error processing game state update", err);
-          }
-        });
+        // client.subscribe(`/topic/game/${id}`, (message: IMessage) => {
+        //   try {
+        //     const data: GameSessionState = JSON.parse(message.body);
+        //     console.log("Public game state update:", data);
+        //     setGameState({
+        //         ...gameState,
+        //         gameId: parseInt(id as string, 10),
+        //         tableCards: data.tableCards, 
+        //         players: data.players,
+        //         currentPlayerId: data.currentPlayerId,
+        //       });
+        //   } catch (err) {
+        //     console.error("Error processing game state update", err);
+        //   }
+        // });
 
         // Private subscription for messages such as capture options or hand updates.
         client.subscribe("/user/queue/reply", (message: IMessage) => {
@@ -90,16 +90,26 @@ export default function GamePage() {
               const payload = JSON.parse(message.body);
               console.log("Private message received:", payload);
   
-              // Check if payload is a capture options message.
-              if (Array.isArray(payload) && payload.length > 0 && Array.isArray(payload[0])) {
-                setCaptureOptions(payload);
-                console.log("Capture options updated:", payload);
+              // // Check if payload is a capture options message.
+              // if (Array.isArray(payload) && payload.length > 0 && Array.isArray(payload[0])) {
+              //   setCaptureOptions(payload);
+              //   console.log("Capture options updated:", payload);
 
-              }
-              if (payload.userId === currentUserId && payload.handCards) {
-                setMyHand(payload.handCards);
-                console.log("My hand updated:", payload.handCards);
-              }
+              // }
+              // if (payload.userId === currentUserId && payload.handCards) {
+              //   setMyHand(payload.handCards);
+              //   console.log("My hand updated:", payload.handCards);
+              // }
+              const data: GameSessionState = JSON.parse(message.body);
+              console.log("Public game state update:", data);
+              setGameState({
+                ...gameState,
+                gameId: parseInt(id as string, 10),
+                tableCards: data.tableCards, 
+                players: data.players,
+                currentPlayerId: data.currentPlayerId,
+              });
+              console.log("I am logging the game stat here: ", JSON.stringify(gameState));
               // handle other types of private messages here.
             } catch (err) {
               console.error("Error processing private message:", err);
@@ -125,7 +135,8 @@ export default function GamePage() {
             }
           });
 
-        setMoveAnimation(null);  
+        setMoveAnimation(null); 
+        setMyHand([]); 
         // // Subscription for move broadcasts
         //   client.subscribe(`/topic/move/${id}`, (message: IMessage) => {
         //     try {
