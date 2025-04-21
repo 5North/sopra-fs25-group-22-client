@@ -5,11 +5,10 @@ import { useParams } from "next/navigation";
 import { Client, IMessage } from "@stomp/stompjs";
 import ScopaGameView from "@/components/ScopaGameView";
 import GameResultView from "@/components/GameResultView";
-import { GameSessionState, Card } from "@/models/GameSession"; 
+import { GameSessionState, Card, TablePrivateState } from "@/models/GameSession"; 
 import { GameResultDTO } from "@/models/GameResult";
 import { getWsDomain } from "@/utils/domain";
 import useLocalStorage from "@/hooks/useLocalStorage";
-
 
 // simple initial state for loading before receiving real updates.
 const initialGameState: GameSessionState = {
@@ -26,6 +25,7 @@ interface MoveAnimationData {
   }
 
 export default function GamePage() {
+  const hasPublishedRef = useRef(false);
   const { id } = useParams(); 
   //const router = useRouter();
   const [gameState, setGameState] = useState<GameSessionState>(initialGameState);
@@ -89,6 +89,24 @@ export default function GamePage() {
             try {
               const payload = JSON.parse(message.body);
               console.log("Private message received:", payload);
+
+              if(JSON.stringify(payload).includes("handCards")) {
+                const data: TablePrivateState = JSON.parse(message.body);
+                setMyHand(data.handCards);
+              } else if (JSON.stringify(payload).includes("tableCards")) {
+                const data: GameSessionState = JSON.parse(message.body);
+                console.log("Public game state update:", data);
+                setGameState({
+                  ...gameState,
+                  gameId: parseInt(id as string, 10),
+                  tableCards: data.tableCards, 
+                  players: data.players,
+                  currentPlayerId: data.currentPlayerId,
+                });
+                console.log("I am logging the game stat here: ", JSON.stringify(gameState));
+              } else {
+                console.log("Unknown message from queue: " + payload)
+              }
   
               // // Check if payload is a capture options message.
               // if (Array.isArray(payload) && payload.length > 0 && Array.isArray(payload[0])) {
@@ -100,29 +118,21 @@ export default function GamePage() {
               //   setMyHand(payload.handCards);
               //   console.log("My hand updated:", payload.handCards);
               // }
-              const data: GameSessionState = JSON.parse(message.body);
-              console.log("Public game state update:", data);
-              setGameState({
-                ...gameState,
-                gameId: parseInt(id as string, 10),
-                tableCards: data.tableCards, 
-                players: data.players,
-                currentPlayerId: data.currentPlayerId,
-              });
-              console.log("I am logging the game stat here: ", JSON.stringify(gameState));
               // handle other types of private messages here.
             } catch (err) {
               console.error("Error processing private message:", err);
             }
           });
 
-
-          console.log(`path is... /app/updateGame/${id}`);
-          client.publish({
-            destination: `/app/updateGame/${id}`,
-            body: '',
-            headers: {userId: `${currentUserId}`},
-          });
+          if (!hasPublishedRef.current) { 
+            console.log(`path is... /app/updateGame/${id}`);
+            client.publish({
+              destination: `/app/updateGame/${id}`,
+              body: '',
+              headers: {userId: `${currentUserId}`},
+            });
+            hasPublishedRef.current = true;
+          }
 
           // Subscription for game result broadcast
           client.subscribe(`/topic/gameresult/${id}`, (message: IMessage) => {
@@ -136,7 +146,6 @@ export default function GamePage() {
           });
 
         setMoveAnimation(null); 
-        setMyHand([]); 
         // // Subscription for move broadcasts
         //   client.subscribe(`/topic/move/${id}`, (message: IMessage) => {
         //     try {
@@ -167,14 +176,14 @@ export default function GamePage() {
         stompClientRef.current.deactivate();
       }
     };
-  }, [id, gameState, token, currentUserId]);
+  }, [id, gameState, myHand, token, currentUserId]);
 
   //  Handler for playing a card (without capture options)
   const handleCardClick = (card: Card) => {
     if (!id) return;
     // payload for a card play without capture options
     const payload = JSON.stringify({
-      "gameId/lobbyID": id,
+      lobbyId: id,
       card: {
         suit: card.suit,
         value: card.value,
@@ -182,6 +191,7 @@ export default function GamePage() {
     });
     console.log("Publishing played card payload:", payload);
     // Publish the payload to the backend endpoint
+
     stompClientRef.current?.publish({
       destination: `/app/playCard`,
       body: payload,

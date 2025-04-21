@@ -24,3 +24,7 @@ export interface Card {
     currentPlayerId: number;
   }
   
+  export interface TablePrivateState {
+    handCards: Card[];
+    userId: string;
+  }
