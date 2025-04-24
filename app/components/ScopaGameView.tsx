@@ -51,7 +51,7 @@ const getUsernameById = (id: number) => {
       <div className="opponent-area top-opponent">
         {opponents[0] && (
           <>
-            <h2>{getUsernameById(opponents[0].userId)}</h2>
+            <h2>{getUsernameById(opponents[0].userId)}&nbsp; 🪙 {opponents[0].scopaCount}</h2>
             <div style={{ display: "flex" }}>
             {Array.from({ length: opponents[0].handSize }).map((_, idx) => (
               <div
@@ -69,7 +69,7 @@ const getUsernameById = (id: number) => {
       <div className="opponent-area left-opponent">
         {opponents[1] && (
           <>
-            <h2>{getUsernameById(opponents[1].userId)}</h2>
+            <h2>{getUsernameById(opponents[1].userId)}&nbsp; 🪙 {opponents[1].scopaCount}</h2>
             <div style={{ display: "flex", flexDirection: "column" }}>
             {Array.from({ length: opponents[1].handSize }).map((_, idx) => (
               <div
@@ -89,7 +89,7 @@ const getUsernameById = (id: number) => {
         {opponents[2] && (
           <>
             {/*<p>Opponent (ID: {opponents[2].userId}) {getUsernameById(opponents[2].userId)}</p>*/}
-            <h2>{getUsernameById(opponents[2].userId)}</h2>
+            <h2>{getUsernameById(opponents[2].userId)}&nbsp; 🪙 {opponents[2].scopaCount}</h2>
             <div style={{ display: "flex", flexDirection: "column" }}>
             {Array.from({ length: opponents[2].handSize }).map((_, idx) => (
               <div
@@ -118,9 +118,10 @@ const getUsernameById = (id: number) => {
 
       {/* Current User’s Hand */}
       <div className="my-hand-area">
-  <h3>
+  <h2>
     {currentUserId === gameSession.currentPlayerId ? 'My turn!' : ''}
-  </h3>
+    &nbsp; 🪙 {gameSession.players.find(p => p.userId === currentUserId)?.scopaCount ?? 0}
+  </h2>
   <div
     style={{
       display: "flex",

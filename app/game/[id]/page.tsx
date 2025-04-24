@@ -228,10 +228,12 @@ useEffect(() => {
       destination: `/app/playCard`,
       body: payload,
     });
+    console.log("user id is: " + currentUserId);
   };
 
     // Handler for when a capture option is selected.
   const handleCaptureOptionClick = (chosenOption: Card[]) => {
+    console.log("user id is in capture option: " + currentUserId);
     if (!id) return;
     // Clear capture options from UI as a user selection is made.
     setCaptureOptions([]);
@@ -244,10 +246,12 @@ useEffect(() => {
       destination: `/app/chooseCapture`,
       body: payload,
     });
+    console.log("user id is in capture 2: " + currentUserId);
   };
 
   // Renders the capture options UI.
   const renderCaptureOptions = () => {
+    console.log("render captur user id is: " + currentUserId);
     if (captureOptions.length === 0) return null;
     return (
       <div style={{ backgroundColor: "rgba(0,0,0,0.8)", padding: "1rem", position: "absolute", top: "10%", left: "50%", transform: "translateX(-50%)", borderRadius: "8px", zIndex: 999,color: "#fff"}}>

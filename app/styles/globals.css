@@ -137,6 +137,9 @@ a {
   width: 100vw;
   height: 100vh;
   background-color: black;
+  background-image: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75)), url("/images/gameback.jpg") !important;
+  background-size: cover;
+  background-position: center;
   color: white;
 }
 
