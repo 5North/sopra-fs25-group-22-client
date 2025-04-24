@@ -319,6 +319,43 @@ useEffect(() => {
         onCardClick={handleCardClick}
       />
       {gameResult && <GameResultView result={gameResult} />}
+      <div
+        onClick={() => {
+          const payload = JSON.stringify({ gameId: id});
+          console.log("🔍 Sending AI suggestion request:", payload);
+          stompClientRef.current?.publish({
+            destination: `/app/ai`,
+            body: payload,
+          });
+        }}
+        style={{
+          position: "fixed",
+          bottom: "20px",
+          right: "20px",
+          backgroundColor: "#f5ce42", 
+          borderRadius: "50%",
+          width: "120px",
+          height: "120px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          boxShadow: "0 4px 10px rgba(0,0,0,0.3)",
+          cursor: "pointer",
+          zIndex: 1001,
+        }}
+        title="Get AI suggestion"
+      >
+  <img
+    src="/images/aibot.png"
+    alt="AI Suggestion"
+    style={{
+      width: "110",
+      height: "110px",
+      borderRadius: "50%",
+      objectFit: "cover" // ensures the image fills the circle without distortion
+    }}
+  />
+      </div>
     </div>
   );
 }

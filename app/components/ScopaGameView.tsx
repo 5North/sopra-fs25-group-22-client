@@ -103,31 +103,32 @@ const getUsernameById = (id: number) => {
 
       {/* Current User’s Hand */}
       <div className="my-hand-area">
-       <h3>My Hand {currentUserId === gameSession.currentPlayerId ? '- My turn' : ''}</h3>
-        <div style={{ display: "flex", flexWrap: "wrap" }}>
-        {myHand.map((card, index) => (
-            <div key={index} style={{ marginRight: "4px" }}>
-              {/* Here we show the actual card, clickable */}
-              <div
-                style={{
-                  width: "40px",
-                  height: "60px",
-                  backgroundColor: "white",
-                  color: "black",
-                  border: "1px solid #ccc",
-                  borderRadius: "3px",
-                  textAlign: "center",
-                  cursor: "pointer",
-                  //backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.1)), url("/images/gameback.jpg")' => TODO: this is the background of my hand cards.. 
-                }}
-                onClick={() => onCardClick(card)}
-              >
-                {card.value} {card.suit}
-              </div>
-            </div>
-          ))}
-        </div>
+  <h3>
+    My Hand {currentUserId === gameSession.currentPlayerId ? '- My turn' : ''}
+  </h3>
+  <div
+    style={{
+      display: "flex",
+      flexWrap: "wrap",
+      opacity: currentUserId === gameSession.currentPlayerId ? 1 : 0.5,
+      pointerEvents: currentUserId === gameSession.currentPlayerId ? "auto" : "none",
+    }}
+  >
+    {myHand.map((card, index) => (
+      <div
+        key={index}
+        onClick={() => onCardClick(card)}
+        style={{
+          cursor: currentUserId === gameSession.currentPlayerId ? "pointer" : "default",
+          marginRight: "4px",
+        }}
+      >
+        <CardComponent card={card} />
       </div>
+    ))}
+  </div>
+</div>
+
     </div>
   );
 };
