@@ -51,7 +51,8 @@ const getUsernameById = (id: number) => {
       <div className="opponent-area top-opponent">
         {opponents[0] && (
           <>
-            <h2>{getUsernameById(opponents[0].userId)}&nbsp; 🪙 {opponents[0].scopaCount}</h2>
+            <h2>{getUsernameById(opponents[0].userId)}</h2>
+            <p>🪙 {opponents[0].scopaCount}</p>
             <div style={{ display: "flex" }}>
             {Array.from({ length: opponents[0].handSize }).map((_, idx) => (
               <div
@@ -69,7 +70,8 @@ const getUsernameById = (id: number) => {
       <div className="opponent-area left-opponent">
         {opponents[1] && (
           <>
-            <h2>{getUsernameById(opponents[1].userId)}&nbsp; 🪙 {opponents[1].scopaCount}</h2>
+            <h2>{getUsernameById(opponents[1].userId)}</h2>
+            <p>🪙 {opponents[1].scopaCount}</p>
             <div style={{ display: "flex", flexDirection: "column" }}>
             {Array.from({ length: opponents[1].handSize }).map((_, idx) => (
               <div
@@ -89,7 +91,8 @@ const getUsernameById = (id: number) => {
         {opponents[2] && (
           <>
             {/*<p>Opponent (ID: {opponents[2].userId}) {getUsernameById(opponents[2].userId)}</p>*/}
-            <h2>{getUsernameById(opponents[2].userId)}&nbsp; 🪙 {opponents[2].scopaCount}</h2>
+            <h2>{getUsernameById(opponents[2].userId)}</h2>
+            <p>🪙 {opponents[2].scopaCount}</p>
             <div style={{ display: "flex", flexDirection: "column" }}>
             {Array.from({ length: opponents[2].handSize }).map((_, idx) => (
               <div
@@ -119,15 +122,15 @@ const getUsernameById = (id: number) => {
       {/* Current User’s Hand */}
       <div className="my-hand-area">
   <h2>
-    {currentUserId === gameSession.currentPlayerId ? 'My turn!' : ''}
-    &nbsp; 🪙 {gameSession.players.find(p => p.userId === currentUserId)?.scopaCount ?? 0}
+    {currentUserId === gameSession?.currentPlayerId ? 'My turn!' : ''}
   </h2>
+  <p> &nbsp; 🪙 {gameSession?.players?.find(p => p.userId === currentUserId)?.scopaCount ?? 0}</p>
   <div
     style={{
       display: "flex",
       flexWrap: "wrap",
-      opacity: currentUserId === gameSession.currentPlayerId ? 1 : 0.5,
-      pointerEvents: currentUserId === gameSession.currentPlayerId ? "auto" : "none",
+      opacity: currentUserId === gameSession?.currentPlayerId ? 1 : 0.5,
+      pointerEvents: currentUserId === gameSession?.currentPlayerId ? "auto" : "none",
     }}
   >
     {myHand.map((card, index) => (
@@ -135,7 +138,7 @@ const getUsernameById = (id: number) => {
         key={index}
         onClick={() => onCardClick(card)}
         style={{
-          cursor: currentUserId === gameSession.currentPlayerId ? "pointer" : "default",
+          cursor: currentUserId === gameSession?.currentPlayerId ? "pointer" : "default",
           marginRight: "4px",
         }}
       >
