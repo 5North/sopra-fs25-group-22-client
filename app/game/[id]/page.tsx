@@ -5,10 +5,11 @@ import { useParams } from "next/navigation";
 import { Client, IMessage } from "@stomp/stompjs";
 import ScopaGameView from "@/components/ScopaGameView";
 import GameResultView from "@/components/GameResultView";
-import { GameSessionState, Card, TablePrivateState } from "@/models/GameSession"; 
+import { GameSessionState, Card, TablePrivateState, UserListElement } from "@/models/GameSession"; 
 import { GameResultDTO } from "@/models/GameResult";
 import { getWsDomain } from "@/utils/domain";
 import useLocalStorage from "@/hooks/useLocalStorage";
+import { getUsers } from "@/api/registerService";
 
 // simple initial state for loading before receiving real updates.
 const initialGameState: GameSessionState = {
@@ -34,28 +35,49 @@ export default function GamePage() {
   const [myHand, setMyHand] = useState<Card[]>([]);
   const [moveAnimation, setMoveAnimation] = useState<MoveAnimationData | null>(null);
   const [gameResult, setGameResult] = useState<GameResultDTO | null>(null);
+  const [allUsers, setAllUsers] = useState<UserListElement[]>([]);
   const stompClientRef = useRef<Client | null>(null);
   const { value: token } = useLocalStorage<string>("token", "");
-  
+  //const [currentUserId, setCurrentUserId] = useState<number | null>(null);
+
+  const getUserIdByUsername = (username: string): number | null => {
+    const user = allUsers.find(u => u.username === username);
+    return user ? user.id : null;
+  };
 
   const getCurrentUserId = (): number | null => {
     if (typeof window !== "undefined") {
-      const userStr = localStorage.getItem("user");
-      if (userStr) {
-        try {
-          const user = JSON.parse(userStr);
-          return user.id;
-        } catch (err) {
-          console.error("Error parsing user info:", err);
-        }
+      const userName = localStorage.getItem("username");
+      if (userName) {
+       return getUserIdByUsername(userName);
       }
     }
     return null;
   };
 
-  const currentUserId = getCurrentUserId() || 0;
+  const currentUserId = getCurrentUserId();
 
   // Basic setup for STOMP client connection on the game topic.
+
+
+useEffect(() => {
+  const fetchUsers = async () => {
+    try {
+      const response = await getUsers();
+      if (!response.ok) {
+        throw new Error("Failed to fetch users");
+      }
+      const users: UserListElement[] = await response.json();
+      console.log("Fetched users:", users);
+      setAllUsers(users);
+    } catch (err) {
+      console.error("Error fetching users:", err);
+    }
+  };
+
+  fetchUsers();
+}, []);
+
   useEffect(() => {
     if (!id) {
       setError("No game ID specified");
@@ -104,8 +126,12 @@ export default function GamePage() {
       players:         payload.players,
       currentPlayerId: payload.currentPlayerId,
     }));
-              } else {
-                console.log("Unknown message from queue: " + payload)
+              } else if(payload.outcome){
+                const resultData: GameResultDTO = JSON.parse(message.body);
+                console.log("Received game result:", resultData);
+                setGameResult(resultData);
+                //{"gameId":1567,"userId":9,"outcome":"LOST","myTotal":2,"otherTotal":3,"myCarteResult":1,"myDenariResult":1,"myPrimieraResult":0,"mySettebelloResult":0,"myScopaResult":0,"otherCarteResult":0,"otherDenariResult":0,"otherPrimieraResult":1,"otherSettebelloResult":1,"otherScopaResult":1}
+                console.log("Unknown message from queue: " + JSON.stringify(payload))
               }
   
               // // Check if payload is a capture options message.
@@ -281,14 +307,15 @@ export default function GamePage() {
   }
 
   return (
-    <div style={{ backgroundColor: "black", minHeight: "100vh" }}>
+    <div style={{ backgroundColor: "blue", minHeight: "100vh"}}>
       {/* Render game view with the current state and card click handler */}
       {renderCaptureOptions()}
       {renderMoveAnimation()}
       <ScopaGameView
         gameSession={gameState}
-        currentUserId={currentUserId} 
+        currentUserId={currentUserId || 0} 
         myHand={myHand}
+        usersList={allUsers}
         onCardClick={handleCardClick}
       />
       {gameResult && <GameResultView result={gameResult} />}

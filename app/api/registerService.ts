@@ -8,6 +8,15 @@ export const createUser = async (values: object):Promise<Response> => {
   return postValuesToPath("/users", values);
 };
 
+export const getUsers = async ():Promise<Response> => {
+  return fetch(getApiDomain() + "/users", {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+};
+
 export const logoutUser = async (token: string):Promise<Response> => {
   return fetch(getApiDomain() + "/logout", {
     method: "POST",

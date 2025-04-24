@@ -27,7 +27,6 @@ const Register: React.FC = () => {
     setLoading(true);
     try {
       response = await createUser(values);
-
       // TODO: make response check reusable
       if (!response.ok) {
         if (response.status === 409) {

@@ -28,3 +28,8 @@ export interface Card {
     handCards: Card[];
     userId: string;
   }
+
+  export interface UserListElement {
+    username: string;
+    id: number;
+  }  
