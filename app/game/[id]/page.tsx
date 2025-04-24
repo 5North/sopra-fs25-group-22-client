@@ -65,26 +65,29 @@ export default function GamePage() {
     const client = new Client({
       brokerURL: getWsDomain() + `/lobby?token=${token}`, 
       reconnectDelay: 2000,
+      debug: (msg) => {
+        console.log("[STOMP]", msg);
+      },
       onConnect: () => {
         console.log("Connected to game WebSocket");
-        // Subscribe to public game state updates
-        // client.subscribe(`/topic/game/${id}`, (message: IMessage) => {
-        //   try {
-        //     const data: GameSessionState = JSON.parse(message.body);
-        //     console.log("Public game state update:", data);
-        //     setGameState({
-        //         ...gameState,
-        //         gameId: parseInt(id as string, 10),
-        //         tableCards: data.tableCards, 
-        //         players: data.players,
-        //         currentPlayerId: data.currentPlayerId,
-        //       });
-        //   } catch (err) {
-        //     console.error("Error processing game state update", err);
-        //   }
-        // });
 
-        // Private subscription for messages such as capture options or hand updates.
+        // Subscribe to public game state updates
+         client.subscribe(`/topic/lobby/${id}`, (message: IMessage) => {
+           try {
+             const data: GameSessionState = JSON.parse(message.body);
+             console.log("Public game state update:", data);
+             setGameState(prev => ({
+                ...prev,
+                tableCards: data.tableCards,
+                players:    data.players,
+                currentPlayerId: data.currentPlayerId,
+              }));
+           } catch (err) {
+             console.error("Error processing game state update", err);
+           }
+         });
+
+        // subscription to private queue
         client.subscribe("/user/queue/reply", (message: IMessage) => {
             try {
               const payload = JSON.parse(message.body);
@@ -93,17 +96,14 @@ export default function GamePage() {
               if(JSON.stringify(payload).includes("handCards")) {
                 const data: TablePrivateState = JSON.parse(message.body);
                 setMyHand(data.handCards);
-              } else if (JSON.stringify(payload).includes("tableCards")) {
-                const data: GameSessionState = JSON.parse(message.body);
-                console.log("Public game state update:", data);
-                setGameState({
-                  ...gameState,
-                  gameId: parseInt(id as string, 10),
-                  tableCards: data.tableCards, 
-                  players: data.players,
-                  currentPlayerId: data.currentPlayerId,
-                });
-                console.log("I am logging the game stat here: ", JSON.stringify(gameState));
+              } else if (payload.tableCards) {
+    console.log("🔔 initial public state (via queue):", payload);
+    setGameState(prev => ({
+      ...prev,
+      tableCards:      payload.tableCards,
+      players:         payload.players,
+      currentPlayerId: payload.currentPlayerId,
+    }));
               } else {
                 console.log("Unknown message from queue: " + payload)
               }
@@ -176,7 +176,7 @@ export default function GamePage() {
         stompClientRef.current.deactivate();
       }
     };
-  }, [id, gameState, myHand, token, currentUserId]);
+  }, [id, token, currentUserId]);
 
   //  Handler for playing a card (without capture options)
   const handleCardClick = (card: Card) => {
