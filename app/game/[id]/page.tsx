@@ -10,6 +10,7 @@ import { GameResultDTO } from "@/models/GameResult";
 import { getWsDomain } from "@/utils/domain";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { getUsers } from "@/api/registerService";
+import CardComponent from "@/components/CardComponent";
 
 // simple initial state for loading before receiving real updates.
 const initialGameState: GameSessionState = {
@@ -131,6 +132,11 @@ useEffect(() => {
                 console.log("Received game result:", resultData);
                 setGameResult(resultData);
                 //{"gameId":1567,"userId":9,"outcome":"LOST","myTotal":2,"otherTotal":3,"myCarteResult":1,"myDenariResult":1,"myPrimieraResult":0,"mySettebelloResult":0,"myScopaResult":0,"otherCarteResult":0,"otherDenariResult":0,"otherPrimieraResult":1,"otherSettebelloResult":1,"otherScopaResult":1}
+                
+              } else if (Array.isArray(payload) && payload.length > 0 && Array.isArray(payload[0])) {
+                console.log("Received capture options:", payload);
+                setCaptureOptions(payload); 
+              } else {
                 console.log("Unknown message from queue: " + JSON.stringify(payload))
               }
   
@@ -244,16 +250,14 @@ useEffect(() => {
   const renderCaptureOptions = () => {
     if (captureOptions.length === 0) return null;
     return (
-      <div style={{ backgroundColor: "rgba(0,0,0,0.8)", padding: "1rem", position: "absolute", top: "10%", left: "50%", transform: "translateX(-50%)", borderRadius: "8px" }}>
+      <div style={{ backgroundColor: "rgba(0,0,0,0.8)", padding: "1rem", position: "absolute", top: "10%", left: "50%", transform: "translateX(-50%)", borderRadius: "8px", zIndex: 999,color: "#fff"}}>
         <h3 style={{ color: "#fff" }}>Choose your capture option:</h3>
         {captureOptions.map((option, idx) => (
           <div key={idx}
               style={{ display: "flex", cursor: "pointer", marginBottom: "0.5rem", border: "1px solid #fff", padding: "0.5rem" }}
               onClick={() => handleCaptureOptionClick(option)}>
             {option.map((card, cardIdx) => (
-              <div key={cardIdx} style={{ margin: "0 0.5rem", color: "#fff" }}>
-                {card.value} {card.suit}
-              </div>
+              <CardComponent card={card} key={cardIdx} />
             ))}
           </div>
         ))}
@@ -309,6 +313,19 @@ useEffect(() => {
   return (
     <div style={{ backgroundColor: "blue", minHeight: "100vh"}}>
       {/* Render game view with the current state and card click handler */}
+      {captureOptions.length > 0 && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100vw",
+            height: "100vh",
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+            zIndex: 998,
+          }}
+        />
+      )}
       {renderCaptureOptions()}
       {renderMoveAnimation()}
       <ScopaGameView

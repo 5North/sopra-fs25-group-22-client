@@ -51,11 +51,15 @@ const getUsernameById = (id: number) => {
       <div className="opponent-area top-opponent">
         {opponents[0] && (
           <>
-            <p>Opponent (ID: {opponents[0].userId}) {getUsernameById(opponents[0].userId)}</p>
+            <h2>{getUsernameById(opponents[0].userId)}</h2>
             <div style={{ display: "flex" }}>
             {Array.from({ length: opponents[0].handSize }).map((_, idx) => (
-                <CardBackComponent key={idx} />
-              ))}
+              <div
+                key={`right-${idx}-${opponents[0].handSize}`} 
+              >
+                <CardBackComponent />
+              </div>
+            ))}
             </div>
           </>
         )}
@@ -65,11 +69,16 @@ const getUsernameById = (id: number) => {
       <div className="opponent-area left-opponent">
         {opponents[1] && (
           <>
-            <p>Opponent (ID: {opponents[1].userId}) {getUsernameById(opponents[1].userId)}</p>
+            <h2>{getUsernameById(opponents[1].userId)}</h2>
             <div style={{ display: "flex", flexDirection: "column" }}>
             {Array.from({ length: opponents[1].handSize }).map((_, idx) => (
-                <CardBackComponent key={idx} />
-              ))}
+              <div
+                key={`right-${idx}-${opponents[1].handSize}`} 
+                style={{ transform: "rotate(90deg)", margin: "4px 0" }}
+              >
+                <CardBackComponent />
+              </div>
+            ))}
             </div>
           </>
         )}
@@ -79,11 +88,17 @@ const getUsernameById = (id: number) => {
       <div className="opponent-area right-opponent">
         {opponents[2] && (
           <>
-            <p>Opponent (ID: {opponents[2].userId}) {getUsernameById(opponents[2].userId)}</p>
+            {/*<p>Opponent (ID: {opponents[2].userId}) {getUsernameById(opponents[2].userId)}</p>*/}
+            <h2>{getUsernameById(opponents[2].userId)}</h2>
             <div style={{ display: "flex", flexDirection: "column" }}>
             {Array.from({ length: opponents[2].handSize }).map((_, idx) => (
-                <CardBackComponent key={idx} />
-              ))}
+              <div
+                key={`right-${idx}-${opponents[2].handSize}`}
+                style={{ transform: "rotate(-90deg)", margin: "4px 0" }}
+              >
+                <CardBackComponent />
+              </div>
+            ))}
             </div>
           </>
         )}
@@ -92,7 +107,7 @@ const getUsernameById = (id: number) => {
       {/* Center Table */}
       {gameSession.tableCards && (
   <div className="table-area">
-    <h3>Table</h3>
+    {/* <h3>Table</h3> */}
     <div style={{ display: "flex", flexWrap: "wrap" }}>
       {gameSession.tableCards.map((card, index) => (
         <CardComponent key={index} card={card} />
@@ -104,7 +119,7 @@ const getUsernameById = (id: number) => {
       {/* Current User’s Hand */}
       <div className="my-hand-area">
   <h3>
-    My Hand {currentUserId === gameSession.currentPlayerId ? '- My turn' : ''}
+    {currentUserId === gameSession.currentPlayerId ? 'My turn!' : ''}
   </h3>
   <div
     style={{
