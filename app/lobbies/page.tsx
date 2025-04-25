@@ -182,13 +182,26 @@ const LobbyPage: React.FC = () => {
 
   return (
     <div className="register-container">
-      <div>
-        <h1 style={{ marginBottom: "1rem", opacity: 0.8 }}>♠️ ♥️ ♦️ ♣️ </h1>
-        <h2 style={{ margin: "1rem 0" }}>
-          Game ID: {lobby.PIN ?? lobby.lobbyId} 🔗
-        </h2>
-        <h1 style={{ marginBottom: "1rem", opacity: 0.8 }}>♠️ ♥️ ♦️ ♣️ </h1>
-      </div>
+    <div style={{ textAlign: "center" }}>
+      <h1 style={{ marginBottom: "1rem", opacity: 0.8 }}>♠️ ♥️ ♦️ ♣️</h1>
+
+      {/* ←─ Game-ID pill ─→ */}
+      <h2
+        style={{
+          margin: "1rem 0",
+          display: "inline-block",
+          backgroundColor: "#ffffff",      // solid white
+          color: "#000000",                // solid black text
+          padding: "0.5rem 1rem",
+          borderRadius: "0.5rem",
+          boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
+        }}
+      >
+        Game ID: {lobby.PIN ?? lobby.lobbyId} 🔗
+      </h2>
+
+      <h1 style={{ marginTop: "1rem", opacity: 0.8 }}>♠️ ♥️ ♦️ ♣️</h1>
+    </div>
 
       <div className="team-wrapper">
         <div className="team-box">
@@ -197,8 +210,7 @@ const LobbyPage: React.FC = () => {
             .filter((_, i) => i % 2 === 0)
             .map((player, idx) => (
                 <p key={`t1-${idx}`}>
-                {player.username}
-                 joined
+                {player.username} joined
                 </p>
             ))}
         </div>
@@ -208,8 +220,7 @@ const LobbyPage: React.FC = () => {
             .filter((_, i) => i % 2 === 1)
             .map((player, idx) => (
                 <p key={`t2-${idx}`}>
-                {player.username}
-                 joined
+                {player.username} joined
                 </p>
             ))}
         </div>
