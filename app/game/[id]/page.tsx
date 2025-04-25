@@ -11,7 +11,6 @@ import { GameSessionState, Card, TablePrivateState, UserListElement } from "@/mo
 import { GameResultDTO } from "@/models/GameResult";
 import { getWsDomain } from "@/utils/domain";
 import useLocalStorage from "@/hooks/useLocalStorage";
-import { usePrevious } from "@/hooks/usePrevious";
 import { getUsers } from "@/api/registerService";
 import CardComponent from "@/components/CardComponent";
 
@@ -25,6 +24,12 @@ const initialGameState: GameSessionState = {
   players: [],         
   currentPlayerId: 0,  
 };
+
+interface MoveState {
+  playerId: number
+  pickedCards: Card[],
+  playedCard: Card
+}
 
 
 
@@ -41,8 +46,8 @@ export default function GamePage() {
   const [allUsers, setAllUsers] = useState<UserListElement[]>([]);
   const stompClientRef = useRef<Client | null>(null);
   const { value: token } = useLocalStorage<string>("token", "");
-  const prevTableCards = usePrevious(gameState.tableCards);
-  const prevHand  = usePrevious(myHand);
+  const [moveState, setMoveState] = useState<MoveState>();
+  
 
   //const [currentUserId, setCurrentUserId] = useState<number | null>(null);
 
@@ -102,14 +107,23 @@ useEffect(() => {
         // Subscribe to public game state updates
          client.subscribe(`/topic/lobby/${id}`, (message: IMessage) => {
            try {
-             const data: GameSessionState = JSON.parse(message.body);
-             console.log("Public game state update:", data);
-             setGameState(prev => ({
+            const payload = JSON.parse(message.body);
+            console.log("==> PUBLIC MESSAGE message received:", payload);
+             if(JSON.parse(message.body).pickedCards) {
+              const data: MoveState = JSON.parse(message.body);
+              console.log("cards picked are coming: " + data);
+              setMoveState(data);
+             }
+             else {
+              const data: GameSessionState = JSON.parse(message.body);
+              console.log("Public game state update:", data);
+              setGameState(prev => ({
                 ...prev,
                 tableCards: data.tableCards,
                 players:    data.players,
                 currentPlayerId: data.currentPlayerId,
               }));
+             }
            } catch (err) {
              console.error("Error processing game state update", err);
            }
@@ -275,28 +289,8 @@ useEffect(() => {
   };
 
 
-  useEffect(() => {
-    if (!prevTableCards || !prevHand) return;
-  
-    const newKeys = new Set(gameState?.tableCards?.map(c => `${c.suit}-${c.value}`));
-  
-    // const handPlayedCard = prevHand.find(
-    //   h => !myHand.some(m => m.suit === h.suit && m.value === h.value)
-    // ) ?? null;
-  
-    const tablePlayedCard = gameState?.tableCards?.find(
-      c => !prevTableCards.some(pc => pc.suit === c.suit && pc.value === c.value)
-    ) ?? null;
-  
-    // const playedCard = tablePlayedCard || handPlayedCard;
-    const playedCard = tablePlayedCard;
-  
-    const capturedCards = prevTableCards.filter(
-      pc => !newKeys.has(`${pc.suit}-${pc.value}`)
-    );
-  
-    //console.log("🔍 diff:", { handPlayedCard, tablePlayedCard, capturedCards });
-  
+  useEffect(() => {  
+    if(!moveState) return;
     const players = gameState?.players || [];
   
     const meIndex = players.findIndex(p => p.userId === currentUserId);
@@ -305,15 +299,14 @@ useEffect(() => {
       : players;
   
     const activeSeatIndex = seating.findIndex(
-      p => p.userId === gameState?.currentPlayerId
+      p => p.userId === moveState.playerId
     );
   
-    if (playedCard || capturedCards.length > 0) {
       setMoveAnimation({
-        playerId: gameState?.currentPlayerId,
+        playerId: moveState.playerId ,
         seatIndex: activeSeatIndex as 0 | 1 | 2 | 3,
-        playedCard,
-        capturedCards,
+        playedCard: moveState?.playedCard || null,
+        capturedCards: moveState?.pickedCards || [],
       });
   
       const timeout = setTimeout(() => {
@@ -321,15 +314,8 @@ useEffect(() => {
       }, 1500); // Give it enough time to finish animating
   
       return () => clearTimeout(timeout);
-    }
   }, [
-    gameState.tableCards,
-    gameState.currentPlayerId,
-    gameState.players,
-    myHand,
-    prevTableCards,
-    prevHand,
-    currentUserId,
+    moveState,
   ]);
   
   
