@@ -21,14 +21,26 @@ const ScopaGameView: React.FC<ScopaGameViewProps> = ({
   onCardClick,
 }) => {
   // All opponents
+  const allPlayers = gameSession.players || [];
+  const meIndex   = allPlayers.findIndex(p => p.userId === currentUserId);
+  const seating = meIndex >= 0
+    ? [ ...allPlayers.slice(meIndex), ...allPlayers.slice(0, meIndex) ]
+    : allPlayers;
+    
+  const opponents = [
+    seating[2],  // top = partner
+    seating[1],  // left = next
+    seating[3],  // right = last
+    ].filter(Boolean) as Player[];
+
   console.log("game session in scopa view: ", gameSession);
-  let opponents:Player[] = [];
+  //let opponents:Player[] = [];
   // let currentPlayer: Player[] = [];
   
 if (gameSession.players) {
   console.log("🔹 All player IDs:", gameSession.players.map(p => p.userId));
   // Hack:  current user id is always 0 due to a previous issue. this is a hacky soltion to set current user id to the actual id current user has (and not 0)
-  opponents = gameSession.players.filter((p) => p.userId !== currentUserId);
+  //opponents = gameSession.players.filter((p) => p.userId !== currentUserId);
   console.log("🔸 Opponent IDs:", opponents.map(p => p.userId));
   // current player == players - opponents
   // currentPlayer = gameSession.players.filter((p) => p.userId === currentUserId);;
@@ -40,116 +52,144 @@ const getUsernameById = (id: number) => {
   return user ? user.username : "Unknown";
 };
 
+const isActive = (playerId: number) =>
+  playerId === gameSession.currentPlayerId;
+
+const TurnDot = () => (
+    <span
+      style={{
+        width: 10,
+        height: 10,
+        borderRadius: "50%",
+        backgroundColor: "limegreen",
+        marginLeft: 6,
+      }}
+    />
+  );
 // const isMyTurn = !opponents.some(p => p.userId === gameSession.currentPlayerId);
 
 
-  return (
-    <div className="game-board">
-      {/* Render Opponents: for simplicity, assume up to three opponents placed at top, left and right. */}
-      
-      {/* Top Opponent */}
-      <div className="opponent-area top-opponent">
-        {opponents[0] && (
-          <>
-            <h2>{getUsernameById(opponents[0].userId)}</h2>
-            <p>🪙 {opponents[0].scopaCount}</p>
-            <div style={{ display: "flex" }}>
+return (
+  <div className="game-board">
+    {/* Top Opponent (partner) */}
+    <div className="opponent-area top-opponent">
+      {opponents[0] && (
+        <>
+          <h2 style={{ display: "flex", alignItems: "center" }}>
+            {getUsernameById(opponents[0].userId)}
+            {isActive(opponents[0].userId) && <TurnDot />}
+          </h2>
+          <p>🪙 {opponents[0].scopaCount}</p>
+          <div style={{ display: "flex" }}>
             {Array.from({ length: opponents[0].handSize }).map((_, idx) => (
-              <div
-                key={`right-${idx}-${opponents[0].handSize}`} 
-              >
-                <CardBackComponent />
-              </div>
+              <CardBackComponent key={idx} />
             ))}
-            </div>
-          </>
-        )}
-      </div>
+          </div>
+        </>
+      )}
+    </div>
 
-      {/* Left Opponent */}
-      <div className="opponent-area left-opponent">
-        {opponents[1] && (
-          <>
-            <h2>{getUsernameById(opponents[1].userId)}</h2>
-            <p>🪙 {opponents[1].scopaCount}</p>
-            <div style={{ display: "flex", flexDirection: "column" }}>
+    {/* Left Opponent (next clockwise) */}
+    <div className="opponent-area left-opponent">
+      {opponents[1] && (
+        <>
+          <h2 style={{ display: "flex", alignItems: "center" }}>
+            {getUsernameById(opponents[1].userId)}
+            {isActive(opponents[1].userId) && <TurnDot />}
+          </h2>
+          <p>🪙 {opponents[1].scopaCount}</p>
+          <div style={{ display: "flex", flexDirection: "column" }}>
             {Array.from({ length: opponents[1].handSize }).map((_, idx) => (
               <div
-                key={`right-${idx}-${opponents[1].handSize}`} 
+                key={idx}
                 style={{ transform: "rotate(90deg)", margin: "4px 0" }}
               >
                 <CardBackComponent />
               </div>
             ))}
-            </div>
-          </>
-        )}
-      </div>
+          </div>
+        </>
+      )}
+    </div>
 
-      {/* Right Opponent */}
-      <div className="opponent-area right-opponent">
-        {opponents[2] && (
-          <>
-            {/*<p>Opponent (ID: {opponents[2].userId}) {getUsernameById(opponents[2].userId)}</p>*/}
-            <h2>{getUsernameById(opponents[2].userId)}</h2>
-            <p>🪙 {opponents[2].scopaCount}</p>
-            <div style={{ display: "flex", flexDirection: "column" }}>
+    {/* Right Opponent (last) */}
+    <div className="opponent-area right-opponent">
+      {opponents[2] && (
+        <>
+          <h2 style={{ display: "flex", alignItems: "center" }}>
+            {getUsernameById(opponents[2].userId)}
+            {isActive(opponents[2].userId) && <TurnDot />}
+          </h2>
+          <p>🪙 {opponents[2].scopaCount}</p>
+          <div style={{ display: "flex", flexDirection: "column" }}>
             {Array.from({ length: opponents[2].handSize }).map((_, idx) => (
               <div
-                key={`right-${idx}-${opponents[2].handSize}`}
+                key={idx}
                 style={{ transform: "rotate(-90deg)", margin: "4px 0" }}
               >
                 <CardBackComponent />
               </div>
             ))}
-            </div>
-          </>
-        )}
-      </div>
-
-      {/* Center Table */}
-      {gameSession.tableCards && (
-  <div className="table-area">
-    {/* <h3>Table</h3> */}
-    <div style={{ display: "flex", flexWrap: "wrap" }}>
-      {gameSession.tableCards.map((card, index) => (
-        <CardComponent key={index} card={card} />
-      ))}
+          </div>
+        </>
+      )}
     </div>
-  </div>
-)}
 
-      {/* Current User’s Hand */}
-      <div className="my-hand-area">
-  <h2>
-    {currentUserId === gameSession?.currentPlayerId ? 'My turn!' : ''}
-  </h2>
-  <p> &nbsp; 🪙 {gameSession?.players?.find(p => p.userId === currentUserId)?.scopaCount ?? 0}</p>
-  <div
-    style={{
-      display: "flex",
-      flexWrap: "wrap",
-      opacity: currentUserId === gameSession?.currentPlayerId ? 1 : 0.5,
-      pointerEvents: currentUserId === gameSession?.currentPlayerId ? "auto" : "none",
-    }}
-  >
-    {myHand.map((card, index) => (
+    {/* Center Table */}
+    {gameSession.tableCards && (
+      <div className="table-area">
+        <div style={{ display: "flex", flexWrap: "wrap" }}>
+          {gameSession.tableCards.map((card, i) => (
+            <CardComponent key={i} card={card} />
+          ))}
+        </div>
+      </div>
+    )}
+
+    {/* Your Hand (bottom) */}
+    <div className="my-hand-area">
+      <h2 style={{ display: "flex", alignItems: "center" }}>
+        {currentUserId === gameSession.currentPlayerId ? "My turn!" : ""}
+        {currentUserId === gameSession.currentPlayerId && <TurnDot />}
+      </h2>
+      <p>
+        &nbsp;🪙{" "}
+        {
+          gameSession.players?.find((p) => p.userId === currentUserId)
+            ?.scopaCount ?? 0
+        }
+      </p>
       <div
-        key={index}
-        onClick={() => onCardClick(card)}
         style={{
-          cursor: currentUserId === gameSession?.currentPlayerId ? "pointer" : "default",
-          marginRight: "4px",
+          display: "flex",
+          flexWrap: "wrap",
+          opacity:
+            currentUserId === gameSession.currentPlayerId ? 1 : 0.5,
+          pointerEvents:
+            currentUserId === gameSession.currentPlayerId
+              ? "auto"
+              : "none",
         }}
       >
-        <CardComponent card={card} />
+        {myHand.map((card, i) => (
+          <div
+            key={i}
+            onClick={() => onCardClick(card)}
+            style={{
+              cursor:
+                currentUserId === gameSession.currentPlayerId
+                  ? "pointer"
+                  : "default",
+              marginRight: 4,
+            }}
+          >
+            <CardComponent card={card} />
+          </div>
+        ))}
       </div>
-    ))}
-  </div>
-</div>
-
     </div>
-  );
+  </div>
+);
 };
 
 export default ScopaGameView;
