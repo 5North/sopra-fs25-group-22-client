@@ -93,16 +93,18 @@ return (
     <div className="opponent-area left-opponent">
       {opponents[1] && (
         <>
-          <h2 style={{ display: "flex", alignItems: "center" }}>
-            {getUsernameById(opponents[1].userId)}
-            {isActive(opponents[1].userId) && <TurnDot />}
-          </h2>
-          <p>🪙 {opponents[1].scopaCount}</p>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+        <h2 style={{ margin: 0, display: "flex", alignItems: "center" }}>
+          {getUsernameById(opponents[1].userId)}
+          {isActive(opponents[1].userId) && <TurnDot />}
+        </h2>
+        <p style={{ margin: 0 }}>🪙 {opponents[1].scopaCount}</p>
+      </div>
           <div style={{ display: "flex", flexDirection: "column" }}>
             {Array.from({ length: opponents[1].handSize }).map((_, idx) => (
               <div
                 key={idx}
-                style={{ transform: "rotate(90deg)", margin: "4px 0" }}
+                style={{ transform: "rotate(90deg)", margin: "0px 0" }}
               >
                 <CardBackComponent />
               </div>
@@ -116,16 +118,18 @@ return (
     <div className="opponent-area right-opponent">
       {opponents[2] && (
         <>
-          <h2 style={{ display: "flex", alignItems: "center" }}>
-            {getUsernameById(opponents[2].userId)}
-            {isActive(opponents[2].userId) && <TurnDot />}
-          </h2>
-          <p>🪙 {opponents[2].scopaCount}</p>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+        <h2 style={{ margin: 0, display: "flex", alignItems: "center" }}>
+          {getUsernameById(opponents[2].userId)}
+          {isActive(opponents[2].userId) && <TurnDot />}
+        </h2>
+        <p style={{ margin: 0 }}>🪙 {opponents[2].scopaCount}</p>
+      </div>
           <div style={{ display: "flex", flexDirection: "column" }}>
             {Array.from({ length: opponents[2].handSize }).map((_, idx) => (
               <div
                 key={idx}
-                style={{ transform: "rotate(-90deg)", margin: "4px 0" }}
+                style={{ transform: "rotate(-90deg)", margin: "0px 0" }}
               >
                 <CardBackComponent />
               </div>
@@ -148,17 +152,20 @@ return (
 
     {/* Your Hand (bottom) */}
     <div className="my-hand-area">
-      <h2 style={{ display: "flex", alignItems: "center" }}>
-        {currentUserId === gameSession.currentPlayerId ? "My turn!" : ""}
-        {currentUserId === gameSession.currentPlayerId && <TurnDot />}
-      </h2>
-      <p>
-        &nbsp;🪙{" "}
-        {
-          gameSession.players?.find((p) => p.userId === currentUserId)
-            ?.scopaCount ?? 0
-        }
-      </p>
+    <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+  <h2 style={{ margin: 0, display: "flex", alignItems: "center" }}>
+    {currentUserId === gameSession.currentPlayerId ? "My turn!" : ""}
+    {currentUserId === gameSession.currentPlayerId && <TurnDot />}
+  </h2>
+  <p style={{ margin: 0 }}>
+    🪙{" "}
+    {
+      gameSession.players?.find((p) => p.userId === currentUserId)
+        ?.scopaCount ?? 0
+    }
+  </p>
+</div>
+
       <div
         style={{
           display: "flex",
@@ -180,7 +187,7 @@ return (
                 currentUserId === gameSession.currentPlayerId
                   ? "pointer"
                   : "default",
-              marginRight: 4,
+              marginRight: 2,
             }}
           >
             <CardComponent card={card} />

@@ -5,12 +5,12 @@ import React from "react";
 const cardBackStyle: React.CSSProperties = {
   width: "40px",
   height: "60px",
-  margin: "4px",
+  margin: "2px",
   backgroundImage: "url('/images/cardback.jpg')", // Path to your card back
   backgroundSize: "cover",
   backgroundPosition: "center",
   border: "1px solid #ccc",
-  borderRadius: "3px",
+  borderRadius: "0px",
 };
 
 interface CardBackProps {
