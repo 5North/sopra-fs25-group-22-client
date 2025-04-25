@@ -33,3 +33,9 @@ export interface Card {
     username: string;
     id: number;
   }  
+
+  export interface MoveAnimationData {
+    playerId:      number;
+    playedCard:    Card | null;
+    capturedCards: Card[];
+  }

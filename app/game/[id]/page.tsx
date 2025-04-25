@@ -5,12 +5,18 @@ import { useParams } from "next/navigation";
 import { Client, IMessage } from "@stomp/stompjs";
 import ScopaGameView from "@/components/ScopaGameView";
 import GameResultView from "@/components/GameResultView";
+import { MoveAnimator } from "@/components/MoveAnimator";
+import type { MoveAnimationData } from "@/components/MoveAnimator";
 import { GameSessionState, Card, TablePrivateState, UserListElement } from "@/models/GameSession"; 
 import { GameResultDTO } from "@/models/GameResult";
 import { getWsDomain } from "@/utils/domain";
 import useLocalStorage from "@/hooks/useLocalStorage";
+import { usePrevious } from "@/hooks/usePrevious";
 import { getUsers } from "@/api/registerService";
 import CardComponent from "@/components/CardComponent";
+
+
+
 
 // simple initial state for loading before receiving real updates.
 const initialGameState: GameSessionState = {
@@ -20,11 +26,7 @@ const initialGameState: GameSessionState = {
   currentPlayerId: 0,  
 };
 
-interface MoveAnimationData {
-    playerId: number;
-    playedCard: Card;
-    capturedCards: Card[];
-  }
+
 
 export default function GamePage() {
   const hasPublishedRef = useRef(false);
@@ -39,6 +41,9 @@ export default function GamePage() {
   const [allUsers, setAllUsers] = useState<UserListElement[]>([]);
   const stompClientRef = useRef<Client | null>(null);
   const { value: token } = useLocalStorage<string>("token", "");
+  const prevTableCards = usePrevious(gameState.tableCards);
+  const prevHand  = usePrevious(myHand);
+
   //const [currentUserId, setCurrentUserId] = useState<number | null>(null);
 
   const getUserIdByUsername = (username: string): number | null => {
@@ -270,41 +275,6 @@ useEffect(() => {
   };
 
 
-  const renderMoveAnimation = () => {
-    if (!moveAnimation) return null;
-    return (
-      <div style={{
-        position: "absolute",
-        top: "50%",
-        left: "50%",
-        transform: "translate(-50%, -50%)",
-        backgroundColor: "rgba(0,0,0,0.8)",
-        padding: "1rem",
-        borderRadius: "8px",
-        color: "#fff",
-        zIndex: 1000,
-      }}>
-        <h3>Move Animation</h3>
-        <p>Player {moveAnimation.playerId} played:</p>
-        <div style={{ marginBottom: "0.5rem" }}>
-          {moveAnimation.playedCard.value} {moveAnimation.playedCard.suit}
-        </div>
-        {moveAnimation.capturedCards.length > 0 && (
-          <>
-            <p>and captured:</p>
-            <div style={{ display: "flex" }}>
-              {moveAnimation.capturedCards.map((card, idx) => (
-                <div key={idx} style={{ marginRight: "4px" }}>
-                  {card.value} {card.suit}
-                </div>
-              ))}
-            </div>
-          </>
-        )}
-      </div>
-    );
-  };
-
   if (error) {
     return (
       <div style={{ color: "#fff", textAlign: "center", padding: "2rem" }}>
@@ -313,6 +283,69 @@ useEffect(() => {
       </div>
     );
   }
+
+  useEffect(() => {
+    // don’t run until we have “before” snapshots
+    if (!prevTableCards || !prevHand) return;
+
+    const newKeys = new Set(
+        gameState.tableCards.map(c => `${c.suit}-${c.value}`)
+      );
+  
+    // A) Which card did I *play* from my hand?
+    const handPlayedCard = prevHand.find(
+      h => !myHand.some(m => m.suit === h.suit && m.value === h.value)
+    ) ?? null;
+  
+    // B) Which card appeared on the table?
+    const tablePlayedCard =
+      gameState.tableCards.find(
+        c => !prevTableCards.some(pc => pc.suit === c.suit && pc.value === c.value)
+      ) ?? null;
+  
+    // pick whichever we know about first:
+    const playedCard = tablePlayedCard || handPlayedCard;
+  
+    // C) Which cards disappeared from the table? (captures)
+    const capturedCards = prevTableCards.filter(
+        pc => !newKeys.has(`${pc.suit}-${pc.value}`)
+        );  
+    console.log("🔍 diff:", { handPlayedCard, tablePlayedCard, capturedCards });
+
+    const players = gameState.players || [];
+
+    // 1) Reconstruct seating
+    const meIndex = players.findIndex(p => p.userId === currentUserId);
+    const seating = meIndex >= 0
+    ? [...players.slice(meIndex), ...players.slice(0, meIndex)]
+    : players;
+
+    // 2) Find which seat just moved
+    const activeSeatIndex = seating.findIndex(
+        p => p.userId === gameState.currentPlayerId
+    );
+  
+    // If we have *anything* to animate, fire it
+    if (playedCard || capturedCards.length > 0) {
+      setMoveAnimation({
+        playerId: gameState.currentPlayerId,
+        seatIndex: activeSeatIndex as 0|1|2|3,
+        playedCard,
+        capturedCards,
+      });
+    }
+  
+    // clear after 1s
+    const t = setTimeout(() => setMoveAnimation(null), 1000);
+    return () => clearTimeout(t);
+  }, [
+    gameState.tableCards,
+    prevTableCards,
+  ]);
+  
+  
+
+
 
   return (
     <div style={{ backgroundColor: "blue", minHeight: "100vh"}}>
@@ -331,7 +364,10 @@ useEffect(() => {
         />
       )}
       {renderCaptureOptions()}
-      {renderMoveAnimation()}
+      <MoveAnimator 
+        animation={moveAnimation} 
+        currentUserId={currentUserId || 0}
+      />
       <ScopaGameView
         gameSession={gameState}
         currentUserId={currentUserId || 0} 
