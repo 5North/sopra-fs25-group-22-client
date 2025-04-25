@@ -182,7 +182,7 @@ useEffect(() => {
             }
           });
 
-        setMoveAnimation(null); 
+        // setMoveAnimation(null); 
         // // Subscription for move broadcasts
         //   client.subscribe(`/topic/move/${id}`, (message: IMessage) => {
         //     try {
@@ -276,59 +276,52 @@ useEffect(() => {
 
 
   useEffect(() => {
-    // don’t run until we have “before” snapshots
     if (!prevTableCards || !prevHand) return;
-
-    const newKeys = new Set(
-        gameState.tableCards.map(c => `${c.suit}-${c.value}`)
-      );
   
-    // A) Which card did I *play* from my hand?
-    const handPlayedCard = prevHand.find(
-      h => !myHand.some(m => m.suit === h.suit && m.value === h.value)
+    const newKeys = new Set(gameState?.tableCards?.map(c => `${c.suit}-${c.value}`));
+  
+    // const handPlayedCard = prevHand.find(
+    //   h => !myHand.some(m => m.suit === h.suit && m.value === h.value)
+    // ) ?? null;
+  
+    const tablePlayedCard = gameState?.tableCards?.find(
+      c => !prevTableCards.some(pc => pc.suit === c.suit && pc.value === c.value)
     ) ?? null;
   
-    // B) Which card appeared on the table?
-    const tablePlayedCard =
-      gameState.tableCards.find(
-        c => !prevTableCards.some(pc => pc.suit === c.suit && pc.value === c.value)
-      ) ?? null;
+    // const playedCard = tablePlayedCard || handPlayedCard;
+    const playedCard = tablePlayedCard;
   
-    // pick whichever we know about first:
-    const playedCard = tablePlayedCard || handPlayedCard;
-  
-    // C) Which cards disappeared from the table? (captures)
     const capturedCards = prevTableCards.filter(
-        pc => !newKeys.has(`${pc.suit}-${pc.value}`)
-        );  
-    console.log("🔍 diff:", { handPlayedCard, tablePlayedCard, capturedCards });
-
-    const players = gameState.players || [];
-
-    // 1) Reconstruct seating
-    const meIndex = players.findIndex(p => p.userId === currentUserId);
-    const seating = meIndex >= 0
-    ? [...players.slice(meIndex), ...players.slice(0, meIndex)]
-    : players;
-
-    // 2) Find which seat just moved
-    const activeSeatIndex = seating.findIndex(
-        p => p.userId === gameState.currentPlayerId
+      pc => !newKeys.has(`${pc.suit}-${pc.value}`)
     );
   
-    // If we have *anything* to animate, fire it
+    //console.log("🔍 diff:", { handPlayedCard, tablePlayedCard, capturedCards });
+  
+    const players = gameState?.players || [];
+  
+    const meIndex = players.findIndex(p => p.userId === currentUserId);
+    const seating = meIndex >= 0
+      ? [...players.slice(meIndex), ...players.slice(0, meIndex)]
+      : players;
+  
+    const activeSeatIndex = seating.findIndex(
+      p => p.userId === gameState?.currentPlayerId
+    );
+  
     if (playedCard || capturedCards.length > 0) {
       setMoveAnimation({
-        playerId: gameState.currentPlayerId,
-        seatIndex: activeSeatIndex as 0|1|2|3,
+        playerId: gameState?.currentPlayerId,
+        seatIndex: activeSeatIndex as 0 | 1 | 2 | 3,
         playedCard,
         capturedCards,
       });
-    }
   
-    // clear after 1s
-    const t = setTimeout(() => setMoveAnimation(null), 1000);
-    return () => clearTimeout(t);
+      const timeout = setTimeout(() => {
+        setMoveAnimation(null);
+      }, 1500); // Give it enough time to finish animating
+  
+      return () => clearTimeout(timeout);
+    }
   }, [
     gameState.tableCards,
     gameState.currentPlayerId,
@@ -338,6 +331,7 @@ useEffect(() => {
     prevHand,
     currentUserId,
   ]);
+  
   
 
   if (error) {
