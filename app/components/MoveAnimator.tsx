@@ -12,7 +12,6 @@ export interface MoveAnimationData {
   
   export interface MoveAnimatorProps {
     animation: MoveAnimationData | null;
-    currentUserId: number;
   }
 
   const seatOrigins = [
@@ -26,7 +25,6 @@ export interface MoveAnimationData {
 
   export function MoveAnimator({
     animation,
-    currentUserId,
   }: MoveAnimatorProps) {
     if (!animation) return null;
 

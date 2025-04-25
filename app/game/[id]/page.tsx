@@ -331,9 +331,15 @@ useEffect(() => {
     return () => clearTimeout(t);
   }, [
     gameState.tableCards,
+    gameState.currentPlayerId,
+    gameState.players,
+    myHand,
     prevTableCards,
+    prevHand,
+    currentUserId,
   ]);
   
+
   if (error) {
     return (
       <div style={{ color: "#fff", textAlign: "center", padding: "2rem" }}>
@@ -346,8 +352,6 @@ useEffect(() => {
   if (gameResult) {
     return <GameResultView result={gameResult} />;
   }
-
-
 
   return (
     <div style={{ backgroundColor: "blue", minHeight: "100vh"}}>
@@ -368,7 +372,6 @@ useEffect(() => {
       {renderCaptureOptions()}
       <MoveAnimator 
         animation={moveAnimation} 
-        currentUserId={currentUserId || 0}
       />
       <ScopaGameView
         gameSession={gameState}
