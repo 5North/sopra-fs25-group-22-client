@@ -275,15 +275,6 @@ useEffect(() => {
   };
 
 
-  if (error) {
-    return (
-      <div style={{ color: "#fff", textAlign: "center", padding: "2rem" }}>
-        <h2>Error</h2>
-        <p>{error}</p>
-      </div>
-    );
-  }
-
   useEffect(() => {
     // don’t run until we have “before” snapshots
     if (!prevTableCards || !prevHand) return;
@@ -343,7 +334,18 @@ useEffect(() => {
     prevTableCards,
   ]);
   
-  
+  if (error) {
+    return (
+      <div style={{ color: "#fff", textAlign: "center", padding: "2rem" }}>
+        <h2>Error</h2>
+        <p>{error}</p>
+      </div>
+    );
+  }
+
+  if (gameResult) {
+    return <GameResultView result={gameResult} />;
+  }
 
 
 

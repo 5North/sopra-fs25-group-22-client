@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { useRouter } from "next/navigation";
 import { GameResultDTO } from "@/models/GameResult";
 
 interface GameResultViewProps {
@@ -8,26 +9,80 @@ interface GameResultViewProps {
 }
 
 const GameResultView: React.FC<GameResultViewProps> = ({ result }) => {
+  const router = useRouter();
+
   return (
-    <div style={{ backgroundColor: "rgba(0,0,0,0.9)", color: "#fff", padding: "2rem", borderRadius: "8px", position: "absolute", top: "20%", left: "50%", transform: "translateX(-50%)", zIndex: 1500 }}>
-      <h2>Game Over</h2>
-      <p>Your outcome: <strong>{result.outcome}</strong></p>
-      <p>Your Total Score: {result.myTotal}</p>
-      <p>Opponents Total Score: {result.otherTotal}</p>
-      <h3>Your Breakdown</h3>
-      <p>Carte Result: {result.myCarteResult}</p>
-      <p>Denari Result: {result.myDenariResult}</p>
-      <p>Primiera Result: {result.myPrimieraResult}</p>
-      <p>Settebello Result: {result.mySettebelloResult}</p>
-      <p>Scopa Result: {result.myScopaResult}</p>
-      <h3>Opponent Breakdown</h3>
-      <p>Carte Result: {result.otherCarteResult}</p>
-      <p>Denari Result: {result.otherDenariResult}</p>
-      <p>Primiera Result: {result.otherPrimieraResult}</p>
-      <p>Settebello Result: {result.otherSettebelloResult}</p>
-      <p>Scopa Result: {result.otherScopaResult}</p>
+    <div
+      style={{
+        position: "fixed",
+        top: 0,
+        left: 0,
+        width: "100vw",
+        height: "100vh",
+        backgroundColor: "rgba(0, 0, 0, 0.85)",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+        color: "#fff",
+        padding: "2rem",
+        boxSizing: "border-box",
+        zIndex: 2000,
+      }}
+    >
+      <div
+        style={{
+          backgroundColor: "#222",
+          padding: "2rem",
+          borderRadius: "8px",
+          maxWidth: "400px",
+          width: "100%",
+          textAlign: "center",
+        }}
+      >
+        <h1 style={{ marginBottom: "1rem" }}>Game Over</h1>
+        <p>Your outcome: <strong>{result.outcome}</strong></p>
+        <p>Your Total Score: <strong>{result.myTotal}</strong></p>
+        <p>Opponent’s Total Score: <strong>{result.otherTotal}</strong></p>
+
+        <h2 style={{ marginTop: "1.5rem", marginBottom: "0.5rem" }}>
+          Your Breakdown
+        </h2>
+        <p>Carte: {result.myCarteResult}</p>
+        <p>Denari: {result.myDenariResult}</p>
+        <p>Primiera: {result.myPrimieraResult}</p>
+        <p>Settebello: {result.mySettebelloResult}</p>
+        <p>Scopa: {result.myScopaResult}</p>
+
+        <h2 style={{ marginTop: "1.5rem", marginBottom: "0.5rem" }}>
+          Opponent Breakdown
+        </h2>
+        <p>Carte: {result.otherCarteResult}</p>
+        <p>Denari: {result.otherDenariResult}</p>
+        <p>Primiera: {result.otherPrimieraResult}</p>
+        <p>Settebello: {result.otherSettebelloResult}</p>
+        <p>Scopa: {result.otherScopaResult}</p>
+
+        <button
+          onClick={() => router.push("/")}
+          style={{
+            marginTop: "2rem",
+            padding: "0.75rem 1.5rem",
+            backgroundColor: "#f5ce42",
+            color: "#000",
+            border: "none",
+            borderRadius: "4px",
+            fontSize: "1rem",
+            cursor: "pointer",
+            width: "100%",
+          }}
+        >
+          Return to Home
+        </button>
+      </div>
     </div>
   );
 };
 
 export default GameResultView;
+
