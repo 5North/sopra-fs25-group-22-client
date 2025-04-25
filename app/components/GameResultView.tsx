@@ -40,7 +40,7 @@ const GameResultView: React.FC<GameResultViewProps> = ({ result }) => {
           textAlign: "center",
         }}
       >
-        <h1 style={{ marginBottom: "1rem" }}>Game Over</h1>
+        <h1 style={{ marginBottom: "1rem", color: "#B8860B" }}>Game Over</h1>
         <p>Your outcome: <strong>{result.outcome}</strong></p>
         <p>Your Total Score: <strong>{result.myTotal}</strong></p>
         <p>Opponent’s Total Score: <strong>{result.otherTotal}</strong></p>
@@ -64,12 +64,12 @@ const GameResultView: React.FC<GameResultViewProps> = ({ result }) => {
         <p>Scopa: {result.otherScopaResult}</p>
 
         <button
-          onClick={() => router.push("/")}
+          onClick={() => router.push("/home")}
           style={{
             marginTop: "2rem",
             padding: "0.75rem 1.5rem",
-            backgroundColor: "#f5ce42",
-            color: "#000",
+            backgroundColor: "#3E5F3A",
+            color: "#ffffff",
             border: "none",
             borderRadius: "4px",
             fontSize: "1rem",
