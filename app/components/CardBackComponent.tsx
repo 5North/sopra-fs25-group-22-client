@@ -3,8 +3,8 @@
 import React from "react";
 
 const cardBackStyle: React.CSSProperties = {
-  width: "40px",
-  height: "60px",
+  width: "28px",
+  height: "42px",
   margin: "2px",
   backgroundImage: "url('/images/cardback.jpg')", // Path to your card back
   backgroundSize: "cover",

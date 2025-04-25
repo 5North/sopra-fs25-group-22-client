@@ -75,11 +75,13 @@ return (
     <div className="opponent-area top-opponent">
       {opponents[0] && (
         <>
-          <h2 style={{ display: "flex", alignItems: "center" }}>
-            {getUsernameById(opponents[0].userId)}
-            {isActive(opponents[0].userId) && <TurnDot />}
-          </h2>
-          <p>🪙 {opponents[0].scopaCount}</p>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+        <h2 style={{ margin: 0, display: "flex", alignItems: "center" }}>
+          {getUsernameById(opponents[0].userId)}
+          {isActive(opponents[0].userId) && <TurnDot />}
+        </h2>
+        <p style={{ margin: 0 }}>🪙 {opponents[0].scopaCount}</p>
+      </div>
           <div style={{ display: "flex" }}>
             {Array.from({ length: opponents[0].handSize }).map((_, idx) => (
               <CardBackComponent key={idx} />
