@@ -47,6 +47,9 @@ export default function GamePage() {
   const stompClientRef = useRef<Client | null>(null);
   const { value: token } = useLocalStorage<string>("token", "");
   const [moveState, setMoveState] = useState<MoveState>();
+  const [showRoundAnimation, setShowRoundAnimation] = useState(false);
+  const prevEmptyRef = useRef(gameState.tableCards.length === 0);
+
   
 
   //const [currentUserId, setCurrentUserId] = useState<number | null>(null);
@@ -69,12 +72,22 @@ export default function GamePage() {
   const currentUserId = getCurrentUserId();
 
   // Basic setup for STOMP client connection on the game topic.
+  useEffect(() => {
+    const isNowEmpty = gameState.tableCards.length === 0;
+    // only fire when it goes from non-empty → empty
+    if (!prevEmptyRef.current && isNowEmpty) {
+      setShowRoundAnimation(true);
+      // hide it after 2s (0.5s slide in + 1s pause + 0.5s slide out)
+      setTimeout(() => setShowRoundAnimation(false), 2000);
+    }
+    prevEmptyRef.current = isNowEmpty;
+  }, [gameState.tableCards]);
 
 
 useEffect(() => {
   const fetchUsers = async () => {
     try {
-      const response = await getUsers();
+      const response = await getUsers(token);
       if (!response.ok) {
         throw new Error("Failed to fetch users");
       }
@@ -335,6 +348,14 @@ useEffect(() => {
 
   return (
     <div style={{ backgroundColor: "blue", minHeight: "100vh"}}>
+      {showRoundAnimation && (
+        <>
+        <div className="shuffle-overlay" />
+      <div className="round-animation">
+        <img src="/images/scopa.png" alt="New Round" />
+      </div>
+      </>
+    )}
       {/* Render game view with the current state and card click handler */}
       {captureOptions.length > 0 && (
         <div
@@ -370,19 +391,21 @@ useEffect(() => {
             body: payload,
           });
         }}
+        className="neon-button"
         style={{
           position: "fixed",
           bottom: "20px",
           right: "20px",
-          backgroundColor: "#f5ce42", 
+          backgroundColor: "transparent", 
           borderRadius: "50%",
           width: "120px",
           height: "120px",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          boxShadow: "0 4px 10px rgba(0,0,0,0.3)",
+          boxShadow: "0 0 8px rgb(133, 251, 255), 0 0 16px rgb(133, 251, 255)",
           cursor: "pointer",
+          border: "2px solid #0ff",
           zIndex: 1001,
         }}
         title="Get AI suggestion"
@@ -395,10 +418,47 @@ useEffect(() => {
       height: "110px",
       borderRadius: "50%",
       objectFit: "cover" // ensures the image fills the circle without distortion
+      
     }}
   />
       </div>
-    </div>
+      <style jsx>{`
+      .round-animation {
+        pointer-events: none;
+        position: absolute;
+        top: 50%;
+        left: 0;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transform: translateY(-50%);
+        z-index: 1000;
+      }
+      .round-animation img {
+        animation: slideInOut 2s ease-in-out forwards;
+      }
+      @keyframes slideInOut {
+        0% {
+          transform: translateX(-100vw);
+          opacity: 1;
+        }
+        25% {
+          transform: translateX(0);
+          opacity: 1;
+        }
+        75% {
+          transform: translateX(0);
+          opacity: 1;
+        }
+        100% {
+          transform: translateX(100vw);
+          opacity: 0;
+        }
+      }
+    `}</style>
+  </div>
+  
   );
 }
 

@@ -83,10 +83,16 @@ const Register: React.FC = () => {
         <Form.Item>
           {error && <p style={{ color: "red" }}>{error}</p>}
           <Button type="primary" htmlType="submit" className="custom-button" loading={loading}>
-            ♣️ Register
+            Register
           </Button>
         </Form.Item>
       </Form>
+      <div className="auth-link">
+          <Button type="link" onClick={() => router.push("/login")}
+          className="register-button-text"
+          > Already have an Account? Login
+          </Button>
+        </div>
     </div>
   );
 };

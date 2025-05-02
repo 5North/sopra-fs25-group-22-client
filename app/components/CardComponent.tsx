@@ -2,46 +2,59 @@
 
 import React from "react";
 
-function getSuitSymbol(suit: string) {
-  switch (suit) {
-    case "DENARI":
-      return "♦"; // You can also replace with an image if needed.
-    case "COPPE":
-      return "♥";
-    case "BASTONI":
-      return "♣";
-    case "SPADE":
-      return "♠";
-    default:
-      return "?";
-  }
-}
-
 interface CardProps {
   card: { suit: string; value: number };
   onClick?: () => void;
+  borderColor?: string;
+  glowColor?: string;
+}
+
+const suitMap: Record<string,string> = {
+  DENARI:  "diamond",  
+  COPPE:   "heart",
+  BASTONI: "spade",
+  SPADE:   "club",
+};
+
+function valueMap(v: number): string {
+  if (v >= 1 && v <= 7) return String(v);
+  if (v === 8)        return "jack";
+  if (v === 9)        return "queen";
+  if (v === 10)       return "king";
+  throw new Error("Unknown card value: " + v);
 }
 
 const CardComponent: React.FC<CardProps> = ({ card, onClick }) => {
+  const id       = `${valueMap(card.value)}_${suitMap[card.suit]}`;  
+  const src      = `/cards/${id}.svg`;                             
+  const altText  = `${card.value} of ${card.suit}`;
+
+
   return (
     <div onClick={onClick} style={cardStyle}>
-      <div style={{ fontSize: "1.2rem" }}>{card.value}</div>
-      <div style={{ fontSize: "1.2rem" }}>{getSuitSymbol(card.suit)}</div>
+      <img
+        src={src}
+        width={60}
+        height={90}
+        alt={altText}
+        style={{ display: "block" , objectFit:  "contain", filter:     "contrast(5) saturate(1)", }}
+      />
     </div>
   );
 };
 
 const cardStyle: React.CSSProperties = {
-  width: "40px",
-  height: "60px",
+  width:  "60px",
+  height: "90px",
   margin: "4px",
-  padding: "4px",
+  padding: 0,
   backgroundColor: "white",
-  color: "black", 
-  border: "1px solid #ccc",
-  borderRadius: "3px",
+  border:          "2px solid  #4b0082", // neon violet border
+  borderRadius:    "4px",
+  boxShadow:       "0 0 8px 2px rgba(75,0,300,0.8)", // glow
   textAlign: "center",
   cursor: "pointer",
 };
+
 
 export default CardComponent;

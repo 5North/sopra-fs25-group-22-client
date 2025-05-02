@@ -8,6 +8,7 @@ import useLocalStorage from "@/hooks/useLocalStorage";
 import { Client, IMessage } from "@stomp/stompjs";
 import { getWsDomain } from "@/utils/domain";
 
+
 interface Player {
   username: string;
 }
@@ -181,60 +182,82 @@ const LobbyPage: React.FC = () => {
 
 
   return (
-    <div className="register-container">
-    <div style={{ textAlign: "center" }}>
-      <h1 style={{ marginBottom: "1rem", opacity: 0.8 }}>♠️ ♥️ ♦️ ♣️</h1>
-
-      {/* ←─ Game-ID pill ─→ */}
+    <div
+      className="register-container"
+      style={{
+        position: "relative", 
+        color: "#f0f0f0",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        padding: "2rem",
+        height: "100vh", 
+      }}
+    >
+      {/* Game-ID Pill */}
       <h2
         style={{
-          margin: "1rem 0",
-          display: "inline-block",
-          backgroundColor: "#ffffff",      // solid white
-          color: "#000000",                // solid black text
+          margin: "7rem 0 2rem",
           padding: "0.5rem 1rem",
           borderRadius: "0.5rem",
-          boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
+          backgroundColor: "rgba(0,0,0,0.6)",
+          color: "#00e5ff",                // neon-blue
+          border: "1px solid #00e5ff",
+          boxShadow: "0 0 8px rgba(0,229,255,0.5)",
+          fontWeight: "normal",
         }}
       >
         Game ID: {lobby.PIN ?? lobby.lobbyId} 🔗
       </h2>
 
-      <h1 style={{ marginTop: "1rem", opacity: 0.8 }}>♠️ ♥️ ♦️ ♣️</h1>
-    </div>
-
-      <div className="team-wrapper">
-        <div className="team-box">
-            <h3> Team 1 </h3>
-            {Array.isArray(lobby.players) && lobby.players
-            .filter((_, i) => i % 2 === 0)
-            .map((player, idx) => (
-                <p key={`t1-${idx}`}>
-                {player.username} joined
+      {/* Teams row */}
+      <div
+        className="team-wrapper"
+        style={{
+          display: "flex",
+          gap: "2rem",
+          width: "100%",
+          maxWidth: "700px",
+          marginBottom: "3rem",
+        }}
+      >
+        {["Team 1", "Team 2"].map((label, teamIndex) => (
+          <div
+            key={label}
+            className="team-box"
+            style={{
+              flex: "0 0 45%",
+              maxWidth: "45%", 
+              backgroundColor: "rgba(0,0,0,0.4)",    
+              border: "1px solid #00e5ff",
+              borderRadius: "0.5rem",
+              padding: "0.5rem",
+              textAlign: "center",
+            }}
+          >
+            <h3 style={{ color: "#00e5ff" }}>{label}</h3>
+            {(lobby.players ?? [])
+              .filter((_, i) => i % 2 === teamIndex)
+              .map((p, i) => (
+                <p key={i} style={{ margin: "0.5rem 0" }}>
+                  {p.username} joined
                 </p>
-            ))}
-        </div>
-        <div className="team-box">
-            <h3> Team 2 </h3>
-            {Array.isArray(lobby.players) && lobby.players
-            .filter((_, i) => i % 2 === 1)
-            .map((player, idx) => (
-                <p key={`t2-${idx}`}>
-                {player.username} joined
-                </p>
-            ))}
-        </div>
-        </div>
+              ))}
+          </div>
+        ))}
+      </div>
 
-      <h2 style={{ marginBottom: "6rem" }}>🏁</h2>
-      {lobby.players && lobby.players.length === 4 && 
-      lobby.players.some((p) => p.username === username) && (
-        <Button
+      {/* Start button */}
+      {lobby.players?.length === 4 &&
+        lobby.players.some((p) => p.username === username) && (
+          <div>
+          <Button
             type="primary"
-            className="custom-button"
             onClick={handleStartGame}
-            style={{ width: "fit-content", alignSelf: "center" }}
-        >♣️Start Game</Button>
+          >
+            Start Game
+          </Button>
+          </div>
         )}
     </div>
   );
