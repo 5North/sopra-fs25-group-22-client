@@ -3,6 +3,7 @@
 import React from "react";
 import { useRouter } from "next/navigation";
 import { GameResultDTO } from "@/models/GameResult";
+import { Button } from "antd";
 
 interface GameResultViewProps {
   result: GameResultDTO;
@@ -12,6 +13,7 @@ const GameResultView: React.FC<GameResultViewProps> = ({ result }) => {
   const router = useRouter();
 
   return (
+    <div className="result-container">
     <div
       style={{
         position: "fixed",
@@ -19,12 +21,10 @@ const GameResultView: React.FC<GameResultViewProps> = ({ result }) => {
         left: 0,
         width: "100vw",
         height: "100vh",
-        backgroundColor: "rgba(0, 0, 0, 0.85)",
+       
         display: "flex",
-        flexDirection: "column",
         justifyContent: "center",
         alignItems: "center",
-        color: "#fff",
         padding: "2rem",
         boxSizing: "border-box",
         zIndex: 2000,
@@ -32,57 +32,72 @@ const GameResultView: React.FC<GameResultViewProps> = ({ result }) => {
     >
       <div
         style={{
-          backgroundColor: "#222",
+          backgroundColor: "#222", //box
           padding: "2rem",
           borderRadius: "8px",
           maxWidth: "400px",
           width: "100%",
-          textAlign: "center",
+       
         }}
       >
-        <h1 style={{ marginBottom: "1rem", color: "#B8860B" }}>Game Over</h1>
-        <p>Your outcome: <strong>{result.outcome}</strong></p>
-        <p>Your Total Score: <strong>{result.myTotal}</strong></p>
-        <p>Opponent’s Total Score: <strong>{result.otherTotal}</strong></p>
+        <h1 style={{ marginBottom: "1rem", color: "#B8860B" }}>
+          Game Over
+        </h1>
 
-        <h2 style={{ marginTop: "1.5rem", marginBottom: "0.5rem" }}>
-          Your Breakdown
-        </h2>
-        <p>Carte: {result.myCarteResult}</p>
-        <p>Denari: {result.myDenariResult}</p>
-        <p>Primiera: {result.myPrimieraResult}</p>
-        <p>Settebello: {result.mySettebelloResult}</p>
-        <p>Scopa: {result.myScopaResult}</p>
+        <p style={{ margin: "4px 0" }}>
+          Your outcome: <strong>{result.outcome}</strong>
+        </p>
+        <p style={{ margin: "4px 0" }}>
+          Your Total Score: <strong>{result.myTotal}</strong>
+        </p>
+        <p style={{ margin: "4px 0 1.5rem" }}>
+          Opponent’s Total Score: <strong>{result.otherTotal}</strong>
+        </p>
 
-        <h2 style={{ marginTop: "1.5rem", marginBottom: "0.5rem" }}>
-          Opponent Breakdown
-        </h2>
-        <p>Carte: {result.otherCarteResult}</p>
-        <p>Denari: {result.otherDenariResult}</p>
-        <p>Primiera: {result.otherPrimieraResult}</p>
-        <p>Settebello: {result.otherSettebelloResult}</p>
-        <p>Scopa: {result.otherScopaResult}</p>
-
-        <button
-          onClick={() => router.push("/home")}
+        {/* ← here’s flex container for the two breakdowns → */}
+        <div
           style={{
-            marginTop: "2rem",
-            padding: "0.75rem 1.5rem",
-            backgroundColor: "#3E5F3A",
-            color: "#ffffff",
-            border: "none",
-            borderRadius: "4px",
-            fontSize: "1rem",
-            cursor: "pointer",
-            width: "100%",
+            display:        "flex",
+            justifyContent: "space-between",
+            gap:            "1rem",
+            marginBottom:   "1.5rem",
           }}
         >
+          {/* Your breakdown on the left */}
+          <div style={{ flex: 1, textAlign: "left" }}>
+            <h2 style={{ margin: "0 0 0.5rem", fontSize: "1.1rem" }}>
+              Your Breakdown
+            </h2>
+            <p style={{ margin: "2px 0" }}>Carte: {result.myCarteResult}</p>
+            <p style={{ margin: "2px 0" }}>Denari: {result.myDenariResult}</p>
+            <p style={{ margin: "2px 0" }}>Primiera: {result.myPrimieraResult}</p>
+            <p style={{ margin: "2px 0" }}>Settebello: {result.mySettebelloResult}</p>
+            <p style={{ margin: "2px 0" }}>Scopa: {result.myScopaResult}</p>
+          </div>
+
+          {/* Opponent breakdown on the right */}
+          <div style={{ flex: 1, textAlign: "right" }}>
+            <h2 style={{ margin: "0 0 0.5rem", fontSize: "1.1rem" }}>
+              Opponent Breakdown
+            </h2>
+            <p style={{ margin: "2px 0" }}>Carte: {result.otherCarteResult}</p>
+            <p style={{ margin: "2px 0" }}>Denari: {result.otherDenariResult}</p>
+            <p style={{ margin: "2px 0" }}>Primiera: {result.otherPrimieraResult}</p>
+            <p style={{ margin: "2px 0" }}>Settebello: {result.otherSettebelloResult}</p>
+            <p style={{ margin: "2px 0" }}>Scopa: {result.otherScopaResult}</p>
+          </div>
+        </div>
+
+        <Button
+          onClick={() => router.push("/home")}
+          
+        >
           Return to Home
-        </button>
+        </Button>
       </div>
+    </div>
     </div>
   );
 };
-
 export default GameResultView;
 

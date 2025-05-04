@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "antd";
 import { Client } from "@stomp/stompjs";
@@ -12,14 +12,28 @@ const JoinGamePage: React.FC = () => {
   const [digits, setDigits] = useState(["", "", "", ""]);
   const isFull = false;
   const [joinError, setJoinError] = useState("");
-  //const [lobbyPINtoJoin, setPIN] = useState("");
   const { value: token } = useLocalStorage<string>("token", "");
+  const inputsRef = useRef<Array<HTMLInputElement | null>>([]);
   const [client, setClient] = useState<Client | null>(null);
 
+
   const handleInputChange = (index: number, value: string) => {
-    const newDigits = [...digits];
-    newDigits[index] = value.replace(/\D/g, "").slice(0, 1);
-    setDigits(newDigits);
+    const digit = value.replace(/\D/, "").slice(0, 1);
+    setDigits(ds => {
+      const copy = [...ds];
+      copy[index] = digit;
+      return copy;
+    });
+    if (digit && index < 3) {
+      inputsRef.current[index + 1]?.focus();
+    }
+  };
+
+   // Backspace jumps back
+   const handleKeyDown = (e: React.KeyboardEvent, index: number) => {
+    if (e.key === "Backspace" && !digits[index] && index > 0) {
+      inputsRef.current[index - 1]?.focus();
+    }
   };
 
   useEffect(() => {
@@ -180,12 +194,20 @@ const JoinGamePage: React.FC = () => {
           margin: "2rem 0",
         }}
       >
-        {digits.map((digit, idx) => (
+        {digits.map((digit, i) => (
           <input
-            key={idx}
+            key={i}
+            ref={el => {
+              inputsRef.current[i] = el;  // returns void
+            }}
             type="text"
+            inputMode="numeric"
+            autoComplete="one-time-code"
+            pattern="\d{1}"
+            maxLength={1}
             value={digit}
-            onChange={(e) => handleInputChange(idx, e.target.value)}
+            onChange={e => handleInputChange(i, e.target.value)}
+            onKeyDown={e => handleKeyDown(e, i)}
             style={{
               width: "60px",
               height: "60px",
@@ -196,7 +218,6 @@ const JoinGamePage: React.FC = () => {
               backgroundColor: "#fff",
               color: "#000",
             }}
-            maxLength={1}
           />
         ))}
       </div>

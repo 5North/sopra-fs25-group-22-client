@@ -7,19 +7,9 @@ interface LocalStorage<T> {
 }
 
 /**
- * This custom function/hook safely handles SSR by checking
- * for the window before accessing browser localStorage.
- * IMPORTANT: It has a local react state AND a localStorage state.
- * When initializing the state with a default value,
- * clearing will revert to this default value for the state and
- * the corresponding token gets deleted in the localStorage.
- *
- * @param key - The key from localStorage, generic type T.
- * @param defaultValue - The default value if nothing is in localStorage yet.
- * @returns An object containing:
- *  - value: The current value (synced with localStorage).
- *  - set: Updates both react state & localStorage.
- *  - clear: Resets state to defaultValue and deletes localStorage key.
+ * Custom hook to sync a value with localStorage, with SSR safety and JSON fallback.
+ * @param key - localStorage key
+ * @param defaultValue - default state value
  */
 export default function useLocalStorage<T>(
   key: string,
@@ -27,20 +17,22 @@ export default function useLocalStorage<T>(
 ): LocalStorage<T> {
   const [value, setValue] = useState<T>(defaultValue);
 
-  // On mount, try to read the stored value
+  // On mount, read the stored value (SSR-safe)
   useEffect(() => {
-    if (typeof window === "undefined") return; // SSR safeguard
+    if (typeof window === "undefined") return;
+    const raw = globalThis.localStorage.getItem(key);
+    if (raw === null) return;
+
     try {
-      const stored = globalThis.localStorage.getItem(key);
-      if (stored) {
-        setValue(JSON.parse(stored) as T);
-      }
-    } catch (error) {
-      console.error(`Error reading localStorage key "${key}":`, error);
+      // attempt to parse JSON
+      setValue(JSON.parse(raw) as T);
+    } catch {
+      // fallback: treat raw as the stored value
+      setValue(raw as unknown as T);
     }
   }, [key]);
 
-  // Simple setter that updates both state and localStorage
+  // Setter: syncs React state and localStorage
   const set = (newVal: T) => {
     setValue(newVal);
     if (typeof window !== "undefined") {
@@ -48,7 +40,7 @@ export default function useLocalStorage<T>(
     }
   };
 
-  // Removes the key from localStorage and resets the state
+  // Clear: remove from storage and reset state
   const clear = () => {
     setValue(defaultValue);
     if (typeof window !== "undefined") {
@@ -58,3 +50,4 @@ export default function useLocalStorage<T>(
 
   return { value, set, clear };
 }
+

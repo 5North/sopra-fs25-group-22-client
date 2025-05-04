@@ -6,6 +6,7 @@ import useLocalStorage from "@/hooks/useLocalStorage";
 import { Client } from "@stomp/stompjs";
 import { getWsDomain } from "@/utils/domain";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 // interface Player {
 //   username: string;
@@ -60,10 +61,24 @@ const LobbyPage: React.FC = () => {
 
   return (
     <div className="register-container">
-      <h1 style={{ marginBottom: "6rem" }}>🏁</h1>
-      <h1>Waiting for others to join to start the game...</h1>
+      {/* the dark overlay */}
+      <div className="overlay" />
+
+      {/* your statue image */}
+      <Image
+        src="/images/waiting.png"
+        alt="Waiting for players"
+        className="waiting-image"
+        width={200}
+        height={400}
+      />
+
+      <h1 className="waiting-text" >
+        Waiting for others to join to start the game...
+      </h1>
     </div>
   );
+
 };
 
 export default LobbyPage;

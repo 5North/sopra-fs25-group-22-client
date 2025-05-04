@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation"; // use NextJS router for navigation
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { Button, Form, Input } from "antd";
 import { useState } from "react";
-import { login } from "@/api/registerService";
+import { login, getUsers } from "@/api/registerService";
 
 interface FormFieldProps {
   username: string;
@@ -23,6 +23,7 @@ const Login: React.FC = () => {
   const handleLogin = async (values: FormFieldProps) => {
     try {
       const response = await login(values);
+    console.log("🚀 LOGIN RESPONSE PAYLOAD:", response);
 
     if (!response.ok) {
       if (response.status === 403) {
@@ -42,6 +43,23 @@ const Login: React.FC = () => {
     setToken(token); 
     localStorage.setItem("username", values.username); 
     setError("");
+
+    const usersRes = await getUsers(token);
+    if (!usersRes.ok) {
+      throw new Error(`Failed to fetch users: ${usersRes.status}`);
+    }
+    const users: { id: number; username: string }[] = await usersRes.json();
+
+    //Find the logged-in user by username
+    const me = users.find(u => u.username === values.username);
+    if (!me) {
+      throw new Error("Logged-in user not found in users list");
+    }
+
+    // Store their ID (and username) for later pages
+    localStorage.setItem("userId", String(me.id));
+    localStorage.setItem("username", me.username);
+
     router.push("/home");
   } catch (error) {
     if (error instanceof Error) {
@@ -88,13 +106,14 @@ const Login: React.FC = () => {
           <Form.Item>
           {error && <p style={{ color: "red" }}>{error}</p>}
             <Button type="primary" htmlType="submit" className="custom-button">
-            ♣️ Login
+            Login
             </Button>
           </Form.Item>
         </Form>
         <div className="auth-link">
-          <Button type="link" onClick={() => router.push("/register")}>
-            New here? Register
+          <Button type="link" onClick={() => router.push("/register")}
+          className="register-button-text"
+          > New here? Register
           </Button>
         </div>
       </div>

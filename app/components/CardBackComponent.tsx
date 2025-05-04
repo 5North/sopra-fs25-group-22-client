@@ -6,18 +6,19 @@ const cardBackStyle: React.CSSProperties = {
   width: "28px",
   height: "42px",
   margin: "2px",
-  backgroundImage: "url('/images/cardback.jpg')", // Path to your card back
+  backgroundImage: "url('/images/cardback.png')", 
   backgroundSize: "cover",
   backgroundPosition: "center",
-  border: "1px solid #ccc",
-  borderRadius: "0px",
+  backgroundColor: "white",
+  border:          "2px solid #000080", 
+  borderRadius:    "2px",
+  boxShadow:       "0 0 8px 2px rgba(65,105,225,0.8)", 
 };
 
 interface CardBackProps {
-  onClick?: () => void;
+  onClick?: () => void; 
 }
 
-// This component just displays the card back image.
 const CardBackComponent: React.FC<CardBackProps> = ({ onClick }) => {
   return <div onClick={onClick} style={cardBackStyle}></div>;
 };

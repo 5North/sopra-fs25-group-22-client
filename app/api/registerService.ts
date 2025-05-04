@@ -8,11 +8,12 @@ export const createUser = async (values: object):Promise<Response> => {
   return postValuesToPath("/users", values);
 };
 
-export const getUsers = async ():Promise<Response> => {
-  return fetch(getApiDomain() + "/users", {
+export const getUsers = async (token: string): Promise<Response> => {
+  return fetch(`${getApiDomain()}/users`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
+      token,             
     },
   });
 };

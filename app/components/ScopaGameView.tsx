@@ -61,8 +61,14 @@ const TurnDot = () => (
         width: 10,
         height: 10,
         borderRadius: "50%",
-        backgroundColor: "limegreen",
-        marginLeft: 6,
+        backgroundColor: "limegreen",       
+        border: "1px solid #32CD32",
+        boxShadow: [
+          "0 0 2px #32CD32", 
+          "0 0 6px #32CD32",  
+          "0 0 10px rgba(50,205,50,0.6)" 
+        ].join(", "),
+        marginLeft: "6px",
       }}
     />
   );
@@ -70,8 +76,9 @@ const TurnDot = () => (
 
 
 return (
+  <div className="board-wrapper">
   <div className="game-board">
-    {/* Top Opponent (partner) */}
+    {/* Top Opponent  */}
     <div className="opponent-area top-opponent">
       {opponents[0] && (
         <>
@@ -84,23 +91,25 @@ return (
       </div>
           <div style={{ display: "flex" }}>
             {Array.from({ length: opponents[0].handSize }).map((_, idx) => (
-              <CardBackComponent key={idx} />
+              <CardBackComponent key={idx} 
+                  // for the top opponent, use blue-violet neon
+                />
             ))}
           </div>
         </>
       )}
     </div>
 
-    {/* Left Opponent (next clockwise) */}
+    {/* Left Opponent */}
     <div className="opponent-area left-opponent">
       {opponents[1] && (
         <>
-          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-        <h2 style={{ margin: 0, display: "flex", alignItems: "center" }}>
+           <div className="opponent-label" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "8px" }}>
+        <h2 style={{ margin: "-5px", display: "flex", alignItems: "center" , paddingTop: "10rem", paddingRight: "5rem"}}>
           {getUsernameById(opponents[1].userId)}
           {isActive(opponents[1].userId) && <TurnDot />}
         </h2>
-        <p style={{ margin: 0 }}>🪙 {opponents[1].scopaCount}</p>
+        <p style={{ margin: "-5px", paddingRight: "4rem" }}>🪙 {opponents[1].scopaCount}</p>
       </div>
           <div style={{ display: "flex", flexDirection: "column" }}>
             {Array.from({ length: opponents[1].handSize }).map((_, idx) => (
@@ -116,16 +125,16 @@ return (
       )}
     </div>
 
-    {/* Right Opponent (last) */}
+    {/* Right Opponent  */}
     <div className="opponent-area right-opponent">
       {opponents[2] && (
         <>
-          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-        <h2 style={{ margin: 0, display: "flex", alignItems: "center" }}>
+          <div className="opponent-label" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "8px" }}>
+        <h2 style={{ margin: "-5px", display: "flex", alignItems: "center", paddingTop: "10rem", paddingRight: "6rem" }}>
           {getUsernameById(opponents[2].userId)}
           {isActive(opponents[2].userId) && <TurnDot />}
         </h2>
-        <p style={{ margin: 0 }}>🪙 {opponents[2].scopaCount}</p>
+        <p style={{ margin: "-5px", paddingRight: "6rem"  }}>🪙 {opponents[2].scopaCount}</p>
       </div>
           <div style={{ display: "flex", flexDirection: "column" }}>
             {Array.from({ length: opponents[2].handSize }).map((_, idx) => (
@@ -133,7 +142,8 @@ return (
                 key={idx}
                 style={{ transform: "rotate(-90deg)", margin: "0px 0" }}
               >
-                <CardBackComponent />
+                <CardBackComponent 
+                />
               </div>
             ))}
           </div>
@@ -146,27 +156,15 @@ return (
       <div className="table-area">
         <div style={{ display: "flex", flexWrap: "wrap" }}>
           {gameSession.tableCards.map((card, i) => (
-            <CardComponent key={i} card={card} />
+            <CardComponent key={i} card={card} borderColor="#FFAA00"           // yellow-orange neon
+            glowColor="rgba(255,170,0,0.8)"/>
           ))}
         </div>
       </div>
     )}
 
-    {/* Your Hand (bottom) */}
+    {/* Hand (bottom) */}
     <div className="my-hand-area">
-    <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-  <h2 style={{ margin: 0, display: "flex", alignItems: "center" }}>
-    {currentUserId === gameSession.currentPlayerId ? "My turn!" : ""}
-    {currentUserId === gameSession.currentPlayerId && <TurnDot />}
-  </h2>
-  <p style={{ margin: 0 }}>
-    🪙{" "}
-    {
-      gameSession.players?.find((p) => p.userId === currentUserId)
-        ?.scopaCount ?? 0
-    }
-  </p>
-</div>
 
       <div
         style={{
@@ -194,9 +192,24 @@ return (
           >
             <CardComponent card={card} />
           </div>
+          
         ))}
       </div>
+      <div style={{ display: "flex", alignItems: "center", gap: "8px"}}>
+  <h2 style={{ margin: "-4px", display: "flex", alignItems: "center" }}>
+    {currentUserId === gameSession.currentPlayerId ? "My turn!" : ""}
+    {currentUserId === gameSession.currentPlayerId && <TurnDot />}
+  </h2>
+  <p style={{ margin: 0 }}>
+    🪙{" "}
+    {
+      gameSession.players?.find((p) => p.userId === currentUserId)
+        ?.scopaCount ?? 0
+    }
+  </p>
+</div>
     </div>
+  </div>
   </div>
 );
 };

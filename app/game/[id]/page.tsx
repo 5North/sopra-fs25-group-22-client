@@ -13,11 +13,9 @@ import { getWsDomain } from "@/utils/domain";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { getUsers } from "@/api/registerService";
 import CardComponent from "@/components/CardComponent";
+import Image from "next/image";
 
 
-
-
-// simple initial state for loading before receiving real updates.
 const initialGameState: GameSessionState = {
   gameId: 0,          // 
   tableCards: [],      
@@ -36,7 +34,6 @@ interface MoveState {
 export default function GamePage() {
   const hasPublishedRef = useRef(false);
   const { id } = useParams(); 
-  //const router = useRouter();
   const [gameState, setGameState] = useState<GameSessionState>(initialGameState);
   const [error, setError] = useState<string | null>(null);
   const [captureOptions, setCaptureOptions] = useState<Card[][]>([]);
@@ -47,9 +44,9 @@ export default function GamePage() {
   const stompClientRef = useRef<Client | null>(null);
   const { value: token } = useLocalStorage<string>("token", "");
   const [moveState, setMoveState] = useState<MoveState>();
-  
+  const [showRoundAnimation, setShowRoundAnimation] = useState(false);
+  const prevEmptyRef = useRef(gameState.tableCards.length === 0);
 
-  //const [currentUserId, setCurrentUserId] = useState<number | null>(null);
 
   const getUserIdByUsername = (username: string): number | null => {
     const user = allUsers.find(u => u.username === username);
@@ -69,12 +66,21 @@ export default function GamePage() {
   const currentUserId = getCurrentUserId();
 
   // Basic setup for STOMP client connection on the game topic.
+  useEffect(() => {
+    const isNowEmpty = gameState.tableCards.length === 0;
+    // only fire when it goes from non-empty → empty
+    if (!prevEmptyRef.current && isNowEmpty) {
+      setShowRoundAnimation(true);
+      setTimeout(() => setShowRoundAnimation(false), 2000);
+    }
+    prevEmptyRef.current = isNowEmpty;
+  }, [gameState.tableCards]);
 
 
 useEffect(() => {
   const fetchUsers = async () => {
     try {
-      const response = await getUsers();
+      const response = await getUsers(token);
       if (!response.ok) {
         throw new Error("Failed to fetch users");
       }
@@ -87,7 +93,7 @@ useEffect(() => {
   };
 
   fetchUsers();
-}, []);
+}, [token]);
 
   useEffect(() => {
     if (!id) {
@@ -139,13 +145,13 @@ useEffect(() => {
                 const data: TablePrivateState = JSON.parse(message.body);
                 setMyHand(data.handCards);
               } else if (payload.tableCards) {
-    console.log("🔔 initial public state (via queue):", payload);
-    setGameState(prev => ({
-      ...prev,
-      tableCards:      payload.tableCards,
-      players:         payload.players,
-      currentPlayerId: payload.currentPlayerId,
-    }));
+                console.log("🔔 initial public state (via queue):", payload);
+                setGameState(prev => ({
+                  ...prev,
+                  tableCards:      payload.tableCards,
+                  players:         payload.players,
+                  currentPlayerId: payload.currentPlayerId,
+                }));
               } else if(payload.outcome){
                 const resultData: GameResultDTO = JSON.parse(message.body);
                 console.log("Received game result:", resultData);
@@ -311,12 +317,10 @@ useEffect(() => {
   
       const timeout = setTimeout(() => {
         setMoveAnimation(null);
-      }, 1500); // Give it enough time to finish animating
+      }, 1500); 
   
       return () => clearTimeout(timeout);
-  }, [
-    moveState,
-  ]);
+  }, [moveState, currentUserId, gameState?.players]);
   
   
 
@@ -335,6 +339,16 @@ useEffect(() => {
 
   return (
     <div style={{ backgroundColor: "blue", minHeight: "100vh"}}>
+      {showRoundAnimation && (
+        <>
+        <div className="shuffle-overlay" />
+      <div className="round-animation">
+        <Image src="/images/scopa.png" alt="New Round" width={400} height={600}
+        className="scopa-image"
+        style={{ objectFit: "contain" }}/>
+      </div>
+      </>
+    )}
       {/* Render game view with the current state and card click handler */}
       {captureOptions.length > 0 && (
         <div
@@ -370,35 +384,39 @@ useEffect(() => {
             body: payload,
           });
         }}
+        className="neon-button"
         style={{
           position: "fixed",
           bottom: "20px",
           right: "20px",
-          backgroundColor: "#f5ce42", 
+          backgroundColor: "transparent", 
           borderRadius: "50%",
           width: "120px",
           height: "120px",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          boxShadow: "0 4px 10px rgba(0,0,0,0.3)",
+          boxShadow: "0 0 8px rgb(133, 251, 255), 0 0 16px rgb(133, 251, 255)",
           cursor: "pointer",
+          border: "2px solid #0ff",
           zIndex: 1001,
         }}
         title="Get AI suggestion"
       >
-  <img
+  <Image
     src="/images/aibot.png"
     alt="AI Suggestion"
+    width={100}
+    height={110}
     style={{
-      width: "110",
-      height: "110px",
       borderRadius: "50%",
-      objectFit: "cover" // ensures the image fills the circle without distortion
+      objectFit: "cover" 
+      
     }}
   />
       </div>
-    </div>
+  </div>
+  
   );
 }
 
