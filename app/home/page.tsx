@@ -1,6 +1,6 @@
 "use client"; 
 
-import React, { useEffect, useState } from "react";
+//import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation"; 
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { Button, Form } from "antd";
@@ -24,9 +24,9 @@ const Home: React.FC = () => {
   const {
     value: username,
   } = useLocalStorage<string>("username", "");
-  const {
-    value: userId,
-  } = useLocalStorage<string>("userId", "");
+  //const {
+  //  value: userId,
+  //} = useLocalStorage<string>("userId", "");
   //const [stats, setStats] = useState<UserStats>({
   //  winCount: 0,
   //  lossCount: 0,
