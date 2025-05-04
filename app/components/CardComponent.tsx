@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Image from 'next/image';
 
 interface CardProps {
   card: { suit: string; value: number };
@@ -32,7 +33,7 @@ const CardComponent: React.FC<CardProps> = ({ card, onClick }) => {
 
   return (
     <div onClick={onClick} style={cardStyle}>
-      <img
+      <Image
         src={src}
         width={60}
         height={90}
@@ -49,9 +50,9 @@ const cardStyle: React.CSSProperties = {
   margin: "4px",
   padding: 0,
   backgroundColor: "white",
-  border:          "2px solid  #4b0082", // neon violet border
+  border:          "2px solid  #4b0082",
   borderRadius:    "4px",
-  boxShadow:       "0 0 8px 2px rgba(75,0,300,0.8)", // glow
+  boxShadow:       "0 0 8px 2px rgba(75,0,300,0.8)", 
   textAlign: "center",
   cursor: "pointer",
 };

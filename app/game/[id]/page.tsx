@@ -13,11 +13,9 @@ import { getWsDomain } from "@/utils/domain";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { getUsers } from "@/api/registerService";
 import CardComponent from "@/components/CardComponent";
+import Image from "next/image";
 
 
-
-
-// simple initial state for loading before receiving real updates.
 const initialGameState: GameSessionState = {
   gameId: 0,          // 
   tableCards: [],      
@@ -36,7 +34,6 @@ interface MoveState {
 export default function GamePage() {
   const hasPublishedRef = useRef(false);
   const { id } = useParams(); 
-  //const router = useRouter();
   const [gameState, setGameState] = useState<GameSessionState>(initialGameState);
   const [error, setError] = useState<string | null>(null);
   const [captureOptions, setCaptureOptions] = useState<Card[][]>([]);
@@ -50,9 +47,6 @@ export default function GamePage() {
   const [showRoundAnimation, setShowRoundAnimation] = useState(false);
   const prevEmptyRef = useRef(gameState.tableCards.length === 0);
 
-  
-
-  //const [currentUserId, setCurrentUserId] = useState<number | null>(null);
 
   const getUserIdByUsername = (username: string): number | null => {
     const user = allUsers.find(u => u.username === username);
@@ -77,7 +71,6 @@ export default function GamePage() {
     // only fire when it goes from non-empty → empty
     if (!prevEmptyRef.current && isNowEmpty) {
       setShowRoundAnimation(true);
-      // hide it after 2s (0.5s slide in + 1s pause + 0.5s slide out)
       setTimeout(() => setShowRoundAnimation(false), 2000);
     }
     prevEmptyRef.current = isNowEmpty;
@@ -152,13 +145,13 @@ useEffect(() => {
                 const data: TablePrivateState = JSON.parse(message.body);
                 setMyHand(data.handCards);
               } else if (payload.tableCards) {
-    console.log("🔔 initial public state (via queue):", payload);
-    setGameState(prev => ({
-      ...prev,
-      tableCards:      payload.tableCards,
-      players:         payload.players,
-      currentPlayerId: payload.currentPlayerId,
-    }));
+                console.log("🔔 initial public state (via queue):", payload);
+                setGameState(prev => ({
+                  ...prev,
+                  tableCards:      payload.tableCards,
+                  players:         payload.players,
+                  currentPlayerId: payload.currentPlayerId,
+                }));
               } else if(payload.outcome){
                 const resultData: GameResultDTO = JSON.parse(message.body);
                 console.log("Received game result:", resultData);
@@ -324,12 +317,10 @@ useEffect(() => {
   
       const timeout = setTimeout(() => {
         setMoveAnimation(null);
-      }, 1500); // Give it enough time to finish animating
+      }, 1500); 
   
       return () => clearTimeout(timeout);
-  }, [
-    moveState,
-  ]);
+  }, [moveState, currentUserId, gameState?.players]);
   
   
 
@@ -352,7 +343,9 @@ useEffect(() => {
         <>
         <div className="shuffle-overlay" />
       <div className="round-animation">
-        <img src="/images/scopa.png" alt="New Round" />
+        <Image src="/images/scopa.png" alt="New Round" width={400} height={600}
+        className="scopa-image"
+        style={{ objectFit: "contain" }}/>
       </div>
       </>
     )}
@@ -410,53 +403,18 @@ useEffect(() => {
         }}
         title="Get AI suggestion"
       >
-  <img
+  <Image
     src="/images/aibot.png"
     alt="AI Suggestion"
+    width={100}
+    height={110}
     style={{
-      width: "110",
-      height: "110px",
       borderRadius: "50%",
-      objectFit: "cover" // ensures the image fills the circle without distortion
+      objectFit: "cover" 
       
     }}
   />
       </div>
-      <style jsx>{`
-      .round-animation {
-        pointer-events: none;
-        position: absolute;
-        top: 50%;
-        left: 0;
-        width: 100%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        transform: translateY(-50%);
-        z-index: 1000;
-      }
-      .round-animation img {
-        animation: slideInOut 2s ease-in-out forwards;
-      }
-      @keyframes slideInOut {
-        0% {
-          transform: translateX(-100vw);
-          opacity: 1;
-        }
-        25% {
-          transform: translateX(0);
-          opacity: 1;
-        }
-        75% {
-          transform: translateX(0);
-          opacity: 1;
-        }
-        100% {
-          transform: translateX(100vw);
-          opacity: 0;
-        }
-      }
-    `}</style>
   </div>
   
   );

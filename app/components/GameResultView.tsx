@@ -3,7 +3,7 @@
 import React from "react";
 import { useRouter } from "next/navigation";
 import { GameResultDTO } from "@/models/GameResult";
-import { Button, Form } from "antd";
+import { Button } from "antd";
 
 interface GameResultViewProps {
   result: GameResultDTO;
@@ -54,7 +54,7 @@ const GameResultView: React.FC<GameResultViewProps> = ({ result }) => {
           Opponent’s Total Score: <strong>{result.otherTotal}</strong>
         </p>
 
-        {/* ← here’s the flex container for the two breakdowns → */}
+        {/* ← here’s flex container for the two breakdowns → */}
         <div
           style={{
             display:        "flex",

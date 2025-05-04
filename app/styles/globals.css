@@ -310,7 +310,6 @@ a {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    /* Other styles */
     background-image: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0)), url("/images/result.png") !important;
     background-size: cover;
     background-position: center 75%;
@@ -344,7 +343,6 @@ a {
   }
 }
 
-/* wrapper that covers the viewport */
 .shuffle-overlay {
   position: fixed;
   top: 0;
@@ -352,24 +350,40 @@ a {
   width: 100vw;
   height: 100vh;
   background-color: rgba(0, 0, 0, 0.9);
-  z-index: 999;          /* on top of everything */
-  pointer-events: none;   /* clicks pass through */
+  z-index: 999;          
+  pointer-events: none;   
 }
 
-/* the image itself, centered and animated */
 .shuffle-overlay img {
   position: absolute;
   top: 50%;
+  
   left: 50%;
   transform: translate(-50%, -50%);
   width: 120px;
   height: 120px;
   object-fit: contain;
   user-select: none;
-  /* play our keyframes over 3s, forwards so it stays at 100% at the end */
   animation: slideInOut 3s ease-in-out forwards;
 }
 
+.round-animation {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  pointer-events: none;
+}
+
+.scopa-image {
+  animation: slideInOut 3s ease-in-out forwards;
+  user-select: none;
+}
 
 .neon-button:hover {
   box-shadow: 0 0 12px rgb(133, 251, 255), 0 0 24px #0ff !important;

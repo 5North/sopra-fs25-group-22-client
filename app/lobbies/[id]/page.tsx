@@ -6,6 +6,7 @@ import useLocalStorage from "@/hooks/useLocalStorage";
 import { Client } from "@stomp/stompjs";
 import { getWsDomain } from "@/utils/domain";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 // interface Player {
 //   username: string;
@@ -64,10 +65,12 @@ const LobbyPage: React.FC = () => {
       <div className="overlay" />
 
       {/* your statue image */}
-      <img
+      <Image
         src="/images/waiting.png"
         alt="Waiting for players"
         className="waiting-image"
+        width={200}
+        height={400}
       />
 
       <h1 className="waiting-text" >

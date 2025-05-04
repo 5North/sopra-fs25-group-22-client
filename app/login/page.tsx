@@ -50,13 +50,13 @@ const Login: React.FC = () => {
     }
     const users: { id: number; username: string }[] = await usersRes.json();
 
-    // 4) Find the logged-in user by username
+    //Find the logged-in user by username
     const me = users.find(u => u.username === values.username);
     if (!me) {
       throw new Error("Logged-in user not found in users list");
     }
 
-    // 5) Store their ID (and username) for later pages
+    // Store their ID (and username) for later pages
     localStorage.setItem("userId", String(me.id));
     localStorage.setItem("username", me.username);
 
