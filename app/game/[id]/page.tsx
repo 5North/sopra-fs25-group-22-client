@@ -93,7 +93,7 @@ useEffect(() => {
   };
 
   fetchUsers();
-}, []);
+}, [token]);
 
   useEffect(() => {
     if (!id) {

@@ -1,4 +1,3 @@
-
 "use client"; 
 
 import React, { useEffect, useState } from "react";
@@ -8,31 +7,33 @@ import { Button, Form } from "antd";
 import { logoutUser } from "@/api/registerService";
 
 
-interface UserStats {
-  winCount: number;
-  lossCount: number;
-  tieCount: number;
-}
+//interface UserStats {
+//  winCount: number;
+//  lossCount: number;
+//  tieCount: number;
+//}
 
 const Home: React.FC = () => {
   const router = useRouter();
   const [form] = Form.useForm();
-  const username = localStorage.getItem("username");
   const {
     clear: clearToken, 
     value: token
   } = useLocalStorage<string>("token", ""); 
   let response: Response;
-  
-  const userId = typeof window !== "undefined"
-    ? localStorage.getItem("userId")
-    : null;
-    const [stats, setStats] = useState<UserStats>({
-      winCount: 0,
-      lossCount: 0,
-      tieCount: 0,
-    });
-  
+  const {
+    value: username,
+  } = useLocalStorage<string>("username", "");
+  const {
+    value: userId,
+  } = useLocalStorage<string>("userId", "");
+  //const [stats, setStats] = useState<UserStats>({
+  //  winCount: 0,
+  //  lossCount: 0,
+  //  tieCount: 0,
+  //  });
+
+    /*
     useEffect(() => {
       if (!token || !userId) return;
       fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/${userId}`, {
@@ -42,7 +43,7 @@ const Home: React.FC = () => {
           if (!res.ok) throw new Error("Failed to load user stats");
           return res.json();
         })
-        .then((body: { winCount: number; lossCount: number; tieCount: number }) => {
+        /*.then((body: { winCount: number; lossCount: number; tieCount: number }) => {
           setStats({
             winCount: body.winCount,
             lossCount: body.lossCount,
@@ -53,6 +54,7 @@ const Home: React.FC = () => {
           console.error(err);
         });
     }, [token, userId]);
+    */
   
   const handleLogout = async () => {
     try {
@@ -106,9 +108,9 @@ const Home: React.FC = () => {
           </h2>
           <p>Here are your current stats:</p>
           <ul style={{ listStyle: "none", padding: 0, fontSize: "1.1rem" }}>
-            <li> Wins: {stats.winCount}</li>
-            <li>Losses: {stats.lossCount}</li>
-            <li> Ties: {stats.tieCount}</li>
+            <li> Wins: {/* {stats.winCount}*/} </li>
+            <li>Losses: {/*{stats.lossCount}*/}</li>
+            <li> Ties: {/*{stats.tieCount}*/}</li>
           </ul>
         </div>
 
