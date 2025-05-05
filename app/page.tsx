@@ -31,7 +31,7 @@ export default function Home() {
             margin: '0 auto',
             padding: '2rem',
             backgroundColor: 'rgba(0, 0, 0, 0.7)',
-            borderRadius: '8px',
+            borderRadius: '2x',
           }}
         >
           <h1 style={{ ...textStyle, textAlign: 'center', marginBottom: '1rem' }}>
