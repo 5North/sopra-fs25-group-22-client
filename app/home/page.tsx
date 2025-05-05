@@ -1,60 +1,57 @@
 "use client"; 
 
-//import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation"; 
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { Button, Form } from "antd";
-import { logoutUser } from "@/api/registerService";
+import { logoutUser, getUserById } from "@/api/registerService";
 
 
-//interface UserStats {
-//  winCount: number;
-//  lossCount: number;
-//  tieCount: number;
-//}
+interface UserStats {
+  id: number;
+  username: string;
+  winCount: number;
+  lossCount: number;
+  tieCount: number;
+}
 
 const Home: React.FC = () => {
   const router = useRouter();
   const [form] = Form.useForm();
-  const {
-    clear: clearToken, 
-    value: token
-  } = useLocalStorage<string>("token", ""); 
+  const { clear: clearToken, value: token} = useLocalStorage<string>("token", ""); 
+  const {value: username} = useLocalStorage<string>("username", "");
+  const { value: userIdStr} = useLocalStorage<string>("userId", "");
+  const userId = Number(userIdStr);
+  const [stats, setStats] = useState<Pick<UserStats, "winCount" | "lossCount" | "tieCount">>({
+    winCount:  0,
+    lossCount: 0,
+    tieCount:  0,
+  });
   let response: Response;
-  const {
-    value: username,
-  } = useLocalStorage<string>("username", "");
-  //const {
-  //  value: userId,
-  //} = useLocalStorage<string>("userId", "");
-  //const [stats, setStats] = useState<UserStats>({
-  //  winCount: 0,
-  //  lossCount: 0,
-  //  tieCount: 0,
-  //  });
-
-    /*
+    
     useEffect(() => {
       if (!token || !userId) return;
-      fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/${userId}`, {
-        headers: { token },
-      })
-        .then((res) => {
-          if (!res.ok) throw new Error("Failed to load user stats");
-          return res.json();
-        })
-        /*.then((body: { winCount: number; lossCount: number; tieCount: number }) => {
+      
+      const loadStats = async () => {
+        try {
+          const response = await getUserById(token, userIdStr);
+          if (!response.ok) {
+            throw new Error(`Failed to load user: ${response.status}`);
+          }
+          const dto: UserStats = await response.json();
           setStats({
-            winCount: body.winCount,
-            lossCount: body.lossCount,
-            tieCount: body.tieCount,
+            winCount:  dto.winCount,
+            lossCount: dto.lossCount,
+            tieCount:  dto.tieCount,
           });
-        })
-        .catch((err) => {
-          console.error(err);
-        });
-    }, [token, userId]);
-    */
+        } catch (err) {
+          console.error("Error fetching stats:", err);
+        }
+      };
+  
+      loadStats();
+    }, [token, userId, userIdStr]);
+    
   
   const handleLogout = async () => {
     try {
@@ -96,21 +93,22 @@ const Home: React.FC = () => {
           display: "flex",
           justifyContent: "center",
           alignItems: "flex-start",
-          gap: "3rem",
+          gap: "10rem",
           marginTop: "1rem",
           padding: "0 2rem 2rem",
         }}
       >
         {/* Left: welcome + stats */}
-        <div style={{ flex: 1, maxWidth: "300px", paddingLeft: 0 }}>
+        <div style={{ flex: 1, maxWidth: "300px",margin: '0 auto', padding: '0.5rem', backgroundColor: 'rgba(0, 0, 0, 0.7)',
+            borderRadius: '8px',}}>
           <h2 style={{ fontSize: "1.5rem", margin: 0 , paddingTop: "0.5rem",  lineHeight: 3,}}>
             Welcome back, {username}!
           </h2>
           <p>Here are your current stats:</p>
           <ul style={{ listStyle: "none", padding: 0, fontSize: "1.1rem" }}>
-            <li> Wins: {/* {stats.winCount}*/} </li>
-            <li>Losses: {/*{stats.lossCount}*/}</li>
-            <li> Ties: {/*{stats.tieCount}*/}</li>
+            <li> Wins: {stats.winCount} </li>
+            <li>Losses: {stats.lossCount}</li>
+            <li> Ties: {stats.tieCount}</li>
           </ul>
         </div>
 

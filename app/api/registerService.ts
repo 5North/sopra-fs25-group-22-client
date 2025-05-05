@@ -13,7 +13,7 @@ export const getUsers = async (token: string): Promise<Response> => {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
-      token,             
+      "Token": token,            
     },
   });
 };
@@ -61,5 +61,18 @@ export const postValuesToPath = async (path: string, values: object):Promise<Res
       "Content-Type": "application/json",
     },
     body: JSON.stringify(values),
+  });
+};
+
+export const getUserById = async (
+  token: string,
+  userId: string
+): Promise<Response> => {
+  return fetch(`${getApiDomain()}/users/${userId}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Token: token,
+    },
   });
 };
