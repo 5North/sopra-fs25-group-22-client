@@ -4,7 +4,6 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {Button } from "antd";
 import { getUsers } from "@/api/registerService";
-import useLocalStorage from "@/hooks/useLocalStorage";
 
 interface UserGetDTO {
   id:         number;
