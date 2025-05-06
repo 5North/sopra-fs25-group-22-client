@@ -29,8 +29,6 @@ interface MoveState {
   playedCard: Card
 }
 
-
-
 export default function GamePage() {
   const hasPublishedRef = useRef(false);
   const { id } = useParams(); 
@@ -45,6 +43,8 @@ export default function GamePage() {
   const { value: token } = useLocalStorage<string>("token", "");
   const [moveState, setMoveState] = useState<MoveState>();
   const [showRoundAnimation, setShowRoundAnimation] = useState(false);
+  const [suggestion, setSuggestion] = useState(null);
+  const [showPanel, setShowPanel] = useState(false);
   const prevEmptyRef = useRef(gameState.tableCards.length === 0);
 
 
@@ -161,21 +161,12 @@ useEffect(() => {
               } else if (Array.isArray(payload) && payload.length > 0 && Array.isArray(payload[0])) {
                 console.log("Received capture options:", payload);
                 setCaptureOptions(payload); 
-              } else {
+              } else if (payload.suggestion) {
+                setSuggestion(payload.suggestion)
+              }else {
                 console.log("Unknown message from queue: " + JSON.stringify(payload))
               }
   
-              // // Check if payload is a capture options message.
-              // if (Array.isArray(payload) && payload.length > 0 && Array.isArray(payload[0])) {
-              //   setCaptureOptions(payload);
-              //   console.log("Capture options updated:", payload);
-
-              // }
-              // if (payload.userId === currentUserId && payload.handCards) {
-              //   setMyHand(payload.handCards);
-              //   console.log("My hand updated:", payload.handCards);
-              // }
-              // handle other types of private messages here.
             } catch (err) {
               console.error("Error processing private message:", err);
             }
@@ -201,22 +192,6 @@ useEffect(() => {
               console.error("Error processing game result:", err);
             }
           });
-
-        // setMoveAnimation(null); 
-        // // Subscription for move broadcasts
-        //   client.subscribe(`/topic/move/${id}`, (message: IMessage) => {
-        //     try {
-        //       const moveData: MoveAnimationData = JSON.parse(message.body);
-        //       console.log("Received move broadcast:", moveData);
-        //       // Set the move animation state to trigger display in the UI.
-        //       setMoveAnimation(moveData);
-        //       setTimeout(() => {
-        //         setMoveAnimation(null);
-        //       }, 3000);
-        //     } catch (err) {
-        //       console.error("Error processing move broadcast:", err);
-        //     }
-        //   });
       },
       onStompError: (frame) => {
         console.error("STOMP error:", frame.headers["message"]);
@@ -383,6 +358,7 @@ useEffect(() => {
             destination: `/app/ai`,
             body: payload,
           });
+          setShowPanel(true);
         }}
         className="neon-button"
         style={{
@@ -415,6 +391,30 @@ useEffect(() => {
     }}
   />
       </div>
+            {/* Suggestion Panel */}
+            {showPanel && (
+        <div
+          style={{
+            position: "fixed",
+            bottom: "150px",
+            right: "20px",
+            width: "250px",
+            padding: "12px",
+            backgroundColor: "#000c",
+            color: "#0ff",
+            border: "2px solid #0ff",
+            borderRadius: "12px",
+            boxShadow: "0 0 8px rgb(133, 251, 255), 0 0 16px rgb(133, 251, 255)",
+            zIndex: 1000,
+          }}
+        >
+          {suggestion ? (
+            <div>{suggestion}</div>
+          ) : (
+            <div><em>Waiting for suggestion...</em></div>
+          )}
+        </div>
+      )}
   </div>
   
   );

@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "antd";
 import { createLobby } from "@/api/registerService";
 import useLocalStorage from "@/hooks/useLocalStorage";
-import { Client, IMessage } from "@stomp/stompjs";
+import { Client, IMessage, StompSubscription } from "@stomp/stompjs";
 import { getWsDomain } from "@/utils/domain";
 
 
@@ -36,6 +36,7 @@ const LobbyPage: React.FC = () => {
   const [error, setError] = useState("");
   const [lobby, setLobby] = useState<Lobby | null>(null);
   const stompClientRef = useRef<Client | null>(null);
+  const subscriptionRef = useRef<StompSubscription | null>(null);
 
   const { value: token } = useLocalStorage<string>("token", "");
   const username = getUsername();
@@ -93,7 +94,7 @@ const LobbyPage: React.FC = () => {
         onConnect: () => {
           console.log("Connected to STOMP");
 
-          client.subscribe(`/topic/lobby/${lobby.lobbyId}`, (message: IMessage) => {
+          subscriptionRef.current = client.subscribe(`/topic/lobby/${lobby.lobbyId}`, (message: IMessage) => {
             const data = JSON.parse(message.body);
             console.log("Received lobby update:", data);
 
@@ -126,8 +127,13 @@ const LobbyPage: React.FC = () => {
       client.activate();
 
       return () => {
+        if (subscriptionRef.current) {
+          subscriptionRef.current.unsubscribe();
+          subscriptionRef.current = null;
+        }
         if (stompClientRef.current) {
           stompClientRef.current.deactivate();
+          stompClientRef.current = null;
         }
       };
     
@@ -180,6 +186,20 @@ const LobbyPage: React.FC = () => {
   console.log("Local username:", username);
   console.log("Lobby players:", lobby.players);
 
+  const handleLeaveLobby = () => {
+    if (subscriptionRef.current) {
+      subscriptionRef.current.unsubscribe();
+      console.log(`Unsubscribed from /topic/lobby/${lobby.lobbyId}`);
+      subscriptionRef.current = null;
+    }
+
+    if (stompClientRef.current) {
+      stompClientRef.current.deactivate();
+      stompClientRef.current = null;
+    }
+
+    router.push("/home"); // Go back to home or lobby select
+  };
 
   return (
     <div
@@ -259,6 +279,32 @@ const LobbyPage: React.FC = () => {
           </Button>
           </div>
         )}
+            {/* Leave Lobby Button */}
+            <div
+        onClick={handleLeaveLobby}
+        className="neon-button"
+        style={{
+          position: "fixed",
+          bottom: "160px",
+          right: "20px",
+          backgroundColor: "transparent",
+          borderRadius: "20px",
+          padding: "10px 20px",
+          color: "#0ff",
+          fontWeight: "bold",
+          fontSize: "16px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          boxShadow: "0 0 8px rgb(133, 251, 255), 0 0 16px rgb(133, 251, 255)",
+          cursor: "pointer",
+          border: "2px solid #0ff",
+          zIndex: 1001,
+        }}
+        title="Leave Lobby"
+      >
+        Leave Lobby
+      </div>  
     </div>
   );
 };
