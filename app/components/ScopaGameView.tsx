@@ -77,7 +77,11 @@ const TurnDot = () => (
 
 return (
   <div className="board-wrapper">
-  <div className="game-board">
+  <div className="game-board"
+  style={ {
+    width: 886.32,
+    height: 556.950005 ,
+    paddingRight: 32    }}>
     {/* Top Opponent  */}
     <div className="opponent-area top-opponent">
       {opponents[0] && (

@@ -50,9 +50,9 @@ const cardStyle: React.CSSProperties = {
   margin: "4px",
   padding: 0,
   backgroundColor: "white",
-  border:          "2px solid  #4b0082",
+  border:          "2px solid  #FFA500",
   borderRadius:    "4px",
-  boxShadow:       "0 0 8px 2px rgba(75,0,300,0.8)", 
+  boxShadow:       "0 0 8px 2px rgba(255,165,0,0.8)", 
   textAlign: "center",
   cursor: "pointer",
 };

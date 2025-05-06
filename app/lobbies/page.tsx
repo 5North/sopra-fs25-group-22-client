@@ -276,31 +276,18 @@ const LobbyPage: React.FC = () => {
           </div>
         )}
             {/* Leave Lobby Button */}
-            <div
+            <Button
         onClick={handleLeaveLobby}
-        className="neon-button"
         style={{
-          position: "fixed",
-          bottom: "160px",
-          right: "20px",
-          backgroundColor: "transparent",
-          borderRadius: "20px",
-          padding: "10px 20px",
-          color: "#0ff",
-          fontWeight: "bold",
-          fontSize: "16px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          boxShadow: "0 0 8px rgb(133, 251, 255), 0 0 16px rgb(133, 251, 255)",
-          cursor: "pointer",
-          border: "2px solid #0ff",
-          zIndex: 1001,
+          position: "absolute",
+          bottom: "5rem",
+          right: "5rem",
+          borderRadius: "8px",
         }}
-        title="Leave Lobby"
+      
       >
         Leave Lobby
-      </div>  
+        </Button>
     </div>
   );
 };

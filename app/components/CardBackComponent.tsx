@@ -6,7 +6,7 @@ const cardBackStyle: React.CSSProperties = {
   width: "28px",
   height: "42px",
   margin: "2px",
-  backgroundImage: "url('/images/cardback.png')", 
+  backgroundImage: "url('/images/cardback.JPG')", 
   backgroundSize: "cover",
   backgroundPosition: "center",
   backgroundColor: "white",

@@ -175,7 +175,7 @@ a {
 
 .game-board {
   padding: 5vh 8vw 10vh 3vw;
-  aspect-ratio: 1400 / 600;
+  aspect-ratio: 1350 / 600;
   width: 80vw;
   max-width: 1200px;
 
@@ -203,7 +203,6 @@ a {
   flex-direction: column;
   align-items: center;
   justify-content:flex-start; 
-  padding-left: 6rem;
   margin: -80px;
   gap: 24px;
 
@@ -234,8 +233,6 @@ a {
   flex-direction: column;
   align-items: center;
   justify-content:center; 
-  padding-right: 0;
-  margin-right: -6rem;
   position: relative;
   overflow: visible;
 }
@@ -256,7 +253,8 @@ a {
   align-items: center;
   justify-content:center; 
   margin-top: 0px;
-  padding-left: 50px
+  padding-left: 50px;
+  position: relative
 }
 
 .my-hand-area {
@@ -265,15 +263,15 @@ a {
   flex-direction: column;
   align-items: center;
   justify-content:center; 
-  padding-left:4rem;
-  margin-top: -50px;
-  gap: 50px;
+  gap: 24px;
+
 
 }
 .table-cards,
 .hand-cards {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  justify-content: center;
   gap: 4px;;
 }
 
