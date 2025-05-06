@@ -43,10 +43,6 @@ const LobbyPage: React.FC = () => {
     client.activate();
 
     return () => {
-      if (subscriptionRef.current) {
-        subscriptionRef.current.unsubscribe();
-        subscriptionRef.current = null;
-      }
       if (stompClientRef.current) {
         stompClientRef.current.deactivate();
         stompClientRef.current = null;
