@@ -11,6 +11,7 @@ interface UserGetDTO {
   winCount:   number;
   lossCount:  number;
   tieCount:   number;
+  rank:       number
 }
 
 export default function ScoreboardPage() {
@@ -25,7 +26,6 @@ export default function ScoreboardPage() {
 
 
   useEffect(() => {
-    // 1) grab token from localStorage
     const raw = localStorage.getItem("token");
     if (!raw) {
       setError("Not authenticated");
@@ -35,19 +35,36 @@ export default function ScoreboardPage() {
     const token = raw.replace(/^"|"$/g, "");
 
 
-    // 2) fetch all users
     (async () => {
       try {
         const res = await getUsers(token);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const list = (await res.json()) as UserGetDTO[];
         // sort by wins desc, then ties desc
-        list.sort((a, b) =>
-          b.winCount !== a.winCount
-            ? b.winCount - a.winCount
-            : b.tieCount - a.tieCount
-        );
-        setPlayers(list);
+        list.sort((a, b) => {
+          if (b.winCount !== a.winCount) return b.winCount - a.winCount;
+          if (b.tieCount  !== a.tieCount)  return b.tieCount  - a.tieCount;
+          return 0; // leave equal ones in fetch order
+        });
+
+        // 2) assign “rank” so ties share the same number
+        type WithRank = UserGetDTO & { rank: number };
+        const ranked: WithRank[] = [];
+        let prev: WithRank | null = null;
+        list.forEach((u, idx) => {
+          const sameAsPrev =
+            prev &&
+            u.winCount  === prev.winCount &&
+            u.tieCount  === prev.tieCount &&
+            u.lossCount === prev.lossCount;
+
+          const rank = sameAsPrev ? prev!.rank : idx + 1;
+          const withRank: WithRank = { ...u, rank };
+          ranked.push(withRank);
+          prev = withRank;
+        });
+
+        setPlayers(ranked);
       } catch (e) {
         console.error("Failed to load scoreboard:", e);
         setError("Could not load scoreboard");
@@ -66,10 +83,17 @@ export default function ScoreboardPage() {
   return (
     <div
       style={{
-        backgroundImage: "url('/images/scoreboard.png')",
-        backgroundSize:    "contain",
-        backgroundRepeat:  "no-repeat",
-        backgroundPosition:"center",
+        backgroundImage: `
+          radial-gradient(
+            circle at center,
+            rgba(0,0,0,0) 60%,
+            rgba(0,0,0,0.8) 100%
+          ),
+          url('/images/scoreboard.png')
+        `,
+        backgroundRepeat:  "no-repeat, no-repeat",
+        backgroundPosition:"center center, center center",
+        backgroundSize:    "cover, contain",
         minHeight:         "100vh",
         padding:           "2rem",
         color:             "white",
@@ -125,7 +149,7 @@ export default function ScoreboardPage() {
                   }}
                 >
                   <td style={{ padding: "0.5rem", textAlign: "center" , color: "#ffab40"}}>
-                    {i + 1}
+                    {p.rank}
                   </td>
                   <td style={{ padding: "0.5rem" }}>{p.username}</td>
                   <td style={{ padding: "0.5rem", textAlign: "center" }}>

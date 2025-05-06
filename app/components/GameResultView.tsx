@@ -21,7 +21,7 @@ const GameResultView: React.FC<GameResultViewProps> = ({ result, onReturnHome })
     <div className="result-container">
       <div
         style={{
-          position: "fixed",
+          position: "relative",
           top: 0,
           left: 0,
           width: "100vw",
@@ -36,14 +36,21 @@ const GameResultView: React.FC<GameResultViewProps> = ({ result, onReturnHome })
       >
         <div
           style={{
-            backgroundColor: "#222",
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
             padding: "2rem",
             borderRadius: "8px",
             maxWidth: "400px",
             width: "100%",
+            boxSizing: "content-box"
           }}
         >
-          <h1 style={{ marginBottom: "1rem", color: "#B8860B" }}>Game Over</h1>
+          <h1 style={{ marginBottom: "1rem", color: "#FFAB40", textAlign: "center", textShadow: [
+                    "0 0 4px #FFAB40",                // tight inner glow
+                    "0 0 8px #FFAB40",                // mid-range bloom
+                    "0 0 16px rgba(255,171,64,0.5)"   // softer outer haze
+                  ].join(", ")}}
+                  >Game Over
+          </h1>
 
           {/* If it's the detailed result format */}
           {(isGameCompleted(result)) ? (
@@ -62,6 +69,7 @@ const GameResultView: React.FC<GameResultViewProps> = ({ result, onReturnHome })
                 style={{
                   display: "flex",
                   justifyContent: "space-between",
+                  alignItems: "flex-start",
                   gap: "1rem",
                   marginBottom: "1.5rem",
                 }}

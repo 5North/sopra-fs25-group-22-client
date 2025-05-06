@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { Button, Form, Input } from "antd";
 import { useState } from "react";
-import { createUser } from "@/api/registerService";
+import { createUser, getUsers } from "@/api/registerService";
 
 interface FormFieldProps {
   username: string;
@@ -38,9 +38,27 @@ const Register: React.FC = () => {
       }
 
       const token = response.headers.get("Token");
-      setToken(token ? token : "");
+      if (!token) {
+        throw new Error("No token returned from server.");
+      }
+      setToken(token);
+
       localStorage.setItem("username", values.username);
       setError("");
+
+      const usersRes = await getUsers(token);
+      if (!usersRes.ok) {
+        throw new Error(`Failed to fetch users: ${usersRes.status}`);
+      }
+      const users: { id: number; username: string }[] = await usersRes.json();
+      const me = users.find(u => u.username === values.username);
+      if (!me) {
+        throw new Error("Logged-in user not found in users list");
+      }
+
+      localStorage.setItem("userId", String(me.id));
+      localStorage.setItem("username", me.username);
+    
       router.push("/home");
     } catch (error) {
       if (error instanceof Error) {

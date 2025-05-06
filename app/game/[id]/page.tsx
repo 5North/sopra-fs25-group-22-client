@@ -14,6 +14,8 @@ import useLocalStorage from "@/hooks/useLocalStorage";
 import { getUsers } from "@/api/registerService";
 import CardComponent from "@/components/CardComponent";
 import Image from "next/image";
+import { Button } from "antd";
+
 
 
 const initialGameState: GameSessionState = {
@@ -42,11 +44,11 @@ export default function GamePage() {
   const stompClientRef = useRef<Client | null>(null);
   const { value: token } = useLocalStorage<string>("token", "");
   const [moveState, setMoveState] = useState<MoveState>();
-  //const [showRoundAnimation, setShowRoundAnimation] = useState(false);
+  const [showRoundAnimation, setShowRoundAnimation] = useState(false);
   const [suggestion, setSuggestion] = useState(null);
   const [showAIPanel, setShowAIPanel] = useState(false);
   const subscriptionRef = useRef<StompSubscription | null>(null);
-  // const prevEmptyRef = useRef(gameState?.tableCards.length === 0);
+  const prevEmptyRef = useRef<boolean>(true);
 
 
   const getUserIdByUsername = (username: string): number | null => {
@@ -66,16 +68,21 @@ export default function GamePage() {
 
   const currentUserId = getCurrentUserId();
 
-  // // Basic setup for STOMP client connection on the game topic.
-  // useEffect(() => {
-  //   const isNowEmpty = gameState?.tableCards.length === 0;
-  //   // only fire when it goes from non-empty → empty
-  //   if (!prevEmptyRef.current && isNowEmpty) {
-  //     setShowRoundAnimation(true);
-  //     setTimeout(() => setShowRoundAnimation(false), 2000);
-  //   }
-  //   prevEmptyRef.current = isNowEmpty;
-  // }, [gameState?.tableCards]);
+  useEffect(() => {
+    // 1) ensure we actually have an array
+    if (!gameState?.tableCards) return;
+
+    const isTableEmpty = gameState.tableCards.length === 0;
+    const someoneHasCards =
+      gameState.players?.some(p => p.handSize > 0) ?? false;
+
+    if (!prevEmptyRef.current && isTableEmpty && someoneHasCards) {
+      setShowRoundAnimation(true);
+      setTimeout(() => setShowRoundAnimation(false), 2000);
+    }
+    prevEmptyRef.current = isTableEmpty;
+  }, [gameState?.tableCards, gameState?.players]);
+  
 
 
   useEffect(() => {
@@ -347,33 +354,20 @@ export default function GamePage() {
   return (
     <div style={{ backgroundColor: "blue", minHeight: "100vh" }}>
         {/* Quit button */}
-        <div
+        <Button
         onClick={handleExit}
-        className="neon-button"
         style={{
-          position: "fixed",
-          top: "10px", // Positioning it at the top
-          right: "20px", // Positioning it on the right side of the screen
-          backgroundColor: "transparent", // Transparent background
-          borderRadius: "20px", // Rounded corners
-          padding: "10px 20px", // Padding for the button text
-          color: "#0ff", // Neon cyan color
-          fontWeight: "bold", // Bold text
-          fontSize: "16px", // Font size
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          boxShadow: "0 0 8px rgb(133, 251, 255), 0 0 16px rgb(133, 251, 255)", // Neon glow effect
-          cursor: "pointer",
-          border: "2px solid #0ff", // Cyan border
-          zIndex: 1001, // To make sure the button is on top of other elements
+          position: "absolute",
+          top: "2rem",
+          right: "2rem",
+          borderRadius: "8px",
+          zIndex:999
         }}
-        title="Quit Game"
       >
         Quit Game
-      </div>
+        </Button>
 
-      {/* {showRoundAnimation && (
+       {showRoundAnimation && (
         <>
           <div className="shuffle-overlay" />
           <div className="round-animation">
@@ -382,7 +376,7 @@ export default function GamePage() {
               style={{ objectFit: "contain" }} />
           </div>
         </>
-      )} */}
+      )} 
       {/* Render game view with the current state and card click handler */}
       {captureOptions.length > 0 && (
         <div
