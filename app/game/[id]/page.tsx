@@ -42,7 +42,7 @@ export default function GamePage() {
   const stompClientRef = useRef<Client | null>(null);
   const { value: token } = useLocalStorage<string>("token", "");
   const [moveState, setMoveState] = useState<MoveState>();
-  const [showRoundAnimation, setShowRoundAnimation] = useState(false);
+  //const [showRoundAnimation, setShowRoundAnimation] = useState(false);
   const [suggestion, setSuggestion] = useState(null);
   const [showAIPanel, setShowAIPanel] = useState(false);
   const subscriptionRef = useRef<StompSubscription | null>(null);
@@ -113,7 +113,7 @@ export default function GamePage() {
         console.log("Connected to game WebSocket");
 
         // Subscribe to public game state updates
-        const subscriptionRef = client.subscribe(`/topic/lobby/${id}`, (message: IMessage) => {
+        subscriptionRef.current = client.subscribe(`/topic/lobby/${id}`, (message: IMessage) => {
           try {
             const payload = JSON.parse(message.body);
             console.log("==> PUBLIC MESSAGE message received:", payload);
@@ -349,27 +349,31 @@ export default function GamePage() {
         {/* Quit button */}
         <div
         onClick={handleExit}
+        className="neon-button"
         style={{
           position: "fixed",
-          top: "10px",
-          right: "10px",
-          backgroundColor: "#ff5555",
-          borderRadius: "50%",
-          width: "40px",
-          height: "40px",
+          top: "10px", // Positioning it at the top
+          right: "20px", // Positioning it on the right side of the screen
+          backgroundColor: "transparent", // Transparent background
+          borderRadius: "20px", // Rounded corners
+          padding: "10px 20px", // Padding for the button text
+          color: "#0ff", // Neon cyan color
+          fontWeight: "bold", // Bold text
+          fontSize: "16px", // Font size
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          boxShadow: "0 0 8px rgb(255, 87, 34)",
+          boxShadow: "0 0 8px rgb(133, 251, 255), 0 0 16px rgb(133, 251, 255)", // Neon glow effect
           cursor: "pointer",
-          zIndex: 1001,
+          border: "2px solid #0ff", // Cyan border
+          zIndex: 1001, // To make sure the button is on top of other elements
         }}
         title="Quit Game"
       >
-        <span style={{ fontSize: "24px", color: "#fff" }}>Quit</span>
+        Quit Game
       </div>
 
-      {showRoundAnimation && (
+      {/* {showRoundAnimation && (
         <>
           <div className="shuffle-overlay" />
           <div className="round-animation">
@@ -378,7 +382,7 @@ export default function GamePage() {
               style={{ objectFit: "contain" }} />
           </div>
         </>
-      )}
+      )} */}
       {/* Render game view with the current state and card click handler */}
       {captureOptions.length > 0 && (
         <div

@@ -13,8 +13,8 @@ interface GameResultViewProps {
 const GameResultView: React.FC<GameResultViewProps> = ({ result, onReturnHome }) => {
   const router = useRouter();
 
-  const isGameCompleted = (result: any): result is GameResultDTO => {
-    return result.myTotal !== undefined && result.otherTotal !== undefined;
+  const isGameCompleted = (result: GameResultDTO | { userId: number; outcome: string; message: string }): result is GameResultDTO => {
+    return JSON.stringify(result).includes("myTotal") && JSON.stringify(result).includes("otherTotal");
   };
 
   return (
@@ -46,7 +46,7 @@ const GameResultView: React.FC<GameResultViewProps> = ({ result, onReturnHome })
           <h1 style={{ marginBottom: "1rem", color: "#B8860B" }}>Game Over</h1>
 
           {/* If it's the detailed result format */}
-          {isGameCompleted(result) ? (
+          {(isGameCompleted(result)) ? (
             <>
               <p style={{ margin: "4px 0" }}>
                 Your outcome: <strong>{result.outcome}</strong>
