@@ -70,7 +70,7 @@ const LobbyPage: React.FC = () => {
           ? data.players
           : [];
         // Add the host if not already present
-        if (!initialPlayers.some((player: Player) => player.username === username)) {
+        if (!initialPlayers.some((player: Player) => String(player.username) === String(username))) {
           initialPlayers.push({ username });
         }
 
@@ -105,7 +105,7 @@ const LobbyPage: React.FC = () => {
             
                   // Avoid adding duplicate players
                   const alreadyJoined = prevLobby.players.some(
-                    (p) => p.username === data.username
+                    (p) => String(p.username) === String(data.username)
                   );
                   if (alreadyJoined) return prevLobby;
             
@@ -127,10 +127,6 @@ const LobbyPage: React.FC = () => {
       client.activate();
 
       return () => {
-        if (subscriptionRef.current) {
-          subscriptionRef.current.unsubscribe();
-          subscriptionRef.current = null;
-        }
         if (stompClientRef.current) {
           stompClientRef.current.deactivate();
           stompClientRef.current = null;
