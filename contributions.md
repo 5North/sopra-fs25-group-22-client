@@ -96,12 +96,12 @@ reason).
 
 ---
 
-## Contributions Week 4 - 16.04.25 to 22.04.25
+## Contributions Week 4 and Week 5 - 16.04.25 to 07.05.25
 
 | **Student**        | **Date** | **Link to Commit** | **Description**                 | **Relevance**                       |
 | ------------------ | -------- | ------------------ | ------------------------------- | ----------------------------------- |
-| **[@githubUser1]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
-|                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
+| **[@shellmychakkaith]** | 02.05   | https://github.com/5North/sopra-fs25-group-22-client/commit/fc57542bdfa6b84f975c6e09b5447a52c9574968 | Change of design and fixes | Design to be more enganging |
+|                    | 05.05   | https://github.com/5North/sopra-fs25-group-22-client/commit/7bace8bb621a61b5d8f46fa6c321314e2f80c5cb| Stats and Ranking | Dislay the user statics to the user and able to view overall Ranking of registered users |
 | **[@githubUser2]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
 |                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
 | **[@githubUser3]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
