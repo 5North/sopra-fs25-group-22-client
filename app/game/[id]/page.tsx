@@ -45,7 +45,7 @@ export default function GamePage() {
   const { value: token } = useLocalStorage<string>("token", "");
   const [moveState, setMoveState] = useState<MoveState>();
   const [showRoundAnimation, setShowRoundAnimation] = useState(false);
-  const [suggestion, setSuggestion] = useState(null);
+  const [suggestion, setSuggestion] = useState<string | null>(null);
   const [showAIPanel, setShowAIPanel] = useState(false);
   const subscriptionRef = useRef<StompSubscription | null>(null);
   const prevEmptyRef = useRef<boolean>(true);
@@ -164,9 +164,9 @@ export default function GamePage() {
             } else if (payload.outcome) {
               const resultData: GameResultDTO = JSON.parse(message.body);
               console.log("Received game result:", resultData);
-              setGameResult(resultData);
-              //{"gameId":1567,"userId":9,"outcome":"LOST","myTotal":2,"otherTotal":3,"myCarteResult":1,"myDenariResult":1,"myPrimieraResult":0,"mySettebelloResult":0,"myScopaResult":0,"otherCarteResult":0,"otherDenariResult":0,"otherPrimieraResult":1,"otherSettebelloResult":1,"otherScopaResult":1}
-
+              setTimeout(() => {
+                setGameResult(resultData);
+              }, 2500);
             } else if (Array.isArray(payload) && payload.length > 0 && Array.isArray(payload[0])) {
               console.log("Received capture options:", payload);
               setCaptureOptions(payload);
@@ -196,7 +196,9 @@ export default function GamePage() {
           try {
             const resultData: GameResultDTO = JSON.parse(message.body);
             console.log("Received game result:", resultData);
-            setGameResult(resultData);
+            setTimeout(() => {
+              setGameResult(resultData);
+            }, 2500);
           } catch (err) {
             console.error("Error processing game result:", err);
           }
@@ -326,8 +328,23 @@ export default function GamePage() {
     }
   };
 
+  const rematch = () => {
+    if (!id) return;
+    setCaptureOptions([]);
+    const payload = JSON.stringify({
+      gameId: id,
+      userId: currentUserId,
+      confirmRematch: true
+    });
+    console.log("Publishing capture option payload:", payload);
+    stompClientRef.current?.publish({
+      destination: `/app/rematch`,
+      body: payload,
+    });
+  }
+
   if (gameResult) {
-    return <GameResultView result={gameResult}  onReturnHome={unsubscribeFromGame}/>;
+    return <GameResultView result={gameResult} onReturnHome={unsubscribeFromGame} onRematch={rematch} gameId={Number(id)}/>;
   }
 
   const isMyTurn = currentUserId === gameState?.currentPlayerId;
@@ -467,10 +484,12 @@ export default function GamePage() {
           }}
         >
           {suggestion ? (
-            <div>{suggestion}</div>
-          ) : (
-            <div><em>Waiting for suggestion...</em></div>
-          )}
+          suggestion.split(";").map((line, idx) => (
+            <div key={idx}>{line.trim()}</div>
+      ))
+    ) : (
+      <div><em>Waiting for suggestion...</em></div>
+    )}
         </div>
       )}
     </div>
