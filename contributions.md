@@ -96,14 +96,13 @@ reason).
 
 ---
 
-## Contributions Week 4 - 16.04.25 to 22.04.25
+## Contributions Week 4 - 30.04.25 to 07.05.25
 
 | **Student**        | **Date** | **Link to Commit** | **Description**                 | **Relevance**                       |
 | ------------------ | -------- | ------------------ | ------------------------------- | ----------------------------------- |
-| **[@githubUser1]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
-|                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
-| **[@githubUser2]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
-|                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
+| **@sbenzo99** | 04.05   | https://github.com/5North/sopra-fs25-group-22-server/commit/9da6ec1bbe87451421ced164dca7e616f3995896 | Timer to set a limit on how much time to play a card (30 seconds) + order of player card hands | Guarantee a good flow of the game|
+| **@sbenzo99** | 03.05   | https://github.com/5North/sopra-fs25-group-22-server/commit/4b1b86998e3fad2c31e73247927b86a7532b0bf9 | Quit game during game, considered as forfait | Avoid to force player to play until the end |
+|    **@sbenzo99**  | 06.05  | https://github.com/5North/sopra-fs25-group-22-server/commit/4c75ae2b11491563dc6abc5b69a3940d6787afc6 | Modification of Results (points instead of result) + extensive test according to not covered lines | make the visibility of the result better |
 | **[@githubUser3]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
 |                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
 | **[@githubUser4]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
