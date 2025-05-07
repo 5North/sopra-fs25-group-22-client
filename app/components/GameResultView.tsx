@@ -8,9 +8,11 @@ import { Button } from "antd";
 interface GameResultViewProps {
   result: GameResultDTO | { userId: number; outcome: string; message: string };
   onReturnHome: () => void;
+  onRematch: () => void;
+  gameId: number;
 }
 
-const GameResultView: React.FC<GameResultViewProps> = ({ result, onReturnHome }) => {
+const GameResultView: React.FC<GameResultViewProps> = ({ result, onReturnHome, onRematch, gameId }) => {
   const router = useRouter();
 
   const isGameCompleted = (result: GameResultDTO | { userId: number; outcome: string; message: string }): result is GameResultDTO => {
@@ -115,15 +117,36 @@ const GameResultView: React.FC<GameResultViewProps> = ({ result, onReturnHome })
               </div>
             </>
           )}
+  
+        <div
+        style={{
+          display: "flex",
+          justifyContent: isGameCompleted(result) ? "space-between" : "center",
+          marginTop: "2rem",
+        }}
+      >
+        <Button
+          style={{ flex: 1, maxWidth: isGameCompleted(result) ? "45%" : "100%" }}
+          onClick={() => {
+            onReturnHome();
+            router.push("/home");
+          }}
+        >
+          Return to Home
+        </Button>
 
+        {isGameCompleted(result) && (
           <Button
+            style={{ flex: 1, maxWidth: "45%" }}
             onClick={() => {
-              onReturnHome();
-              router.push("/home");
+              onRematch();
+              router.push(`/rematch/${gameId}`);
             }}
           >
-            Return to Home
+            Rematch
           </Button>
+        )}
+      </div>
         </div>
       </div>
     </div>

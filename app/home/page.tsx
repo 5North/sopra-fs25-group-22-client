@@ -19,6 +19,7 @@ const Home: React.FC = () => {
   const router = useRouter();
   const [form] = Form.useForm();
   const { clear: clearToken, value: token} = useLocalStorage<string>("token", ""); 
+  const { clear: clearUsername} = useLocalStorage<string>("username", ""); 
   const {value: username} = useLocalStorage<string>("username", "");
   const { value: userIdStr} = useLocalStorage<string>("userId", "");
   const userId = Number(userIdStr);
@@ -62,6 +63,7 @@ const Home: React.FC = () => {
       }
     
       clearToken();  
+      clearUsername();
       router.push("/login");
     } catch (error) {
       if (error instanceof Error) {
