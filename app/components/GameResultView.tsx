@@ -1,4 +1,3 @@
-// File: app/components/GameResultView.tsx
 "use client";
 
 import React from "react";
@@ -17,7 +16,7 @@ interface GameResultViewProps {
   onReturnHome: () => void;
 }
 
-/** Type guard for full GameResultDTO vs. the simple fallback shape */
+
 function isFullResult(
   r: GameResultDTO | SimpleResult
 ): r is GameResultDTO {
@@ -58,7 +57,7 @@ const GameResultView: React.FC<GameResultViewProps> = ({
 }) => {
   const router = useRouter();
 
-  // 1) Simple fallback if we don’t have the full DTO
+  //Simple fallback if we don’t have the full DTO
   if (!isFullResult(result)) {
     return (
       <div className="result-container">
@@ -83,6 +82,9 @@ const GameResultView: React.FC<GameResultViewProps> = ({
           style={{ marginTop: "1rem" }}
           onClick={() => {
             onReturnHome();
+            localStorage.removeItem("initialLobby");
+            localStorage.removeItem("LobbyId");
+            localStorage.removeItem("Host");
             router.push("/home");
           }}
         >
@@ -92,7 +94,7 @@ const GameResultView: React.FC<GameResultViewProps> = ({
     );
   }
 
-  // 2) Full view once we know it’s GameResultDTO
+  //Full view once we know it’s GameResultDTO
   const full = result;
 
   return (
@@ -105,13 +107,12 @@ const GameResultView: React.FC<GameResultViewProps> = ({
           justifyContent: "center",
           alignItems: "center",
           padding: "2rem",
-          backgroundColor: "rgba(0, 0, 0, 0.5)",
           zIndex: 2000,
         }}
       >
         <div
           style={{
-            backgroundColor: "rgba(0, 0, 0, 0.7)",
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
             padding: "2rem",
             borderRadius: "8px",
             maxWidth: "480px",
@@ -140,9 +141,9 @@ const GameResultView: React.FC<GameResultViewProps> = ({
             }}
           >
             {full.outcome === "WON"
-              ? "You Won 🎉"
+              ? "You Won"
               : full.outcome === "LOST"
-              ? "You Lost 😞"
+              ? "You Lost"
               : `Result: ${full.outcome}`}
           </p>
 

@@ -69,7 +69,7 @@ export default function GamePage() {
   const currentUserId = getCurrentUserId();
 
   useEffect(() => {
-    // 1) ensure we actually have an array
+    // ensure we actually have an array
     if (!gameState?.tableCards) return;
 
     const isTableEmpty = gameState.tableCards.length === 0;
@@ -371,6 +371,9 @@ export default function GamePage() {
   const handleExit = () => {
     console.log("User is quitting the game");
     quitGame();
+    localStorage.removeItem("initialLobby");
+    localStorage.removeItem("LobbyId");
+    localStorage.removeItem("Host");
   };
   
   return (

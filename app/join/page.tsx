@@ -6,7 +6,7 @@ import { Button } from "antd";
 import { Client } from "@stomp/stompjs";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { getWsDomain } from "@/utils/domain";
-import { message as notify } from "antd"
+import { message} from "antd"
 
 const JoinGamePage: React.FC = () => {
   const router = useRouter();
@@ -16,6 +16,7 @@ const JoinGamePage: React.FC = () => {
   const { value: token } = useLocalStorage<string>("token", "");
   const inputsRef = useRef<Array<HTMLInputElement | null>>([]);
   const [client, setClient] = useState<Client | null>(null);
+  const [messageApi, contextHolder] = message.useMessage();
 
 
   const handleInputChange = (index: number, value: string) => {
@@ -68,8 +69,19 @@ const JoinGamePage: React.FC = () => {
           const data = JSON.parse(message.body);
           console.log("Reply from server:", data);
           if (!data.success && data.message.includes("already joined")) {
-            notify.error("You are already joined in a lobby")
-            router.push(`/lobbies/${lobbyPIN}`);
+            messageApi.open({
+              type:    "error",
+              content: "You’re already in a lobby. Sending you there now.",
+              // override colors so it’s visible
+              style: {
+                backgroundColor: "#fff",  
+                color:           "#f5222d",     
+                borderRadius:    "4px",
+              }
+            })
+            setTimeout(() => {
+              router.push(`/lobbies/${lobbyPIN}`);
+            }, 2000);
             return;
           }
           if (!data.success) {
@@ -235,6 +247,7 @@ const JoinGamePage: React.FC = () => {
           {joinError}
         </p>
       )}
+      {contextHolder}
       <Button
         type="primary"
         disabled={!token || digits.some((d) => d === "")}
