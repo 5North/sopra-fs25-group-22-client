@@ -18,7 +18,6 @@ interface GameResultViewProps {
   gameId: number;
 }
 
-
 function isFullResult(
   r: GameResultDTO | SimpleResult
 ): r is GameResultDTO {
@@ -93,6 +92,7 @@ const GameResultView: React.FC<GameResultViewProps> = ({
     );
   }
 
+ 
   const full = result;
 
   return (
