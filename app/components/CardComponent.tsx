@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Image from 'next/image';
-import { Tooltip } from "antd";
+
 
 
 interface CardProps {
@@ -27,10 +27,6 @@ function valueMap(v: number): string {
   throw new Error("Unknown card value: " + v);
 }
 
-function valueMapExplain(v: number): string {
-  if (v >= 1 && v <= 10) return String(v);
-  throw new Error("Unknown card value: " + v);
-}
 
 const CardComponent: React.FC<CardProps> = ({ card, onClick }) => {
 
