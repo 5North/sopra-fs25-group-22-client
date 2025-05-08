@@ -1,3 +1,4 @@
+// File: app/components/GameResultView.tsx
 "use client";
 
 import React from "react";
@@ -14,10 +15,9 @@ interface SimpleResult {
 interface GameResultViewProps {
   result: GameResultDTO | SimpleResult;
   onReturnHome: () => void;
-  onRematch: () => void;
-  gameId: number;
 }
 
+/** Type guard for full GameResultDTO vs. the simple fallback shape */
 function isFullResult(
   r: GameResultDTO | SimpleResult
 ): r is GameResultDTO {
@@ -58,7 +58,7 @@ const GameResultView: React.FC<GameResultViewProps> = ({
 }) => {
   const router = useRouter();
 
-
+  // 1) Simple fallback if we don’t have the full DTO
   if (!isFullResult(result)) {
     return (
       <div className="result-container">
@@ -92,7 +92,7 @@ const GameResultView: React.FC<GameResultViewProps> = ({
     );
   }
 
- 
+  // 2) Full view once we know it’s GameResultDTO
   const full = result;
 
   return (
@@ -183,7 +183,7 @@ const GameResultView: React.FC<GameResultViewProps> = ({
                   <div
                     style={{
                       textAlign: "left",
-                      fontWeight: myVal > opVal ? 3000 : 400,
+                      fontWeight: myVal > opVal ? 800 : 400,
                       color: "#fff",
                     }}
                   >
@@ -200,7 +200,7 @@ const GameResultView: React.FC<GameResultViewProps> = ({
                   <div
                     style={{
                       textAlign: "right",
-                      fontWeight: opVal > myVal ? 3000 : 400,
+                      fontWeight: opVal > myVal ? 800 : 400,
                       color: "#fff",
                     }}
                   >
@@ -211,26 +211,19 @@ const GameResultView: React.FC<GameResultViewProps> = ({
             })}
           </div>
 
-          /*
-        {isGameCompleted(result) && (
-
+          <Button
             block
-
             onClick={() => {
-              onRematch();
-              router.push(`/rematch/${gameId}`);
+              onReturnHome();
+              router.push("/home");
             }}
           >
-            Rematch
+            Return to Home
           </Button>
-        )}
-      </div>
         </div>
       </div>
     </div>
   );
 };
 
-export default GameResultView;*/
-
-
+export default GameResultView;
