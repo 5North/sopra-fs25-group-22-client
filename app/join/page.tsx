@@ -6,6 +6,7 @@ import { Button } from "antd";
 import { Client } from "@stomp/stompjs";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { getWsDomain } from "@/utils/domain";
+import { message as notify } from "antd"
 
 const JoinGamePage: React.FC = () => {
   const router = useRouter();
@@ -66,12 +67,19 @@ const JoinGamePage: React.FC = () => {
         clientObj.subscribe("/user/queue/reply", (message) => {
           const data = JSON.parse(message.body);
           console.log("Reply from server:", data);
+          if (!data.success && data.message.includes("already joined")) {
+            notify.error("You are already joined in a lobby")
+            router.push(`/lobbies/${lobbyPIN}`);
+            return;
+          }
           if (!data.success) {
+            
             setJoinError(data.message);
             clientObj.deactivate();
             console.log("Client deactivated due to join failure.");
           } else {
-            console.log("from user queue...")
+            console.log("Lobby from join:", data.lobby)
+            
             router.push("/lobbies/" + lobbyPIN);
           }
         });
@@ -79,6 +87,7 @@ const JoinGamePage: React.FC = () => {
         clientObj.subscribe(`/topic/lobby/${lobbyPIN}`, (message) => {
           const data = JSON.parse(message.body);
           console.log("Reply from server for lobby:", data);
+          localStorage.setItem("initialLobby", JSON.stringify(data.lobby))
         });
       },
       onStompError: (frame) => {
@@ -243,8 +252,8 @@ const JoinGamePage: React.FC = () => {
         onClick={handleBack}
         style={{
           position: "absolute",
-          bottom: "1rem",
-          right: "1rem",
+          bottom: "5rem",
+          right: "9rem",
           borderRadius: "8px",
         }}
       >

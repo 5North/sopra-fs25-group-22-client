@@ -34,16 +34,11 @@ const ScopaGameView: React.FC<ScopaGameViewProps> = ({
     ].filter(Boolean) as Player[];
 
   console.log("game session in scopa view: ", gameSession);
-  //let opponents:Player[] = [];
-  // let currentPlayer: Player[] = [];
+
   
 if (gameSession.players) {
   console.log("🔹 All player IDs:", gameSession.players.map(p => p.userId));
-  // Hack:  current user id is always 0 due to a previous issue. this is a hacky soltion to set current user id to the actual id current user has (and not 0)
-  //opponents = gameSession.players.filter((p) => p.userId !== currentUserId);
   console.log("🔸 Opponent IDs:", opponents.map(p => p.userId));
-  // current player == players - opponents
-  // currentPlayer = gameSession.players.filter((p) => p.userId === currentUserId);;
 }
 
   
@@ -58,15 +53,15 @@ const isActive = (playerId: number) =>
 const TurnDot = () => (
     <span
       style={{
-        width: 10,
-        height: 10,
+        width: 20,
+        height: 20,
         borderRadius: "50%",
         backgroundColor: "limegreen",       
         border: "1px solid #32CD32",
         boxShadow: [
-          "0 0 2px #32CD32", 
-          "0 0 6px #32CD32",  
-          "0 0 10px rgba(50,205,50,0.6)" 
+          "0 0 10px #32CD32", 
+          "0 0 15px #32CD32",  
+          "0 0 20px rgba(50,205,50,0.9)" 
         ].join(", "),
         marginLeft: "6px",
       }}
@@ -81,7 +76,9 @@ return (
   style={ {
     width: 886.32,
     height: 556.950005 ,
-    paddingRight: 32    }}>
+    paddingRight: 32,
+    paddingBottom: 37.65 
+    }}>
     {/* Top Opponent  */}
     <div className="opponent-area top-opponent">
       {opponents[0] && (

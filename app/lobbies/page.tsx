@@ -41,7 +41,7 @@ const LobbyPage: React.FC = () => {
   const { value: token } = useLocalStorage<string>("token", "");
   const username = getUsername();
 
-
+  /*
   useEffect(() => {
     const autoCreateLobby = async () => {
       setError("");
@@ -84,6 +84,7 @@ const LobbyPage: React.FC = () => {
 
     autoCreateLobby();
   }, [token, username]);
+  */
 
   useEffect(() => {
     if (!lobby) return;
