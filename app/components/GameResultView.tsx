@@ -53,26 +53,39 @@ const categories = [
   },
 ];
 
-const GameResultView: React.FC<GameResultViewProps> = ({ result, onReturnHome }) => {
-
+const GameResultView: React.FC<GameResultViewProps> = ({
+  result,
+  onReturnHome,
+}) => {
   const router = useRouter();
 
+
   if (!isFullResult(result)) {
-    // Simple fallback view
     return (
       <div className="result-container">
-        <h1 style={{ color: "#FFAB40", textAlign: "center" }}>Game Over</h1>
-        <p style={{ textAlign: "center", color: "#fff", fontSize: "1.25rem" }}>
+        <h1 style={{ color: "#FFAB40", textAlign: "center" }}>
+          Game Over
+        </h1>
+        <p
+          style={{
+            textAlign: "center",
+            color: "#fff",
+            fontSize: "1.25rem",
+            margin: "0.5rem 0",
+          }}
+        >
           {result.outcome}
         </p>
-        <p style={{ textAlign: "center", color: "#fff" }}>{result.message}</p>
+        <p style={{ textAlign: "center", color: "#fff" }}>
+          {result.message}
+        </p>
         <Button
           block
+          style={{ marginTop: "1rem" }}
           onClick={() => {
             onReturnHome();
             router.push("/home");
           }}
-          style={{ marginTop: "1rem" }}
         >
           Return to Home
         </Button>
@@ -80,7 +93,6 @@ const GameResultView: React.FC<GameResultViewProps> = ({ result, onReturnHome })
     );
   }
 
-  // From here on, result is GameResultDTO
   const full = result;
 
   return (
@@ -93,13 +105,13 @@ const GameResultView: React.FC<GameResultViewProps> = ({ result, onReturnHome })
           justifyContent: "center",
           alignItems: "center",
           padding: "2rem",
-          backgroundColor: "rgba(0,0,0,0)",
+          backgroundColor: "rgba(0, 0, 0, 0.5)",
           zIndex: 2000,
         }}
       >
         <div
           style={{
-            backgroundColor: "rgba(0,0,0,0.6)",
+            backgroundColor: "rgba(0, 0, 0, 0.7)",
             padding: "2rem",
             borderRadius: "8px",
             maxWidth: "480px",
@@ -128,9 +140,9 @@ const GameResultView: React.FC<GameResultViewProps> = ({ result, onReturnHome })
             }}
           >
             {full.outcome === "WON"
-              ? "You Won"
+              ? "You Won 🎉"
               : full.outcome === "LOST"
-              ? "You Lost"
+              ? "You Lost 😞"
               : `Result: ${full.outcome}`}
           </p>
 
@@ -144,13 +156,21 @@ const GameResultView: React.FC<GameResultViewProps> = ({ result, onReturnHome })
             }}
           >
             <div
-              style={{ textAlign: "left", fontWeight: 700, color: "#fff" }}
+              style={{
+                textAlign: "left",
+                fontWeight: 700,
+                color: "#fff",
+              }}
             >
               Your Breakdown
             </div>
             <div /> {/* spacer */}
             <div
-              style={{ textAlign: "right", fontWeight: 700, color: "#fff" }}
+              style={{
+                textAlign: "right",
+                fontWeight: 700,
+                color: "#fff",
+              }}
             >
               Opponent Breakdown
             </div>
@@ -163,19 +183,24 @@ const GameResultView: React.FC<GameResultViewProps> = ({ result, onReturnHome })
                   <div
                     style={{
                       textAlign: "left",
-                      fontWeight: myVal > opVal ? 800 : 400,
+                      fontWeight: myVal > opVal ? 3000 : 400,
                       color: "#fff",
                     }}
                   >
                     {myVal}
                   </div>
-                  <div style={{ textAlign: "center", color: "#fff" }}>
+                  <div
+                    style={{
+                      textAlign: "center",
+                      color: "#fff",
+                    }}
+                  >
                     {key}
                   </div>
                   <div
                     style={{
                       textAlign: "right",
-                      fontWeight: opVal > myVal ? 800 : 400,
+                      fontWeight: opVal > myVal ? 3000 : 400,
                       color: "#fff",
                     }}
                   >
@@ -186,6 +211,7 @@ const GameResultView: React.FC<GameResultViewProps> = ({ result, onReturnHome })
             })}
           </div>
 
+          /*
         {isGameCompleted(result) && (
 
             block
@@ -205,6 +231,6 @@ const GameResultView: React.FC<GameResultViewProps> = ({ result, onReturnHome })
   );
 };
 
-export default GameResultView;
+export default GameResultView;*/
 
 
