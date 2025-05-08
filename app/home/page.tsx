@@ -5,6 +5,12 @@ import { useRouter } from "next/navigation";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { Button, Form } from "antd";
 import { logoutUser, getUserById } from "@/api/registerService";
+import { createLobby } from "@/api/registerService";
+import { message } from "antd";
+
+interface Player {
+  username: string;
+}
 
 
 interface UserStats {
@@ -14,6 +20,7 @@ interface UserStats {
   lossCount: number;
   tieCount: number;
 }
+
 
 const Home: React.FC = () => {
   const router = useRouter();
@@ -29,6 +36,52 @@ const Home: React.FC = () => {
     tieCount:  0,
   });
   let response: Response;
+
+  // Create lobby 
+  const handleStartGame = async () => {            
+  
+    if (!token) {
+      message.error(" Please log in.");
+      return;
+    }
+  
+    try {
+      const response = await createLobby(token, {});
+      if (response.status === 409) {
+        message.error("You already have an open lobby. Ask your friend for the Game ID");
+        return;
+      }
+      else if (!response.ok) {
+        message.error(
+          response.status === 400
+            ? "Invalid input or missing data."
+            : "Failed to create lobby. Please try again."
+        );
+        return;
+      }
+  
+      const data = await response.json();
+      console.log("Lobby created:", data);
+  
+      // build the initial players list
+      const initialPlayers: Player[] =
+        data.players?.length > 0 ? data.players : [];
+      if (!initialPlayers.some(p => p.username === username)) {
+        initialPlayers.push({ username });
+      }
+
+      localStorage.setItem("initialLobby", JSON.stringify({
+        ...data,
+        players: initialPlayers,
+      }));
+      localStorage.setItem("Host", username);
+  
+      router.push(`/lobbies/${data.lobbyId}`);
+    } catch (err) {
+      console.error("Lobby creation error:", err);
+      message.error("An error occurred while creating the lobby.");
+    }
+  };
     
     useEffect(() => {
       if (!token || !userId) return;
@@ -101,13 +154,13 @@ const Home: React.FC = () => {
         }}
       >
         {/* Left: welcome + stats */}
-        <div style={{ flex: 1, maxWidth: "300px",margin: '0 auto', padding: '0.5rem', backgroundColor: 'rgba(0, 0, 0, 0.7)',
+        <div style={{ flex: 1, maxWidth: "300px",margin: '0 auto', padding: '0.5rem', backgroundColor: 'rgba(0, 0, 0, 0.8)',
             borderRadius: '8px',}}>
           <h2 style={{ fontSize: "1.5rem", margin: 0 , paddingTop: "0.5rem",  lineHeight: 3,}}>
-            Welcome back, {username}!
+            Welcome back, <strong style={{ color: "#FFA726" }}>{username}</strong>!
           </h2>
           <p>Here are your current stats:</p>
-          <ul style={{ listStyle: "none", padding: 0, fontSize: "1.1rem" }}>
+          <ul style={{ listStyle: "none", paddingTop: "0.7rem", fontSize: "1.1rem" }}>
             <li> Wins: {stats.winCount} </li>
             <li>Losses: {stats.lossCount}</li>
             <li> Ties: {stats.tieCount}</li>
@@ -126,7 +179,7 @@ const Home: React.FC = () => {
             <Form.Item>
               <Button
                 className="custom-button"
-                onClick={() => router.push("/lobbies")}
+                onClick={handleStartGame}
               >
                 Start a Game
               </Button>

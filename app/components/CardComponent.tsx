@@ -3,6 +3,8 @@
 import React, { useState } from "react";
 import Image from 'next/image';
 
+
+
 interface CardProps {
   card: { suit: string; value: number };
   onClick?: () => void;
@@ -25,14 +27,18 @@ function valueMap(v: number): string {
   throw new Error("Unknown card value: " + v);
 }
 
+
 const CardComponent: React.FC<CardProps> = ({ card, onClick }) => {
+
   const [hovered, setHovered] = useState(false);
+
 
   const id = `${valueMap(card.value)}_${suitMap[card.suit]}`;
   const src = `/cards/${id}.svg`;
   const altText = `${card.value} of ${card.suit}`;
 
   return (
+
     <div
       onClick={onClick}
       style={cardStyle}
@@ -56,10 +62,12 @@ const CardComponent: React.FC<CardProps> = ({ card, onClick }) => {
         }}
       />
     </div>
+
   );
 };
 
 const cardStyle: React.CSSProperties = {
+
   position: "relative",
   width: "60px",
   height: "90px",
@@ -71,6 +79,7 @@ const cardStyle: React.CSSProperties = {
   boxShadow: "0 0 8px 2px rgba(255,165,0,0.8)",
   textAlign: "center",
   cursor: "pointer",
+
 };
 
 const tooltipStyle: React.CSSProperties = {
@@ -89,6 +98,7 @@ const tooltipStyle: React.CSSProperties = {
   zIndex: 1000,
   pointerEvents: "none",
 };
+
 
 
 

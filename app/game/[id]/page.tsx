@@ -320,6 +320,7 @@ export default function GamePage() {
     );
   }
 
+  
   const unsubscribeFromGame = () => {
     if (subscriptionRef.current) {
       subscriptionRef.current.unsubscribe();
@@ -327,8 +328,9 @@ export default function GamePage() {
       subscriptionRef.current = null;
     }
   };
+  
 
-  const rematch = () => {
+  /*const rematch = () => {
     if (!id) return;
     setCaptureOptions([]);
     const payload = JSON.stringify({
@@ -341,10 +343,13 @@ export default function GamePage() {
       destination: `/app/rematch`,
       body: payload,
     });
-  }
+  }*/
 
   if (gameResult) {
-    return <GameResultView result={gameResult} onReturnHome={unsubscribeFromGame} onRematch={rematch} gameId={Number(id)}/>;
+    return <GameResultView result={gameResult} onReturnHome={unsubscribeFromGame} 
+    //onRematch={rematch} 
+    //gameId={Number(id)}
+    />;
   }
 
   const isMyTurn = currentUserId === gameState?.currentPlayerId;
@@ -434,8 +439,8 @@ export default function GamePage() {
         className="neon-button"
         style={{
           position: "fixed",
-          bottom: "20px",
-          right: "20px",
+          bottom: "5rem",
+          right: "5rem",
           backgroundColor: isMyTurn ? "transparent" : "#333",
           borderRadius: "50%",
           width: "120px",
@@ -443,6 +448,7 @@ export default function GamePage() {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
+        
           boxShadow: isMyTurn
             ? "0 0 8px rgb(133, 251, 255), 0 0 16px rgb(133, 251, 255)"
             : "none",
@@ -456,9 +462,10 @@ export default function GamePage() {
         <Image
           src="/images/aibot.png"
           alt="AI Suggestion"
-          width={100}
-          height={110}
+          width={120}
+          height={120}
           style={{
+            position:"absolute",
             borderRadius: "50%",
             objectFit: "cover",
             filter: isMyTurn ? "none" : "grayscale(100%)",

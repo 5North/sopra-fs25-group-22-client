@@ -4,8 +4,11 @@ import React from "react";
 import { useRouter } from "next/navigation";
 import {Button, Collapse } from "antd";
 import { CaretRightOutlined } from "@ant-design/icons";
+import Image from "next/image";
 
 const { Panel } = Collapse;
+
+const ranks = ["1","2","3","4","5","6","7","jack","queen","king"];
 
 const ScopaInstructions: React.FC = () => {
   const router = useRouter();
@@ -51,6 +54,7 @@ const ScopaInstructions: React.FC = () => {
           style={{ background: "rgba(0, 0, 0, 0.3)", border: "none" }}
         >
           <ul style={{ paddingLeft: "1.5rem", color: "#fff", margin: 0 }}>
+          <li>This is a 4 player game (2 vs. 2)</li>
             <li>At the start, 4 cards are placed on the table.</li>
             <li>Each player receives 9 cards.</li>
             <li>
@@ -85,7 +89,7 @@ const ScopaInstructions: React.FC = () => {
               Capture Options:
               <ul style={{ paddingLeft: "1.5rem", margin: 0 }}>
                 <li>
-                <strong style={{ color: '#ffbf00' }}>Non-deterministic Capture:</strong> If there is exactly one
+                <strong style={{ color: '#ffbf00' }}>Deterministic Capture:</strong> If there is exactly one
                   matching option (for example, a single card on the table that
                   has the same value as your played card), that option is applied automatically.
                 </li>
@@ -101,7 +105,7 @@ const ScopaInstructions: React.FC = () => {
             </li>
             <li>
               If a capture occurs, you collect both the card you played and the
-              cards captured from the table. The collected cards become part of
+              card(s) captured from the table. The collected cards become part of
               your team treasure (which is the aggregate of both teammates’ captured cards).
             </li>
             <li>
@@ -176,7 +180,7 @@ const ScopaInstructions: React.FC = () => {
                   your card is added to the table.
                 </li>
                 <li>
-                  Example: You play a 4 but the table has no cards or combinations that sum up to 4.
+                  Example: You play a 4 but the table has no card with value 4 and/or combinations that sum up to 4.
                   The played card remains on the table.
                 </li>
               </ul>
@@ -194,12 +198,15 @@ const ScopaInstructions: React.FC = () => {
           style={{ background: "rgba(0, 0, 0, 0.3)", border: "none" }}
         >
           <ul style={{ paddingLeft: "1.5rem", color: "#fff", margin: 0 }}>
-            <li>
-              <strong style={{ color: '#ffbf00' }}>Cards:</strong> If a team collects more than 20 cards (combining the captured cards
-              of both teammates), they earn 1 point.
+          <li>
+              To calculate the final score, the treasures of the players on the same team are counted together (including the amount of scopas)
             </li>
             <li>
-              <strong style={{ color: '#ffbf00' }}>Denari:</strong> If a team collects more than 5 cards of the Denari suit, they earn 1 point.
+              <strong style={{ color: '#ffbf00' }}>Cards:</strong> If a team collects more than 20 cards (combining the captured cards
+              of both teammates), they earn 1 point. If both teams have 20 cards then no one get this point.
+            </li>
+            <li>
+              <strong style={{ color: '#ffbf00' }}>Denari:</strong> If a team collects more than 5 cards of the Denari suit, they earn 1 point. If both teams have 5 cards of Denari then no one get this point.
             </li>
             <li>
               <strong style={{ color: '#ffbf00' }}>Settebello:</strong> Capturing the 7 of Denari earns 1 point.
@@ -254,7 +261,7 @@ const ScopaInstructions: React.FC = () => {
               the primiera score is 0.
             </li>
             <li>
-              The team with the higher total primiera score earns 1 point.
+              The team with the higher total primiera score earns 1 point. The Primiera may result in a tie.
             </li>
             <li>
               <strong style={{ color: '#ffbf00' }}>Scopa:</strong> Each time a capture empties the table (except on the last turn),
@@ -284,55 +291,113 @@ const ScopaInstructions: React.FC = () => {
               the last player who made a capture.
             </li>
             <li>
-              The final scores of the teams are then compared to determine the winner.
+              The final scores of the teams are then compared to determine the winner (it may be a tie).
             </li>
           </ul>
         </Panel>
-
+  
         <Panel
           key="6"
           header={
             <span style={{color: headerColor, fontSize: "1.2rem" }}>
-              Team Play
+              Napoleatane cards
             </span>
           }
           style={{ background: "rgba(0, 0, 0, 0.3)", border: "none" }}
         >
-          <p style={{ color: "#fff", margin: 0, paddingLeft: "1.5rem" }}>
-            Players seated in alternating positions form teams (for example, players 1 and 3 are on
-            the same team, while players 2 and 4 are on the opposing team). When calculating team
-            scores, the captured cards from both teammates are combined. The final outcome (win, loss,
-            or tie) is determined by comparing the total points of both teams.
-          </p>
-        </Panel>
+          <li>
+              Scopa is traditionally played with Napoleatane cards.
+            </li>
+          {/* Bastoni (clubs) */}
+          <div style={{ marginBottom: "1rem" }}>
+            <h4 style={{ color: '#ffbf00', margin: 0 }}>Bastoni</h4>
+            <div
+              style={{
+                display: "flex",
+                gap: "0.5rem",
+                flexWrap: "wrap",
+                marginTop: "0.5rem",
+              }}
+            >
+              {ranks.map((rank) => (
+                <Image
+                  key={rank}
+                  src={`/cards/${rank}_club.svg`}
+                  alt={`Bastoni ${rank}`}
+                  width= {48}
+                  height= {70}
+                  style={{
+                    display: "block",
+                    backgroundColor: "#fff",  
+                    padding: "0.25rem",       
+                    borderRadius: "4px", 
+                  }}
+                />
+              ))}
+            </div>
+          </div>
 
-        <Panel
-          key="7"
-          header={
-            <span style={{ color: headerColor, fontSize: "1.2rem" }}>
-              Conclusion
-            </span>
-          }
-          style={{ background: "rgba(0, 0, 0, 0.3)", border: "none" }}
-        >
-          <div style={{ color: "#fff", paddingLeft: "1.5rem" }}>
-            <p>
-              The game starts with 4 cards on the table and 9 cards per player. Players take turns
-              playing cards. Depending on the cards on the table, a capture may occur automatically
-              or you may need to choose between several options. Points are awarded based on the
-              number of cards collected, the number of Denari, capturing the 7 of Denari, achieving
-              the best Primiera, and the number of scopa.
-            </p>
-            <p>
-              The game ends after 36 turns, with any remaining cards on the table assigned to the last
-              capturing player.
-            </p>
-            <p>
-              This overview provides the pure rules for playing the game, intended for the user
-              interface design without revealing any internal implementation details.
-            </p>
+          {/* Diamon */}
+          <div style={{ marginBottom: "1rem" }}>
+            <h4 style={{ color: '#ffbf00', margin: 0 }}>Denari</h4>
+            <div style={{ display: "flex", gap: "0.5rem", marginTop: "0.5rem" }}>
+              {ranks.map((rank) => (
+                <Image
+                  key={rank}
+                  src={`/cards/${rank}_diamond.svg`}
+                  alt={`Denari ${rank}`}
+                  width= {48}
+                  height= {70}
+                  style={{  display: "block",
+                  backgroundColor: "#fff", 
+                  padding: "0.25rem",      
+                  borderRadius: "4px" }}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* Coppe (hearts) */}
+          <div style={{ marginBottom: "1rem" }}>
+            <h4 style={{ color: '#ffbf00', margin: 0 }}>Coppe</h4>
+            <div style={{ display: "flex", gap: "0.5rem", marginTop: "0.5rem" }}>
+              {ranks.map((rank) => (
+                <Image
+                  key={rank}
+                  src={`/cards/${rank}_heart.svg`}
+                  alt={`Coppe ${rank}`}
+                  width= {48}
+                  height= {70}
+                  style={{  display: "block" ,
+                  backgroundColor: "#fff", 
+                  padding: "0.25rem",      
+                  borderRadius: "4px", }}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* Spade */}
+          <div>
+            <h4 style={{ color: '#ffbf00', margin: 0 }}>Spade</h4>
+            <div style={{ display: "flex", gap: "0.5rem", marginTop: "0.5rem" }}>
+              {ranks.map((rank)=> (
+                <Image
+                  key={rank}
+                  src={`/cards/${rank}_spade.svg`}
+                  alt={`Spade ${rank}`}
+                  width= {48}
+                  height= {70}
+                  style={{ display: "block",
+                  backgroundColor: "#fff", 
+                  padding: "0.25rem",     
+                  borderRadius: "4px",  }}
+                />
+              ))}
+            </div>
           </div>
         </Panel>
+     
       </Collapse>
       <div style={{ width: '80%', margin: '0 auto 1rem', display: 'flex', justifyContent: 'flex-end' }}>
         <Button
