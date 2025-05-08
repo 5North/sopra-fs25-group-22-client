@@ -20,6 +20,7 @@ interface Lobby {
 }
 
 interface Player {
+  userId: number;
   username: string;
 
 }
@@ -47,22 +48,29 @@ const LobbyPage: React.FC = () => {
   const stompClientRef = useRef<Client | null>(null);
   const subscriptionRef = useRef<StompSubscription | null>(null);
   const [players, setPlayers] = useState<Player[]>([]);
-  const host = localStorage.getItem("Host");
  
  
   useEffect(() => {
     const raw = localStorage.getItem("initialLobby");
-    if (raw) {
-      try {
-        const parsed = JSON.parse(raw) as Lobby;
-        // Make sure it has an empty `players` array to start:
-        setLobby({ ...parsed, players: [] }as Lobby);
-      } catch {
-        console.warn("Could not parse initialLobby from storage");
-      }
+    if (!raw) return;
+
+    try {
+      const parsed = JSON.parse(raw) as Lobby;
+      setLobby({
+        lobbyId:      parsed.lobbyId,
+        PIN:          parsed.PIN,
+        hostId:       parsed.hostId,
+        usersIds:     parsed.usersIds,
+        rematchersIds: parsed.rematchersIds,
+      });
+     
+      setPlayers(parsed.players || []);
+    } catch {
+      console.warn("Could not parse initialLobby");
     }
   }, []);
-  
+
+
   useEffect(() => {
     if (!pin || !token) return;
   
@@ -70,26 +78,14 @@ const LobbyPage: React.FC = () => {
       brokerURL: getWsDomain() + `/lobby?token=${token}`,
       reconnectDelay: 2000,
       onConnect: () => {
-        console.log("Connected to STOMP");
+        console.log("✅ STOMP connected, subscribing to", pin);
   
-        // Subscribe to  personal reply queue
-        client.subscribe("/user/queue/reply", (message) => {
-          const data = JSON.parse(message.body);
-          console.log("Reply from server LOBBYPAGE:", data);
-  
-          // <-- This if-block must be INSIDE the subscribe callback,
-          // not after you've closed it!
-          
-  
-          // …any success logic here…
-        });
+    
   
         // Subscribe to lobby updates
-        subscriptionRef.current = client.subscribe(
-          `/topic/lobby/${pin}`,
-          (message: IMessage) => {
+        subscriptionRef.current = client.subscribe(`/topic/lobby/${pin}`,(message: IMessage) => {
             const data = JSON.parse(message.body);
-            console.log("Received lobby update:", data);
+            console.log("✅ Received lobby update:", data);
 
             if (data.success === true && data.message === "Starting game") {
               console.log("Starting game, redirecting to /game/", pin);
@@ -107,14 +103,26 @@ const LobbyPage: React.FC = () => {
                       const res = await getUserById(token, id.toString());
                       if (!res.ok) throw new Error(`User ${id} failed`);
                       const dto = await res.json();
-                      return { username: dto.username };
+                      return { userId: id, username: dto.username };
                     })
                   );
                   setPlayers(fetched);
+
+                  setPlayers(fetched);
+
+                  localStorage.setItem(
+                    "initialLobby",
+                    JSON.stringify({
+                      ...data.lobby,
+                      players: fetched
+                    })
+                  );
+
                 } catch (err) {
                   console.error("Failed to load player names:", err);
                 }
-              })();
+              })
+              ();
             }
   
           }
@@ -172,7 +180,7 @@ const LobbyPage: React.FC = () => {
               throw new Error(`Failed to load user ${id}: ${res.status}`);
             }
             const dto = await res.json();
-            return { username: dto.username };
+            return { userId: id, username: dto.username };
           })
         );
         setPlayers(fetched);
@@ -183,6 +191,12 @@ const LobbyPage: React.FC = () => {
 
     loadPlayers();
   }, [token, lobby?.usersIds]);
+
+   const hostUsername = React.useMemo(() => {
+    if (!lobby || players.length === 0) return "";
+    const firstId = lobby.usersIds[0];
+    return players.find(p => p.userId === firstId)?.username || "";
+  }, [lobby, players]);
 
   if (error) {
     return (
@@ -206,9 +220,6 @@ const LobbyPage: React.FC = () => {
     );
   }
 
-//DEBUG
-  console.log("Local username:", username);
-  console.log("Lobby players:", players);
 
   const handleLeaveLobby = () => {
     if (subscriptionRef.current) {
@@ -222,8 +233,13 @@ const LobbyPage: React.FC = () => {
       stompClientRef.current = null;
     }
 
-    router.push("/home"); // Go back to home or lobby select
+  localStorage.removeItem("initialLobby");
+  localStorage.removeItem("LobbyId");
+  localStorage.removeItem("Host");
+
+    router.push("/home"); 
   };
+
 
   return (
     <div
@@ -306,7 +322,7 @@ const LobbyPage: React.FC = () => {
 
       {/* Start button */}
       {players?.length === 4 &&
-        host === username && (
+        hostUsername === username && (
           <div>
           <Button
             type="primary"

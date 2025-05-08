@@ -163,17 +163,20 @@ a {
 
 .board-wrapper {
   position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
+  inset:0;
   background: url("/images/gamemarble.png") center/cover no-repeat !important;
   display: flex;             /* center the game-board inside this */
   justify-content: center;
   align-items: center;
-  margin: -4;
-  padding-top:    0vh;
   
 }
 
 .game-board {
+  width: min(80vw, 1200px);
+  max-height: 80vh;
+  aspect-ratio: 1350 / 600;
+  padding: 5vh 8vw 10vh 3vw;
+
   padding: 5vh 8vw 10vh 3vw;
   aspect-ratio: 1350 / 600;
   width: 80vw;
@@ -184,7 +187,7 @@ a {
     "top    top    top"
     "left   center right"
     "bottom bottom bottom";
-  grid-template-rows: auto 1fr auto;
+  grid-template-rows: 15% 80% 15%;
   grid-template-columns: auto 1fr auto;
   border:       2px solid rgba(224, 255, 255, 0.8);
   border-radius:16px;

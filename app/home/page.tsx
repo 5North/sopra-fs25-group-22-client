@@ -35,6 +35,7 @@ const Home: React.FC = () => {
     lossCount: 0,
     tieCount:  0,
   });
+  const [messageApi, contextHolder] = message.useMessage();
   let response: Response;
 
   // Create lobby 
@@ -44,42 +45,67 @@ const Home: React.FC = () => {
       message.error(" Please log in.");
       return;
     }
-  
+
     try {
-      const response = await createLobby(token, {});
-      if (response.status === 409) {
-        message.error("You already have an open lobby. Ask your friend for the Game ID");
+      // Check if the user already has a lobbyJoined
+      const userRes = await getUserById(token, userIdStr);
+      if (!userRes.ok) {
+        throw new Error(`Failed to load user: ${userRes.status}`);
+      }
+      const userDto = await userRes.json();
+      
+      if (userDto.lobbyJoined !== null) {
+        messageApi.open({
+          type:    "error",
+          content: "You’re already in a lobby. Sending you there...",
+          style: {
+            backgroundColor: "#fff",  
+            color:           "#f5222d",     
+            borderRadius:    "4px",
+          }
+        })
+
+        setTimeout(() => {router.push(`/lobbies/${userDto.lobbyJoined}`);}, 2000);
         return;
       }
-      else if (!response.ok) {
+
+      const lobbyRes = await createLobby(token, {});
+      if (lobbyRes.status === 409) {
+        return;
+
+      }
+      if (!lobbyRes.ok) {
         message.error(
-          response.status === 400
+          lobbyRes.status === 400
             ? "Invalid input or missing data."
             : "Failed to create lobby. Please try again."
         );
         return;
       }
-  
-      const data = await response.json();
-      console.log("Lobby created:", data);
-  
+
+      const lobbyDto = await lobbyRes.json();
+      console.log("Lobby created:", lobbyDto);
+
       // build the initial players list
       const initialPlayers: Player[] =
-        data.players?.length > 0 ? data.players : [];
-      if (!initialPlayers.some(p => p.username === username)) {
+        lobbyDto.players?.length > 0 ? lobbyDto.players : [];
+      if (!initialPlayers.some((p) => p.username === username)) {
         initialPlayers.push({ username });
       }
 
-      localStorage.setItem("initialLobby", JSON.stringify({
-        ...data,
-        players: initialPlayers,
-      }));
-      localStorage.setItem("Host", username);
-  
-      router.push(`/lobbies/${data.lobbyId}`);
+      localStorage.setItem(
+        "initialLobby",
+        JSON.stringify({ ...lobbyDto, players: initialPlayers })
+      );
+
+      router.push(`/lobbies/${lobbyDto.lobbyId}`);
     } catch (err) {
-      console.error("Lobby creation error:", err);
-      message.error("An error occurred while creating the lobby.");
+      console.error("Error during start-game:", err);
+      message.error(
+        err instanceof Error
+          ? err.message
+          : "An unexpected error occurred while starting the game."
+      );
     }
   };
     
@@ -177,6 +203,7 @@ const Home: React.FC = () => {
             style={{ width: "100%" }}
           >
             <Form.Item>
+            {contextHolder}
               <Button
                 className="custom-button"
                 onClick={handleStartGame}
