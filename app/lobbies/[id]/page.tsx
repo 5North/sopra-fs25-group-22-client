@@ -38,10 +38,9 @@ const getUsername = (): string => {
 
 const LobbyPage: React.FC = () => {
   const router = useRouter();
-  const [error, setError] = useState("");
+  const [error] = useState("");
   const { value: token } = useLocalStorage<string>("token", "");
   const username = getUsername();
-  const { value: userIdStr} = useLocalStorage<string>("userId", "");
   const [lobby, setLobby]     = useState<Omit<Lobby,"players"> | null>(null);
   const pathname = usePathname();
   const pin = pathname?.slice(-4) ?? localStorage.getItem("LobbyId");
@@ -136,7 +135,7 @@ const LobbyPage: React.FC = () => {
         }
       };
     
-  }, [router, token]);
+  }, [router, token, pin]);
 
   const handleBack = () => {
     router.push("/home");

@@ -5,26 +5,79 @@ import { useRouter } from "next/navigation";
 import { GameResultDTO } from "@/models/GameResult";
 import { Button } from "antd";
 
+interface SimpleResult {
+  userId: number;
+  outcome: string;
+  message: string;
+}
+
 interface GameResultViewProps {
-  result: GameResultDTO | { userId: number; outcome: string; message: string };
+  result: GameResultDTO | SimpleResult;
   onReturnHome: () => void;
 }
+
+function isFullResult(
+  r: GameResultDTO | SimpleResult
+): r is GameResultDTO {
+  return "myTotal" in r && "otherTotal" in r;
+}
+
+const categories = [
+  {
+    key: "Carte",
+    my: (r: GameResultDTO) => r.myCarteResult,
+    other: (r: GameResultDTO) => r.otherCarteResult,
+  },
+  {
+    key: "Denari",
+    my: (r: GameResultDTO) => r.myDenariResult,
+    other: (r: GameResultDTO) => r.otherDenariResult,
+  },
+  {
+    key: "Primiera",
+    my: (r: GameResultDTO) => r.myPrimieraResult,
+    other: (r: GameResultDTO) => r.otherPrimieraResult,
+  },
+  {
+    key: "Settebello",
+    my: (r: GameResultDTO) => r.mySettebelloResult,
+    other: (r: GameResultDTO) => r.otherSettebelloResult,
+  },
+  {
+    key: "Scopa",
+    my: (r: GameResultDTO) => r.myScopaResult,
+    other: (r: GameResultDTO) => r.otherScopaResult,
+  },
+];
 
 const GameResultView: React.FC<GameResultViewProps> = ({ result, onReturnHome }) => {
   const router = useRouter();
 
-  // type-guard for your full DTO
-  const isFull = (r: any): r is GameResultDTO =>
-    typeof r.myTotal !== "undefined" && typeof r.otherTotal !== "undefined";
+  if (!isFullResult(result)) {
+    // Simple fallback view
+    return (
+      <div className="result-container">
+        <h1 style={{ color: "#FFAB40", textAlign: "center" }}>Game Over</h1>
+        <p style={{ textAlign: "center", color: "#fff", fontSize: "1.25rem" }}>
+          {result.outcome}
+        </p>
+        <p style={{ textAlign: "center", color: "#fff" }}>{result.message}</p>
+        <Button
+          block
+          onClick={() => {
+            onReturnHome();
+            router.push("/home");
+          }}
+          style={{ marginTop: "1rem" }}
+        >
+          Return to Home
+        </Button>
+      </div>
+    );
+  }
 
-  // helper list of categories
-  const categories = [
-    { key: "Carte",       my: (r: GameResultDTO) => r.myCarteResult,    other: (r: GameResultDTO) => r.otherCarteResult },
-    { key: "Denari",      my: (r: GameResultDTO) => r.myDenariResult,   other: (r: GameResultDTO) => r.otherDenariResult },
-    { key: "Primiera",    my: (r: GameResultDTO) => r.myPrimieraResult, other: (r: GameResultDTO) => r.otherPrimieraResult },
-    { key: "Settebello",  my: (r: GameResultDTO) => r.mySettebelloResult, other:(r: GameResultDTO) => r.otherSettebelloResult },
-    { key: "Scopa",       my: (r: GameResultDTO) => r.myScopaResult,     other:(r: GameResultDTO) => r.otherScopaResult },
-  ];
+  // From here on, result is GameResultDTO
+  const full = result;
 
   return (
     <div className="result-container">
@@ -36,19 +89,19 @@ const GameResultView: React.FC<GameResultViewProps> = ({ result, onReturnHome })
           justifyContent: "center",
           alignItems: "center",
           padding: "2rem",
+          backgroundColor: "rgba(0,0,0,0)",
           zIndex: 2000,
         }}
       >
         <div
           style={{
-            backgroundColor: "rgba(0,0,0,0.5)",
+            backgroundColor: "rgba(0,0,0,0.6)",
             padding: "2rem",
             borderRadius: "8px",
             maxWidth: "480px",
             width: "100%",
           }}
         >
-          {/* Header */}
           <h1
             style={{
               marginBottom: "0.5rem",
@@ -61,91 +114,74 @@ const GameResultView: React.FC<GameResultViewProps> = ({ result, onReturnHome })
             Game Over
           </h1>
 
-          {/* You Won / You Lost line */}
           <p
             style={{
               textAlign: "center",
               color: "#fff",
               fontSize: "1.25rem",
-              fontWeight: "bold",
+              fontWeight: 700,
               margin: "0 0 1.5rem",
             }}
           >
-            {isFull(result)
-              ? result.outcome === "WON"
-                ? "You Won"
-                : result.outcome === "LOST"
-                ? "You Lost"
-                : `Result: ${result.outcome}`
-              : `Result: ${result.outcome}`}
+            {full.outcome === "WON"
+              ? "You Won"
+              : full.outcome === "LOST"
+              ? "You Lost"
+              : `Result: ${full.outcome}`}
           </p>
 
-          {isFull(result) ? (
-            <>
-              {/* Three-column breakdown grid */}
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "1fr auto 1fr",
-                  gap: "0.5rem 1rem",
-                  alignItems: "center",
-                  marginBottom: "2rem",
-                }}
-              >
-                {/* Column headers */}
-                <div style={{ textAlign: "left", fontWeight: "bold", color: "#fff" }}>
-                  Your Breakdown
-                </div>
-                <div /> {/* empty center header */}
-                <div style={{ textAlign: "right", fontWeight: "bold", color: "#fff" }}>
-                  Opponent Breakdown
-                </div>
-
-                {/* Rows */}
-                {categories.map(({ key, my, other }) => {
-                  const myVal = my(result)  ?? 0;
-                  const opVal = other(result)  ?? 0;
-                  return (
-                    <React.Fragment key={key}>
-                      <div
-                        style={{
-                          textAlign: "left",
-                          fontWeight: myVal > opVal ? "6000" : "400",
-                          color: "#fff",
-                        }}
-                      >
-                        {myVal}
-                      </div>
-                      <div
-                        style={{
-                          textAlign: "center",
-                          color: "#fff",
-                        }}
-                      >
-                        {key}
-                      </div>
-                      <div
-                        style={{
-                          textAlign: "right",
-                          fontWeight: opVal > myVal ? "6000" : "400",
-                          color: "#fff",
-                        }}
-                      >
-                        {opVal}
-                      </div>
-                    </React.Fragment>
-                  );
-                })}
-              </div>
-            </>
-          ) : (
-            /* fallback for the simple {outcome, message} shape */
-            <div style={{ marginBottom: "2rem", color: "#fff" }}>
-              <p style={{ margin: "0.5rem 0" }}>Message: {result.message}</p>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "1fr auto 1fr",
+              gap: "0.5rem 1rem",
+              alignItems: "center",
+              marginBottom: "2rem",
+            }}
+          >
+            <div
+              style={{ textAlign: "left", fontWeight: 700, color: "#fff" }}
+            >
+              Your Breakdown
             </div>
-          )}
+            <div /> {/* spacer */}
+            <div
+              style={{ textAlign: "right", fontWeight: 700, color: "#fff" }}
+            >
+              Opponent Breakdown
+            </div>
 
-          {/* Return home */}
+            {categories.map(({ key, my, other }) => {
+              const myVal = my(full) ?? 0;
+              const opVal = other(full) ?? 0;
+              return (
+                <React.Fragment key={key}>
+                  <div
+                    style={{
+                      textAlign: "left",
+                      fontWeight: myVal > opVal ? 800 : 400,
+                      color: "#fff",
+                    }}
+                  >
+                    {myVal}
+                  </div>
+                  <div style={{ textAlign: "center", color: "#fff" }}>
+                    {key}
+                  </div>
+                  <div
+                    style={{
+                      textAlign: "right",
+                      fontWeight: opVal > myVal ? 800 : 400,
+                      color: "#fff",
+                    }}
+                  >
+                    {opVal}
+                  </div>
+                </React.Fragment>
+              );
+            })}
+          </div>
+
           <Button
             block
             onClick={() => {

@@ -1,6 +1,6 @@
-"use client";
+//"use client";
 
-import React, { useEffect, useRef, useState } from "react";
+/*import React, { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "antd";
 import { createLobby } from "@/api/registerService";
@@ -85,7 +85,7 @@ const LobbyPage: React.FC = () => {
     autoCreateLobby();
   }, [token, username]);
   */
-
+/*
   useEffect(() => {
     if (!lobby) return;
 
@@ -211,7 +211,7 @@ const LobbyPage: React.FC = () => {
         height: "100vh", 
       }}
     >
-      {/* Game-ID Pill */}
+      {/* Game-ID Pill 
       <h2
         style={{
           margin: "7rem 0 2rem",
@@ -227,7 +227,7 @@ const LobbyPage: React.FC = () => {
         Game ID: {lobby.PIN ?? lobby.lobbyId} 🔗
       </h2>
 
-      {/* Teams row */}
+      {/* Teams row *
       <div
         className="team-wrapper"
         style={{
@@ -264,7 +264,7 @@ const LobbyPage: React.FC = () => {
         ))}
       </div>
 
-      {/* Start button */}
+      {/* Start button 
       {lobby.players?.length === 4 &&
         lobby.players.some((p) => p.username === username) && (
           <div>
@@ -276,7 +276,7 @@ const LobbyPage: React.FC = () => {
           </Button>
           </div>
         )}
-            {/* Leave Lobby Button */}
+            {/* Leave Lobby Button 
             <Button
         onClick={handleLeaveLobby}
         style={{
@@ -291,6 +291,5 @@ const LobbyPage: React.FC = () => {
         </Button>
     </div>
   );
-};
+};*/
 
-export default LobbyPage;

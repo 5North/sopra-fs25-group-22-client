@@ -4,6 +4,7 @@ import React from "react";
 import { useRouter } from "next/navigation";
 import {Button, Collapse } from "antd";
 import { CaretRightOutlined } from "@ant-design/icons";
+import Image from "next/image";
 
 const { Panel } = Collapse;
 
@@ -319,13 +320,13 @@ const ScopaInstructions: React.FC = () => {
               }}
             >
               {ranks.map((rank) => (
-                <img
+                <Image
                   key={rank}
                   src={`/cards/${rank}_club.svg`}
                   alt={`Bastoni ${rank}`}
+                  width= {48}
+                  height= {70}
                   style={{
-                    width: "48px",
-                    height: "auto",
                     display: "block",
                     backgroundColor: "#fff",  
                     padding: "0.25rem",       
@@ -341,11 +342,13 @@ const ScopaInstructions: React.FC = () => {
             <h4 style={{ color: '#ffbf00', margin: 0 }}>Denari</h4>
             <div style={{ display: "flex", gap: "0.5rem", marginTop: "0.5rem" }}>
               {ranks.map((rank) => (
-                <img
+                <Image
                   key={rank}
                   src={`/cards/${rank}_diamond.svg`}
                   alt={`Denari ${rank}`}
-                  style={{ width: "48px", height: "auto", display: "block",
+                  width= {48}
+                  height= {70}
+                  style={{  display: "block",
                   backgroundColor: "#fff", 
                   padding: "0.25rem",      
                   borderRadius: "4px" }}
@@ -359,11 +362,13 @@ const ScopaInstructions: React.FC = () => {
             <h4 style={{ color: '#ffbf00', margin: 0 }}>Coppe</h4>
             <div style={{ display: "flex", gap: "0.5rem", marginTop: "0.5rem" }}>
               {ranks.map((rank) => (
-                <img
+                <Image
                   key={rank}
                   src={`/cards/${rank}_heart.svg`}
                   alt={`Coppe ${rank}`}
-                  style={{ width: "48px", height: "auto", display: "block" ,
+                  width= {48}
+                  height= {70}
+                  style={{  display: "block" ,
                   backgroundColor: "#fff", 
                   padding: "0.25rem",      
                   borderRadius: "4px", }}
@@ -377,11 +382,13 @@ const ScopaInstructions: React.FC = () => {
             <h4 style={{ color: '#ffbf00', margin: 0 }}>Spade</h4>
             <div style={{ display: "flex", gap: "0.5rem", marginTop: "0.5rem" }}>
               {ranks.map((rank)=> (
-                <img
+                <Image
                   key={rank}
                   src={`/cards/${rank}_spade.svg`}
                   alt={`Spade ${rank}`}
-                  style={{ width: "48px", height: "auto", display: "block",
+                  width= {48}
+                  height= {70}
+                  style={{ display: "block",
                   backgroundColor: "#fff", 
                   padding: "0.25rem",     
                   borderRadius: "4px",  }}

@@ -12,11 +12,6 @@ interface Player {
   username: string;
 }
 
-interface Lobby {
-  lobbyId: string | number;
-  PIN: string | number;
-  players: Player[]
-}
 
 interface UserStats {
   id: number;
@@ -26,16 +21,6 @@ interface UserStats {
   tieCount: number;
 }
 
-// Utility to get username from localStorage:
-const getUsername = (): string => {
-  if (typeof window === "undefined") return "";
-  const stored = localStorage.getItem("username") || "";
-  try {
-    return JSON.parse(stored);
-  } catch {
-    return stored;
-  }
-};
 
 const Home: React.FC = () => {
   const router = useRouter();
@@ -44,8 +29,6 @@ const Home: React.FC = () => {
   const {value: username} = useLocalStorage<string>("username", "");
   const { value: userIdStr} = useLocalStorage<string>("userId", "");
   const userId = Number(userIdStr);
-  const [error, setError] = useState("");
-  const [lobby, setLobby] = useState<Lobby | null>(null);
   const [stats, setStats] = useState<Pick<UserStats, "winCount" | "lossCount" | "tieCount">>({
     winCount:  0,
     lossCount: 0,
@@ -54,11 +37,10 @@ const Home: React.FC = () => {
   let response: Response;
 
   // Create lobby 
-  const handleStartGame = async () => {
-    setError("");              // clear any previous error
+  const handleStartGame = async () => {            
   
     if (!token) {
-      setError("User not authenticated. Please log in.");
+      message.error(" Please log in.");
       return;
     }
   
@@ -69,7 +51,7 @@ const Home: React.FC = () => {
         return;
       }
       else if (!response.ok) {
-        setError(
+        (
           response.status === 400
             ? "Invalid input or missing data."
             : "Failed to create lobby. Please try again."
@@ -86,20 +68,17 @@ const Home: React.FC = () => {
       if (!initialPlayers.some(p => p.username === username)) {
         initialPlayers.push({ username });
       }
-  
-      // if you want `/lobbies/[id]` to have the data right away,
-      // you can set it in localStorage or context here:
+
       localStorage.setItem("initialLobby", JSON.stringify({
         ...data,
         players: initialPlayers,
       }));
       localStorage.setItem("Host", username);
   
-      // finally, navigate to the new lobby
       router.push(`/lobbies/${data.lobbyId}`);
     } catch (err) {
       console.error("Lobby creation error:", err);
-      setError("An error occurred while creating the lobby.");
+      message.error("An error occurred while creating the lobby.");
     }
   };
     
