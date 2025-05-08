@@ -343,9 +343,9 @@ export default function GamePage() {
     });
   }
 
-  if (gameResult) {
-    return <GameResultView result={gameResult} onReturnHome={unsubscribeFromGame} onRematch={rematch} gameId={Number(id)}/>;
-  }
+  //if (gameResult) {
+  //  return <GameResultView result={gameResult} onReturnHome={unsubscribeFromGame} onRematch={rematch} gameId={Number(id)}/>;
+  //}
 
   const isMyTurn = currentUserId === gameState?.currentPlayerId;
 
