@@ -320,6 +320,7 @@ export default function GamePage() {
     );
   }
 
+  
   const unsubscribeFromGame = () => {
     if (subscriptionRef.current) {
       subscriptionRef.current.unsubscribe();
@@ -327,8 +328,9 @@ export default function GamePage() {
       subscriptionRef.current = null;
     }
   };
+  
 
-  const rematch = () => {
+  /*const rematch = () => {
     if (!id) return;
     setCaptureOptions([]);
     const payload = JSON.stringify({
@@ -341,11 +343,14 @@ export default function GamePage() {
       destination: `/app/rematch`,
       body: payload,
     });
-  }
+  }*/
 
-  //if (gameResult) {
-  //  return <GameResultView result={gameResult} onReturnHome={unsubscribeFromGame} onRematch={rematch} gameId={Number(id)}/>;
-  //}
+  if (gameResult) {
+    return <GameResultView result={gameResult} onReturnHome={unsubscribeFromGame} 
+    //onRematch={rematch} 
+    //gameId={Number(id)}
+    />;
+  }
 
   const isMyTurn = currentUserId === gameState?.currentPlayerId;
 
