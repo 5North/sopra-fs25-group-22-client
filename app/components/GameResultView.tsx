@@ -14,7 +14,10 @@ interface SimpleResult {
 interface GameResultViewProps {
   result: GameResultDTO | SimpleResult;
   onReturnHome: () => void;
+  onRematch: () => void;
+  gameId: number;
 }
+
 
 function isFullResult(
   r: GameResultDTO | SimpleResult
@@ -51,6 +54,7 @@ const categories = [
 ];
 
 const GameResultView: React.FC<GameResultViewProps> = ({ result, onReturnHome }) => {
+
   const router = useRouter();
 
   if (!isFullResult(result)) {
@@ -182,15 +186,19 @@ const GameResultView: React.FC<GameResultViewProps> = ({ result, onReturnHome })
             })}
           </div>
 
-          <Button
+        {isGameCompleted(result) && (
+
             block
+
             onClick={() => {
-              onReturnHome();
-              router.push("/home");
+              onRematch();
+              router.push(`/rematch/${gameId}`);
             }}
           >
-            Return to Home
+            Rematch
           </Button>
+        )}
+      </div>
         </div>
       </div>
     </div>
