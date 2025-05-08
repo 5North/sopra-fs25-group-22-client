@@ -51,7 +51,7 @@ const Home: React.FC = () => {
         return;
       }
       else if (!response.ok) {
-        (
+        message.error(
           response.status === 400
             ? "Invalid input or missing data."
             : "Failed to create lobby. Please try again."
