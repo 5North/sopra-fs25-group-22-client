@@ -371,9 +371,6 @@ export default function GamePage() {
   const handleExit = () => {
     console.log("User is quitting the game");
     quitGame();
-    localStorage.removeItem("initialLobby");
-    localStorage.removeItem("LobbyId");
-    localStorage.removeItem("Host");
   };
   
   return (
@@ -430,7 +427,7 @@ export default function GamePage() {
       {/* {gameResult && <GameResultView result={gameResult} onReturnHome={unsubscribeFromGame}/>} */}
       <div
         onClick={() => {
-          if (!isMyTurn) return; // Prevent click if it's not your turn
+          if (!isMyTurn) return; // Prevent click if it's turn
           const payload = JSON.stringify({ gameId: id });
           console.log("🔍 Sending AI suggestion request:", payload);
           stompClientRef.current?.publish({

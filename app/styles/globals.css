@@ -187,7 +187,7 @@ a {
     "top    top    top"
     "left   center right"
     "bottom bottom bottom";
-  grid-template-rows: 15% 80% 15%;
+  grid-template-rows: 10% 80% 24%;
   grid-template-columns: auto 1fr auto;
   border:       2px solid rgba(224, 255, 255, 0.8);
   border-radius:16px;

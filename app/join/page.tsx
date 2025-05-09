@@ -3,6 +3,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "antd";
+import { getUserById } from "@/api/registerService";
 import { Client } from "@stomp/stompjs";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { getWsDomain } from "@/utils/domain";
@@ -10,6 +11,7 @@ import { message} from "antd"
 
 const JoinGamePage: React.FC = () => {
   const router = useRouter();
+  const { value: userIdStr} = useLocalStorage<string>("userId", "");
   const [digits, setDigits] = useState(["", "", "", ""]);
   const isFull = false;
   const [joinError, setJoinError] = useState("");
@@ -38,8 +40,8 @@ const JoinGamePage: React.FC = () => {
     }
   };
 
+  // Cleanup: if client exists, deactivate STOMP connection on unmount
   useEffect(() => {
-    // Cleanup: if client exists, deactivate STOMP connection on unmount
     return () => {
       if (client) {
         console.log("Deactivating STOMP connection...");
@@ -48,6 +50,8 @@ const JoinGamePage: React.FC = () => {
     };
   }, [client]);
   
+
+
   const handleJoin = async () => {
     const lobbyPIN = digits.join("");
     if (lobbyPIN.length !== 4) {
@@ -68,38 +72,58 @@ const JoinGamePage: React.FC = () => {
         clientObj.subscribe("/user/queue/reply", (message) => {
           const data = JSON.parse(message.body);
           console.log("Reply from server:", data);
+
+          // Check if the user already has a lobbyJoined
           if (!data.success && data.message.includes("already joined")) {
-            messageApi.open({
-              type:    "error",
-              content: "You’re already in a lobby. Sending you there now.",
-              // override colors so it’s visible
-              style: {
-                backgroundColor: "#fff",  
-                color:           "#f5222d",     
-                borderRadius:    "4px",
-              }
-            })
-            setTimeout(() => {
-              router.push(`/lobbies/${lobbyPIN}`);
-            }, 2000);
+            getUserById(token, userIdStr)
+              .then(userRes => {
+                if (!userRes.ok) {
+                  throw new Error(`Failed to load user: ${userRes.status}`);
+                }
+                return userRes.json();
+              })
+              .then(userDto => {
+                if (userDto.lobbyJoined !== null) {
+                  messageApi.open({
+                    type:    "error",
+                    content: "You’re already in a lobby. Sending you there...",
+                    style: {
+                      backgroundColor: "#000",
+                      color:           "#f5222d",
+                      borderRadius:    "4px",
+                    },
+                  });
+                  setTimeout(() => {
+                    router.push(`/lobbies/${userDto.lobbyJoined}`);
+                  }, 2000);
+                }
+              })
+              .catch(err => {
+                console.error("Error fetching existing lobby:", err);
+              });
+        
             return;
-          }
+          }  
+
+          //Join failure
           if (!data.success) {
             
             setJoinError(data.message);
             clientObj.deactivate();
             console.log("Client deactivated due to join failure.");
           } else {
+            // Join Successful
             console.log("Lobby from join:", data.lobby)
-            
             router.push("/lobbies/" + lobbyPIN);
           }
         });
 
+
+        //Subscribe to broadcast
         clientObj.subscribe(`/topic/lobby/${lobbyPIN}`, (message) => {
           const data = JSON.parse(message.body);
           console.log("Reply from server for lobby:", data);
-          localStorage.setItem("initialLobby", JSON.stringify(data.lobby))
+          
         });
       },
       onStompError: (frame) => {
@@ -277,6 +301,5 @@ const JoinGamePage: React.FC = () => {
 };
 
 export default JoinGamePage;
-
 
 
