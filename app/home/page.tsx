@@ -8,10 +8,6 @@ import { logoutUser, getUserById } from "@/api/registerService";
 import { createLobby } from "@/api/registerService";
 import { message } from "antd";
 
-interface Player {
-  username: string;
-}
-
 
 interface UserStats {
   id: number;
@@ -59,7 +55,7 @@ const Home: React.FC = () => {
           type:    "error",
           content: "You’re already in a lobby. Sending you there...",
           style: {
-            backgroundColor: "#fff",  
+            backgroundColor: "#000",  
             color:           "#f5222d",     
             borderRadius:    "4px",
           }
@@ -85,18 +81,6 @@ const Home: React.FC = () => {
 
       const lobbyDto = await lobbyRes.json();
       console.log("Lobby created:", lobbyDto);
-
-      // build the initial players list
-      const initialPlayers: Player[] =
-        lobbyDto.players?.length > 0 ? lobbyDto.players : [];
-      if (!initialPlayers.some((p) => p.username === username)) {
-        initialPlayers.push({ username });
-      }
-
-      localStorage.setItem(
-        "initialLobby",
-        JSON.stringify({ ...lobbyDto, players: initialPlayers })
-      );
 
       router.push(`/lobbies/${lobbyDto.lobbyId}`);
     } catch (err) {

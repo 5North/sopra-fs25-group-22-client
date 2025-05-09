@@ -7,6 +7,7 @@ import { Client,IMessage, StompSubscription } from "@stomp/stompjs";
 import { getWsDomain } from "@/utils/domain";
 import { getUserById } from "@/api/registerService"; 
 import { Button } from "antd";
+import { message as antdMessage } from "antd";
 
 
 
@@ -48,27 +49,9 @@ const LobbyPage: React.FC = () => {
   const stompClientRef = useRef<Client | null>(null);
   const subscriptionRef = useRef<StompSubscription | null>(null);
   const [players, setPlayers] = useState<Player[]>([]);
+  const [messageApi, contextHolder] = antdMessage.useMessage();
  
- 
-  useEffect(() => {
-    const raw = localStorage.getItem("initialLobby");
-    if (!raw) return;
 
-    try {
-      const parsed = JSON.parse(raw) as Lobby;
-      setLobby({
-        lobbyId:      parsed.lobbyId,
-        PIN:          parsed.PIN,
-        hostId:       parsed.hostId,
-        usersIds:     parsed.usersIds,
-        rematchersIds: parsed.rematchersIds,
-      });
-     
-      setPlayers(parsed.players || []);
-    } catch {
-      console.warn("Could not parse initialLobby");
-    }
-  }, []);
 
 
   useEffect(() => {
@@ -78,14 +61,14 @@ const LobbyPage: React.FC = () => {
       brokerURL: getWsDomain() + `/lobby?token=${token}`,
       reconnectDelay: 2000,
       onConnect: () => {
-        console.log("✅ STOMP connected, subscribing to", pin);
+        console.log("STOMP connected, subscribing to", pin);
   
     
   
         // Subscribe to lobby updates
         subscriptionRef.current = client.subscribe(`/topic/lobby/${pin}`,(message: IMessage) => {
             const data = JSON.parse(message.body);
-            console.log("✅ Received lobby update:", data);
+            console.log("Received lobby update:", data);
 
             if (data.success === true && data.message === "Starting game") {
               console.log("Starting game, redirecting to /game/", pin);
@@ -109,20 +92,32 @@ const LobbyPage: React.FC = () => {
                   setPlayers(fetched);
 
                   setPlayers(fetched);
-
-                  localStorage.setItem(
-                    "initialLobby",
-                    JSON.stringify({
-                      ...data.lobby,
-                      players: fetched
-                    })
-                  );
-
                 } catch (err) {
                   console.error("Failed to load player names:", err);
                 }
               })
               ();
+            }
+
+             // lobby deleted by host
+            if (data.message?.includes("has been deleted")) {
+              // show a red error toast
+              messageApi.open({
+                type:    "error",
+                content: "The host left the lobby. Redirecting to hompage...",
+                style: {
+                  backgroundColor: "#000",  
+                  color:           "#f5222d",     
+                  borderRadius:    "4px",
+                }
+              });
+
+              
+              setTimeout(() => {
+                router.push("/home");
+              }, 2000);
+
+              return; 
             }
   
           }
@@ -242,6 +237,8 @@ const LobbyPage: React.FC = () => {
 
 
   return (
+    <>
+      {contextHolder}
     <div
       className="register-container"
       style={{
@@ -257,7 +254,7 @@ const LobbyPage: React.FC = () => {
       {/* Game-ID Pill */}
       <h2
         style={{
-          margin: "7rem 0 2rem",
+          margin: "7rem 0 0.5rem",
           padding: "0.5rem 1rem",
           borderRadius: "0.5rem",
           backgroundColor: "rgba(0,0,0,0.6)",
@@ -277,11 +274,24 @@ const LobbyPage: React.FC = () => {
           fontSize: "1rem",
           textAlign: "center",
           textShadow: "0 0 4px rgba(0,229,255,0.6)",
+          lineHeight:"1.2",
         }}
       >
-        4 players required<br/>
-        Only the Host can start the game
+        4 players required
       </p>
+      <p
+        style={{
+          margin:    "0.25rem 0 1.5rem", 
+          padding:   "0 1rem",
+          fontSize:  "1rem",
+          textAlign: "center",
+          textShadow:"0 0 4px rgba(0,229,255,0.6)",
+          lineHeight:"1.2",
+        }}
+      >
+        Only the host can start the game
+      </p>
+      
 
       {/* Teams row */}
       <div
@@ -346,6 +356,7 @@ const LobbyPage: React.FC = () => {
         Leave Lobby
         </Button>
     </div>
+    </>
   );
 };
 

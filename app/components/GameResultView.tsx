@@ -78,22 +78,25 @@ const GameResultView: React.FC<GameResultViewProps> = ({
           {result.message}
         </p>
         <Button
-          block
-          style={{ marginTop: "1rem" }}
-          onClick={() => {
-            onReturnHome();
-            localStorage.removeItem("initialLobby");
-            localStorage.removeItem("LobbyId");
-            localStorage.removeItem("Host");
-            router.push("/home");
-          }}
-        >
-          Return to Home
-        </Button>
+            size="small" 
+            onClick={() => {
+              onReturnHome();
+              router.push("/home");
+            }}
+            style={{
+                   width: "160px",          
+                   margin: "1rem auto 0"   
+                 }}
+               
+          >
+            Return to Home
+          </Button>
       </div>
     );
   }
 
+
+  
   //Full view once we know it’s GameResultDTO
   const full = result;
 

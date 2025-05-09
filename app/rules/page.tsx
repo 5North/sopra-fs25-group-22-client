@@ -300,7 +300,7 @@ const ScopaInstructions: React.FC = () => {
           key="6"
           header={
             <span style={{color: headerColor, fontSize: "1.2rem" }}>
-              Napoleatane cards
+              Napoletane cards
             </span>
           }
           style={{ background: "rgba(0, 0, 0, 0.3)", border: "none" }}
@@ -322,7 +322,7 @@ const ScopaInstructions: React.FC = () => {
               {ranks.map((rank) => (
                 <Image
                   key={rank}
-                  src={`/cards/${rank}_club.svg`}
+                  src={`/cards/${rank}_spade.svg`}
                   alt={`Bastoni ${rank}`}
                   width= {48}
                   height= {70}
@@ -384,7 +384,7 @@ const ScopaInstructions: React.FC = () => {
               {ranks.map((rank)=> (
                 <Image
                   key={rank}
-                  src={`/cards/${rank}_spade.svg`}
+                  src={`/cards/${rank}_club.svg`}
                   alt={`Spade ${rank}`}
                   width= {48}
                   height= {70}
