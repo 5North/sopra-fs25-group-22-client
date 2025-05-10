@@ -162,7 +162,7 @@ a {
 }
 
 .board-wrapper {
-  position: fixed;
+  position: absolute;
   inset:0;
   background: url("/images/gamemarble.png") center/cover no-repeat !important;
   display: flex;             /* center the game-board inside this */
@@ -244,7 +244,7 @@ a {
   position: absolute;
   top: 0;                      
   left: 0;                  
-  transform: translateX(100%);
+  transform: translateX(74%);
   white-space: nowrap;         
   margin-top: 0.5rem;          
 }
@@ -256,11 +256,11 @@ a {
   align-items: center;
   justify-content:center; 
   margin-top: 0px;
-  padding-left: 50px;
   position: relative
 }
 
 .my-hand-area {
+  position: relative;
   grid-area: bottom;
   display: flex;
   flex-direction: column;
@@ -387,6 +387,6 @@ a {
 }
 
 .neon-button:hover {
-  box-shadow: 0 0 12px rgb(133, 251, 255), 0 0 24px #0ff !important;
+  box-shadow: 0 0 12px rgb(133, 251, 255), 0 0 30px #0ff !important;
   border-color: rgb(133, 251, 255) !important;
 }
