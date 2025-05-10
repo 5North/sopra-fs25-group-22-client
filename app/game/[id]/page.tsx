@@ -380,8 +380,8 @@ export default function GamePage() {
         onClick={handleExit}
         style={{
           position: "absolute",
-          top: "2rem",
-          right: "2rem",
+          bottom: "3.5rem",
+          right: "5.5rem",
           borderRadius: "8px",
           zIndex:999
         }}
@@ -439,7 +439,7 @@ export default function GamePage() {
         className="neon-button"
         style={{
           position: "fixed",
-          bottom: "5rem",
+          top: "6rem",
           right: "5rem",
           backgroundColor: isMyTurn ? "transparent" : "#333",
           borderRadius: "50%",
@@ -450,7 +450,7 @@ export default function GamePage() {
           justifyContent: "center",
         
           boxShadow: isMyTurn
-            ? "0 0 8px rgb(133, 251, 255), 0 0 16px rgb(133, 251, 255)"
+            ? "0 0 8px rgb(133, 251, 255), 0 0 16px #0ff"
             : "none",
           cursor: isMyTurn ? "pointer" : "not-allowed",
           border: isMyTurn ? "2px solid #0ff" : "2px solid #666",
@@ -478,8 +478,8 @@ export default function GamePage() {
         <div
           style={{
             position: "fixed",
-            bottom: "150px",
-            right: "20px",
+            top: "220px",
+            right: "15px",
             width: "250px",
             padding: "12px",
             backgroundColor: "#000c",

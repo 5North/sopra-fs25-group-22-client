@@ -57,8 +57,14 @@ const CardComponent: React.FC<CardProps> = ({ card, onClick }) => {
         alt={altText}
         style={{
           display: "block",
+          // Ensure the entire SVG is visible without clipping
           objectFit: "contain",
-          filter: "contrast(5) saturate(1)",
+          objectPosition: "center",
+          // Match panel styling:
+          backgroundColor: "#fff",
+          padding: "0.25rem",       // inner padding like panel
+          borderRadius: "4px",      // rounded corners
+          filter: "contrast(3) saturate(1)",
         }}
       />
     </div>

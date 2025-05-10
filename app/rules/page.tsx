@@ -306,7 +306,7 @@ const ScopaInstructions: React.FC = () => {
           style={{ background: "rgba(0, 0, 0, 0.3)", border: "none" }}
         >
           <li>
-              Scopa is traditionally played with Napoleatane cards.
+              Scopa is traditionally played with Napoletane cards.
             </li>
           {/* Bastoni (clubs) */}
           <div style={{ marginBottom: "1rem" }}>

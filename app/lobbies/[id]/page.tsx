@@ -209,7 +209,7 @@ const LobbyPage: React.FC = () => {
     return (
       <div className="register-container">
         <div className="auth-wrapper">
-          <h1 style={{ color: "#fff" }}>Creating Lobby...</h1>
+          <h1 style={{ color: "#fff" }}>Loading...</h1>
         </div>
       </div>
     );
@@ -227,10 +227,6 @@ const LobbyPage: React.FC = () => {
       stompClientRef.current.deactivate();
       stompClientRef.current = null;
     }
-
-  localStorage.removeItem("initialLobby");
-  localStorage.removeItem("LobbyId");
-  localStorage.removeItem("Host");
 
     router.push("/home"); 
   };
