@@ -91,7 +91,6 @@ const LobbyPage: React.FC = () => {
                   );
                   setPlayers(fetched);
 
-                  setPlayers(fetched);
                 } catch (err) {
                   console.error("Failed to load player names:", err);
                 }
@@ -145,13 +144,14 @@ const LobbyPage: React.FC = () => {
   };
 
   const handleStartGame = () => {
-    if (!lobby) return; 
+    if (!lobby || !stompClientRef.current) return;
 
     console.log("handle start game called..")
     if(!stompClientRef.current) {
       console.log("STOMP REF NOT EXISTING!!!");
     }
 
+    // Tell the server to start
     stompClientRef.current?.publish({
       destination: `/app/startGame/${String(lobby.lobbyId)}`,
       body: '',
