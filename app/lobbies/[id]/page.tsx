@@ -30,7 +30,7 @@ const getUsername = (): string => {
   if (typeof window === "undefined") return "";
   const stored = localStorage.getItem("username") || "";
   try {
-    return JSON.parse(stored);
+    return String(JSON.parse(stored));
   } catch {
     return stored;
   }
