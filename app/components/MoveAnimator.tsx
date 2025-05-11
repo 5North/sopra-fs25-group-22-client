@@ -37,7 +37,7 @@ export function MoveAnimator({ animation }: MoveAnimatorProps) {
 
   return (
     <AnimatePresence>
-      {/* 1) Fly in the played card from "from" → "to" */}
+      {/* Fly in the played card from "from" → "to" */}
       {playedCard && (
         <motion.div
           key={`play-${playedCard.suit}-${playedCard.value}`}
@@ -56,7 +56,7 @@ export function MoveAnimator({ animation }: MoveAnimatorProps) {
         </motion.div>
       )}
 
-      {/* 2) Show all cards together, scaled up & held */}
+      {/* Show all cards together, scaled up & held */}
       { (playedCard || capturedCards.length > 0) && (
         <motion.div
           key="highlight-group"

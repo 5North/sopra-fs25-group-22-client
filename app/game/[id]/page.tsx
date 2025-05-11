@@ -119,30 +119,35 @@ export default function GamePage() {
       onConnect: () => {
         console.log("Connected to game WebSocket");
 
-        // Subscribe to public game state updates
-        subscriptionRef.current = client.subscribe(`/topic/lobby/${id}`, (message: IMessage) => {
-          try {
+       // Subscribe to public game state updates
+        subscriptionRef.current = client.subscribe(
+          `/topic/lobby/${id}`,
+          (message: IMessage) => {
             const payload = JSON.parse(message.body);
-            console.log("==> PUBLIC MESSAGE message received:", payload);
-            if (JSON.parse(message.body).pickedCards) {
-              const data: MoveState = JSON.parse(message.body);
-              console.log("cards picked are coming: " + data);
-              setMoveState(data);
+
+            // Ignore pure notification
+            if (payload.success !== undefined && typeof payload.message === "string") {
+              console.log("Lobby notification (ignored):", payload);
+              return;
             }
-            else {
-              const data: GameSessionState = JSON.parse(message.body);
-              console.log("Public game state update:", data);
+
+            // Animatation
+            if (payload.pickedCards) {
+              const move: MoveState = payload;
+              setMoveState(move);
+            }
+            // Update board
+            else if (Array.isArray(payload.tableCards)) {
+              const data: GameSessionState = payload;
               setGameState(prev => ({
                 ...prev,
-                tableCards: data.tableCards,
-                players: data.players,
+                tableCards:      data.tableCards,
+                players:         data.players,
                 currentPlayerId: data.currentPlayerId,
               }));
             }
-          } catch (err) {
-            console.error("Error processing game state update", err);
           }
-        });
+        );
 
         // subscription to private queue
         client.subscribe("/user/queue/reply", (message: IMessage) => {

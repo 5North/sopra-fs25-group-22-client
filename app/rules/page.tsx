@@ -209,9 +209,6 @@ const ScopaInstructions: React.FC = () => {
               <strong style={{ color: '#ffbf00' }}>Denari:</strong> If a team collects more than 5 cards of the Denari suit, they earn 1 point. If both teams have 5 cards of Denari then no one get this point.
             </li>
             <li>
-              <strong style={{ color: '#ffbf00' }}>Settebello:</strong> Capturing the 7 of Denari earns 1 point.
-            </li>
-            <li>
               <strong style={{ color: '#ffbf00' }}>Primiera:</strong> For each suit, the best card is chosen according to this scale:
               <table style={{ width: "100%", color: "#fff", borderCollapse: "collapse", marginTop: "1rem" }}>
                 <thead>
@@ -262,6 +259,9 @@ const ScopaInstructions: React.FC = () => {
             </li>
             <li>
               The team with the higher total primiera score earns 1 point. The Primiera may result in a tie.
+            </li>
+            <li>
+              <strong style={{ color: '#ffbf00' }}>Settebello:</strong> Capturing the 7 of Denari earns 1 point.
             </li>
             <li>
               <strong style={{ color: '#ffbf00' }}>Scopa:</strong> Each time a capture empties the table (except on the last turn),
