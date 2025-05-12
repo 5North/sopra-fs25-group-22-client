@@ -64,7 +64,7 @@ const CardComponent: React.FC<CardProps> = ({ card, onClick }) => {
           backgroundColor: "#fff",
           padding: "0.25rem",       // inner padding like panel
           borderRadius: "4px",      // rounded corners
-          filter: "contrast(3) saturate(1)",
+          filter: "contrast(1) saturate(1)",
         }}
       />
     </div>
