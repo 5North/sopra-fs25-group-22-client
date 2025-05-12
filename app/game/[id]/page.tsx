@@ -335,7 +335,7 @@ export default function GamePage() {
   };
   
 
-  /*const rematch = () => {
+  const rematch = () => {
     if (!id) return;
     setCaptureOptions([]);
     const payload = JSON.stringify({
@@ -348,12 +348,12 @@ export default function GamePage() {
       destination: `/app/rematch`,
       body: payload,
     });
-  }*/
+  }
 
   if (gameResult) {
     return <GameResultView result={gameResult} onReturnHome={unsubscribeFromGame} 
-    //onRematch={rematch} 
-    //gameId={Number(id)}
+    onRematch={rematch} 
+    gameId={Number(id)}
     />;
   }
 
@@ -419,9 +419,9 @@ export default function GamePage() {
         />
       )}
       {renderCaptureOptions()}
-      <MoveAnimator
-        animation={moveAnimation}
-      />
+      <div style={{ position: "relative", width: "100%", height: "100%" }}>
+        <MoveAnimator animation={moveAnimation} />
+      </div>
       <ScopaGameView
         gameSession={gameState}
         currentUserId={currentUserId || 0}

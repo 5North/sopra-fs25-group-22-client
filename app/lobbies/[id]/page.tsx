@@ -50,7 +50,7 @@ const LobbyPage: React.FC = () => {
   const subscriptionRef = useRef<StompSubscription | null>(null);
   const [players, setPlayers] = useState<Player[]>([]);
   const [messageApi, contextHolder] = antdMessage.useMessage();
- 
+  const [hostLeft, setHostLeft] = useState(false); 
 
 
 
@@ -99,25 +99,11 @@ const LobbyPage: React.FC = () => {
             }
 
              // lobby deleted by host
-            if (data.message?.includes("has been deleted")) {
-              // show a red error toast
-              messageApi.open({
-                type:    "error",
-                content: "The host left the lobby. Redirecting to hompage...",
-                style: {
-                  backgroundColor: "#000",  
-                  color:           "#f5222d",     
-                  borderRadius:    "4px",
-                }
-              });
-
-              
-              setTimeout(() => {
-                router.push("/home");
-              }, 2000);
-
-              return; 
-            }
+             // Inside your WebSocket or effect handler
+             if (data.message?.includes("has been deleted")) {
+               setHostLeft(true);
+               return;
+             }
   
           }
         );
@@ -233,20 +219,71 @@ const LobbyPage: React.FC = () => {
 
 
   return (
-    <>
-      {contextHolder}
     <div
       className="register-container"
       style={{
-        position: "relative", 
+        position: "relative",
         color: "#f0f0f0",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
         padding: "2rem",
-        height: "100vh", 
+        height: "100vh",
       }}
     >
+      {/* Host Left Popup */}
+      {hostLeft && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100vw",
+            height: "100vh",
+            backgroundColor: "rgba(0, 0, 0, 0.85)",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 9999,
+            color: "#f5222d",
+            textAlign: "center",
+            padding: "2rem",
+          }}
+        >
+          <h2
+            style={{
+              backgroundColor: "rgba(0,0,0,0.6)",
+              padding: "1rem 2rem",
+              borderRadius: "0.5rem",
+              border: "1px solid #f5222d",
+              boxShadow: "0 0 8px rgba(245,34,45,0.7)",
+              marginBottom: "2rem",
+            }}
+          >
+            The host left the lobby.
+          </h2>
+          <p style={{ marginBottom: "2rem", color: "#fff", fontSize: "1.2rem" }}>
+            You will be redirected to the homepage.
+          </p>
+          <Button
+            type="primary"
+            onClick={() => router.push("/home")}
+            style={{
+              backgroundColor: "#f5222d",
+              borderColor: "#f5222d",
+              color: "#fff",
+              fontWeight: "bold",
+              borderRadius: "8px",
+              padding: "0.5rem 1.5rem",
+              boxShadow: "0 0 10px rgba(245,34,45,0.6)",
+            }}
+          >
+            Go to Home
+          </Button>
+        </div>
+      )}
+
       {/* Game-ID Pill */}
       <h2
         style={{
@@ -254,7 +291,7 @@ const LobbyPage: React.FC = () => {
           padding: "0.5rem 1rem",
           borderRadius: "0.5rem",
           backgroundColor: "rgba(0,0,0,0.6)",
-          color: "#00e5ff",                // neon-blue
+          color: "#00e5ff",
           border: "1px solid #00e5ff",
           boxShadow: "0 0 8px rgba(0,229,255,0.5)",
           fontWeight: "normal",
@@ -262,7 +299,7 @@ const LobbyPage: React.FC = () => {
       >
         Game ID: {lobby.PIN ?? lobby.lobbyId} 🔗
       </h2>
-       <p
+      <p
         style={{
           margin: 0,
           padding: "0.25rem 1rem",
@@ -270,24 +307,23 @@ const LobbyPage: React.FC = () => {
           fontSize: "1rem",
           textAlign: "center",
           textShadow: "0 0 4px rgba(0,229,255,0.6)",
-          lineHeight:"1.2",
+          lineHeight: "1.2",
         }}
       >
         4 players required
       </p>
       <p
         style={{
-          margin:    "0.25rem 0 1.5rem", 
-          padding:   "0 1rem",
-          fontSize:  "1rem",
+          margin: "0.25rem 0 1.5rem",
+          padding: "0 1rem",
+          fontSize: "1rem",
           textAlign: "center",
-          textShadow:"0 0 4px rgba(0,229,255,0.6)",
-          lineHeight:"1.2",
+          textShadow: "0 0 4px rgba(0,229,255,0.6)",
+          lineHeight: "1.2",
         }}
       >
         Only the host can start the game
       </p>
-      
 
       {/* Teams row */}
       <div
@@ -306,8 +342,8 @@ const LobbyPage: React.FC = () => {
             className="team-box"
             style={{
               flex: "0 0 45%",
-              maxWidth: "45%", 
-              backgroundColor: "rgba(0,0,0,0.4)",    
+              maxWidth: "45%",
+              backgroundColor: "rgba(0,0,0,0.4)",
               border: "1px solid #00e5ff",
               borderRadius: "0.5rem",
               padding: "0.5rem",
@@ -326,20 +362,17 @@ const LobbyPage: React.FC = () => {
         ))}
       </div>
 
-      {/* Start button */}
-      {players?.length === 4 &&
-        hostUsername === username && (
-          <div>
-          <Button
-            type="primary"
-            onClick={handleStartGame}
-          >
+      {/* Start Game Button */}
+      {players?.length === 4 && hostUsername === username && (
+        <div>
+          <Button type="primary" onClick={handleStartGame}>
             Start Game
           </Button>
-          </div>
-        )}
-            {/* Leave Lobby Button */}
-            <Button
+        </div>
+      )}
+
+      {/* Leave Lobby Button */}
+      <Button
         onClick={handleLeaveLobby}
         style={{
           position: "absolute",
@@ -347,13 +380,10 @@ const LobbyPage: React.FC = () => {
           right: "5rem",
           borderRadius: "8px",
         }}
-      
       >
         Leave Lobby
-        </Button>
+      </Button>
     </div>
-    </>
   );
 };
-
 export default LobbyPage;
