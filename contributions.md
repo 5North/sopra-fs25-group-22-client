@@ -117,15 +117,16 @@ reason).
 
 ---
 
-## Contributions Week 5 - [Begin Date] to [End Date]
+## Contributions Week 6 - 08.05.25 to 14.05.25
 
 | **Student**        | **Date** | **Link to Commit** | **Description**                 | **Relevance**                       |
 | ------------------ | -------- | ------------------ | ------------------------------- | ----------------------------------- |
-| **[@githubUser1]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
+| **shellmychakkaith** | 08.05   | https://github.com/5North/sopra-fs25-group-22-client/commit/deb6d43f51e5cd6d2aa368637b9dd5af1ac9800f | Host and joining users see same page in lobby; one user per lobby; display cards in rules | joining users now know who is also playing with them; No conflict of being already in a lobby but trying to play in another lobby;  users know how to play with Napoletane cards |
+|  **shellmychakkaith** | 09.05   | https://github.com/5North/sopra-fs25-group-22-client/commit/ac1a2772f8542e706ba0ec5da08e758b3a6e8bd9 | Redirection of users, if they are already in a lobby; Fixation of gameboard | User whose already in a lobby re-enters the same lobby, so host doesnt start game wiht users that are not really on the lobby anymore; gameboard, more centered and cards not moving when screen sized is adjusted by user |
+| **shellmychakkaith** | 09.05   | https://github.com/5North/sopra-fs25-group-22-client/commit/ac1a2772f8542e706ba0ec5da08e758b3a6e8bd9 | Redirection notification | when user already in a lobby, they get a notification that users know whats going on|
 |                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
-| **[@githubUser2]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
-|                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
-| **[@githubUser3]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
+| **[@githubUser4]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
+|                    | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
 |                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
 | **[@githubUser4]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
 |                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
