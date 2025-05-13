@@ -33,13 +33,13 @@ const ScopaGameView: React.FC<ScopaGameViewProps> = ({
     seating[3],  // right = last
     ].filter(Boolean) as Player[];
 
-  console.log("game session in scopa view: ", gameSession);
+  // console.log("game session in scopa view: ", gameSession);
 
   
-if (gameSession.players) {
-  console.log("🔹 All player IDs:", gameSession.players.map(p => p.userId));
-  console.log("🔸 Opponent IDs:", opponents.map(p => p.userId));
-}
+// if (gameSession.players) {
+//   console.log("🔹 All player IDs:", gameSession.players.map(p => p.userId));
+//   console.log("🔸 Opponent IDs:", opponents.map(p => p.userId));
+// }
 
   
 const getUsernameById = (id: number) => {
