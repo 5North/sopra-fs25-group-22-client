@@ -117,10 +117,13 @@ reason).
 
 ---
 
-## Contributions Week 6 - 08.05.25 to 14.05.25
+=======
+## Contributions Week 6 - [07.05] to [14.05]
 
 | **Student**        | **Date** | **Link to Commit** | **Description**                 | **Relevance**                       |
 | ------------------ | -------- | ------------------ | ------------------------------- | ----------------------------------- |
+| **sbenzo99** | 11.05/12.05   | https://github.com/5North/sopra-fs25-group-22-server/commit/399a2b1488d24168f288d82bd97cadfd24a22922 | Timer also for Choice, using strategy design pattern | To make the flow of the game better and smoother, keeping simple to add new timers because of strategy DP |
+| **sbenzo99** | 12.05  | https://github.com/5North/sopra-fs25-group-22-server/commit/b236a21faf13a28d8d3a3fa77ef0b8690678b9a8, https://github.com/5North/sopra-fs25-group-22-server/commit/ba78cd41a35850aadff09b9e9722dd855559462c | Fixing bugs for playing random card and update page when choosing | It would have been a major bug :( |
 | **shellmychakkaith** | 08.05   | https://github.com/5North/sopra-fs25-group-22-client/commit/deb6d43f51e5cd6d2aa368637b9dd5af1ac9800f | Host and joining users see same page in lobby; one user per lobby; display cards in rules | joining users now know who is also playing with them; No conflict of being already in a lobby but trying to play in another lobby;  users know how to play with Napoletane cards |
 |  **shellmychakkaith** | 09.05   | https://github.com/5North/sopra-fs25-group-22-client/commit/ac1a2772f8542e706ba0ec5da08e758b3a6e8bd9 | Redirection of users, if they are already in a lobby; Fixation of gameboard | User whose already in a lobby re-enters the same lobby, so host doesnt start game wiht users that are not really on the lobby anymore; gameboard, more centered and cards not moving when screen sized is adjusted by user |
 | **shellmychakkaith** | 09.05   | https://github.com/5North/sopra-fs25-group-22-client/commit/ac1a2772f8542e706ba0ec5da08e758b3a6e8bd9 | Redirection notification | when user already in a lobby, they get a notification that users know whats going on|
