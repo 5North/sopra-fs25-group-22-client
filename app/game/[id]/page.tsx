@@ -47,8 +47,11 @@ export default function GamePage() {
   const [showRoundAnimation, setShowRoundAnimation] = useState(false);
   const [suggestion, setSuggestion] = useState<string | null>(null);
   const [showAIPanel, setShowAIPanel] = useState(false);
+  const [time, setTimer] = useState<number | null>(null)
   const subscriptionRef = useRef<StompSubscription | null>(null);
   const prevEmptyRef = useRef<boolean>(true);
+  const timerIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
 
 
   const getUserIdByUsername = (username: string): number | null => {
@@ -171,12 +174,30 @@ export default function GamePage() {
               console.log("Received game result:", resultData);
               setTimeout(() => {
                 setGameResult(resultData);
-              }, 2500);
+              }, 2000);
             } else if (Array.isArray(payload) && payload.length > 0 && Array.isArray(payload[0])) {
               console.log("Received capture options:", payload);
               setCaptureOptions(payload);
             } else if (payload.suggestion) {
               setSuggestion(payload.suggestion)
+            } else if (payload.remainingSeconds) {
+              console.log("⏱ Received timer:", payload.remainingSeconds); 
+
+              setTimer(payload.remainingSeconds);
+            
+              if (timerIntervalRef.current) {
+                clearInterval(timerIntervalRef.current);
+              }
+            
+              timerIntervalRef.current = setInterval(() => {
+                setTimer(prev => {
+                  if (prev === null || prev <= 1) {
+                    clearInterval(timerIntervalRef.current!);
+                    return null;
+                  }
+                  return prev - 1;
+                });
+              }, 1000);
             } else {
               console.log("Unknown message from queue: " + JSON.stringify(payload))
             }
@@ -222,6 +243,9 @@ export default function GamePage() {
     return () => {
       if (stompClientRef.current) {
         stompClientRef.current.deactivate();
+      }
+      if (timerIntervalRef.current) {
+        clearInterval(timerIntervalRef.current);
       }
     };
   }, [id, token, currentUserId]);
@@ -325,6 +349,26 @@ export default function GamePage() {
     );
   }
 
+  useEffect(() => {
+    if (time === null) return;
+
+    if (timerIntervalRef.current) {
+      clearInterval(timerIntervalRef.current);
+    }
+
+    timerIntervalRef.current = setInterval(() => {
+      setTimer(prev => {
+        if (prev === null || prev <= 1) {
+          clearInterval(timerIntervalRef.current!);
+          return null;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timerIntervalRef.current!);
+  }, [time]);
+
   
   const unsubscribeFromGame = () => {
     if (subscriptionRef.current) {
@@ -380,6 +424,32 @@ export default function GamePage() {
   
   return (
     <div style={{ backgroundColor: "blue", minHeight: "100vh" }}>
+      {time !== null && time > 0 && (
+        <div
+          style={{
+            position: "fixed",
+            top: "20px",
+            left: "50%",
+            transform: "translateX(-50%)",
+            backgroundColor: "#000c",
+            padding: "12px 24px",
+            borderRadius: "16px",
+            color: "#0ff",
+            border: "2px solid #0ff",
+            fontSize: "20px",
+            fontFamily: "monospace",
+            boxShadow: time <= 5
+              ? "0 0 10px red, 0 0 20px red"
+              : "0 0 10px #0ff, 0 0 20px #0ff",
+            animation: time <= 5
+              ? "blink 1s step-start infinite"
+              : "none",
+            zIndex: 1200,
+          }}
+        >
+          ⏳ {time}
+        </div>
+      )}
         {/* Quit button */}
         <Button
         onClick={handleExit}
