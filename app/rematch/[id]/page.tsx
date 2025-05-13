@@ -55,6 +55,7 @@ const RematchPage: React.FC = () => {
         subscriptionRef.current = client.subscribe(`/topic/lobby/${pin}`, async (message: IMessage) => {
           const data = JSON.parse(message.body);
 
+          console.log("Lobby message: " + JSON.stringify(data))
           if (data.message?.includes("has been deleted")) {
             setHostLeft(true);
             return;

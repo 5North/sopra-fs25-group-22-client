@@ -132,6 +132,25 @@ export default function GamePage() {
             if (payload.success !== undefined && typeof payload.message === "string") {
               console.log("Lobby notification (ignored):", payload);
               return;
+            } else if (payload.remainingSeconds) {
+              console.log("⏱ Received timer:", payload.remainingSeconds); 
+              setTimer(payload.remainingSeconds);
+
+                // Clear previous timer
+              if (timerIntervalRef.current) {
+                clearInterval(timerIntervalRef.current);
+              }
+
+              // Start countdown
+              timerIntervalRef.current = setInterval(() => {
+                setTimer(prev => {
+                  if (prev === null || prev <= 1) {
+                    clearInterval(timerIntervalRef.current!);
+                    return null;
+                  }
+                  return prev - 1;
+                });
+              }, 1000);
             }
 
             // Animatation
@@ -182,22 +201,7 @@ export default function GamePage() {
               setSuggestion(payload.suggestion)
             } else if (payload.remainingSeconds) {
               console.log("⏱ Received timer:", payload.remainingSeconds); 
-
               setTimer(payload.remainingSeconds);
-            
-              if (timerIntervalRef.current) {
-                clearInterval(timerIntervalRef.current);
-              }
-            
-              timerIntervalRef.current = setInterval(() => {
-                setTimer(prev => {
-                  if (prev === null || prev <= 1) {
-                    clearInterval(timerIntervalRef.current!);
-                    return null;
-                  }
-                  return prev - 1;
-                });
-              }, 1000);
             } else {
               console.log("Unknown message from queue: " + JSON.stringify(payload))
             }
@@ -348,27 +352,6 @@ export default function GamePage() {
       </div>
     );
   }
-
-  useEffect(() => {
-    if (time === null) return;
-
-    if (timerIntervalRef.current) {
-      clearInterval(timerIntervalRef.current);
-    }
-
-    timerIntervalRef.current = setInterval(() => {
-      setTimer(prev => {
-        if (prev === null || prev <= 1) {
-          clearInterval(timerIntervalRef.current!);
-          return null;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-
-    return () => clearInterval(timerIntervalRef.current!);
-  }, [time]);
-
   
   const unsubscribeFromGame = () => {
     if (subscriptionRef.current) {
@@ -424,7 +407,7 @@ export default function GamePage() {
   
   return (
     <div style={{ backgroundColor: "blue", minHeight: "100vh" }}>
-      {time !== null && time > 0 && (
+      {/* {time !== null && time > 0 && (
         <div
           style={{
             position: "fixed",
@@ -449,7 +432,31 @@ export default function GamePage() {
         >
           ⏳ {time}
         </div>
-      )}
+      )} */}
+        {time !== null && (
+          <div
+            style={{
+              position: "fixed",
+              top: "20px",
+              left: "20px",
+              backgroundColor: "#111",
+              padding: "10px 20px",
+              borderRadius: "12px",
+              color: "#0ff",
+              fontSize: "22px",
+              fontFamily: "monospace",
+              border: time <= 5 ? "2px solid #0ff" : "none",
+              boxShadow: time <= 5
+                ? "0 0 10px rgba(0, 255, 255, 0.7), 0 0 20px rgba(0, 255, 255, 0.4)"
+                : "none",
+              animation: time <= 5 ? "blink 1s step-start infinite" : "none",
+              zIndex: 1200,
+            }}
+          >
+            ⏳ {time}s
+          </div>
+        )}
+
         {/* Quit button */}
         <Button
         onClick={handleExit}
