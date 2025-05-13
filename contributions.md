@@ -117,13 +117,13 @@ reason).
 
 ---
 
-## Contributions Week 5 - [Begin Date] to [End Date]
+## Contributions Week 5 - [07.05] to [14.05]
 
 | **Student**        | **Date** | **Link to Commit** | **Description**                 | **Relevance**                       |
 | ------------------ | -------- | ------------------ | ------------------------------- | ----------------------------------- |
-| **[@githubUser1]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
+| **sbenzo99** | 11.05/12.05   | https://github.com/5North/sopra-fs25-group-22-server/commit/399a2b1488d24168f288d82bd97cadfd24a22922 | Timer also for Choice, using strategy design pattern | To make the flow of the game better and smoother, keeping simple to add new timers because of strategy DP |
 |                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
-| **[@githubUser2]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
+| **sbenzo99** | 12.05  | https://github.com/5North/sopra-fs25-group-22-server/commit/b236a21faf13a28d8d3a3fa77ef0b8690678b9a8, https://github.com/5North/sopra-fs25-group-22-server/commit/ba78cd41a35850aadff09b9e9722dd855559462c | Fixing bugs for playing random card and update page when choosing | It would have been a major bug :( |
 |                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
 | **[@githubUser3]** | [date]   | [Link to Commit 1] | [Brief description of the task] | [Why this contribution is relevant] |
 |                    | [date]   | [Link to Commit 2] | [Brief description of the task] | [Why this contribution is relevant] |
