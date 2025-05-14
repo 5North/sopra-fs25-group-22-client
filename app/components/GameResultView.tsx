@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { useRouter } from "next/navigation";
 import { GameResultDTO } from "@/models/GameResult";
 import { Button } from "antd";

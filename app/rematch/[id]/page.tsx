@@ -6,8 +6,7 @@ import useLocalStorage from "@/hooks/useLocalStorage";
 import { Client, IMessage, StompSubscription } from "@stomp/stompjs";
 import { getWsDomain } from "@/utils/domain";
 import { getUserById } from "@/api/registerService";
-import { Button, message as antdMessage } from "antd";
-import { UserListElement } from "@/models/GameSession";
+import { Button } from "antd";
 
 interface Lobby {
   lobbyId: number;
@@ -45,25 +44,7 @@ const RematchPage: React.FC = () => {
   const [players, setPlayers] = useState<Player[]>([]);
   const [hostLeft, setHostLeft] = useState(false);
   const [rematchFailed, setRematchFailed] = useState(false);
-  const [allUsers, setAllUsers] = useState<UserListElement[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  const getUserIdByUsername = (username: string): number | null => {
-    const user = allUsers.find(u => u.username === username);
-    return user ? user.id : null;
-  };
-
-  const getCurrentUserId = (): number | null => {
-    if (typeof window !== "undefined") {
-      const userName = localStorage.getItem("username");
-      if (userName) {
-        return getUserIdByUsername(userName);
-      }
-    }
-    return null;
-  };
-
-  const currentUserId = getCurrentUserId();
+  const [loading, setLoading] = useState(true);;
 
   useEffect(() => {
     if (!pin || !token) return;

@@ -52,8 +52,6 @@ export default function GamePage() {
   const prevEmptyRef = useRef<boolean>(true);
   const timerIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
-
-
   const getUserIdByUsername = (username: string): number | null => {
     const user = allUsers.find(u => u.username === username);
     return user ? user.id : null;
@@ -70,15 +68,6 @@ export default function GamePage() {
   };
 
   const currentUserId = getCurrentUserId();
-
-  const getSeatIndexByUserId = (uid: number): 0 | 1 | 2 | 3 => {
-    const players = gameState.players || [];
-    const meIndex = players.findIndex(p => p.userId === currentUserId);
-    const seating = meIndex >= 0
-      ? [...players.slice(meIndex), ...players.slice(0, meIndex)]
-      : players;
-    return seating.findIndex(p => p.userId === uid) as 0 | 1 | 2 | 3;
-  };
 
   useEffect(() => {
     // ensure we actually have an array
@@ -231,18 +220,20 @@ export default function GamePage() {
                 });
               }, 1000);
             } else if (payload.userId && Array.isArray(payload.handCards)) { // TODO: Change this to last cards message..
-              const seatIndex = getSeatIndexByUserId(payload.userId);
-              setMoveAnimation({
-                playerId: payload.userId,
-                seatIndex: seatIndex,
-                playedCard: null,
-                capturedCards: payload.handCards,
-              });
+              console.log("not implemented..!")
+              // TODO:
+              // const seatIndex = getSeatIndexByUserId(gameState.players, currentUserId, targetId);
+              // setMoveAnimation({
+              //   playerId: payload.userId,
+              //   seatIndex: seatIndex,
+              //   playedCard: null,
+              //   capturedCards: payload.handCards,
+              // });
             
-              // Clear animation after short delay
-              setTimeout(() => {
-                setMoveAnimation(null);
-              }, 1500);
+              // // Clear animation after short delay
+              // setTimeout(() => {
+              //   setMoveAnimation(null);
+              // }, 1500);
             } else {
               console.log("Unknown message from queue: " + JSON.stringify(payload))
             }

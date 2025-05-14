@@ -7,9 +7,6 @@ import { Client,IMessage, StompSubscription } from "@stomp/stompjs";
 import { getWsDomain } from "@/utils/domain";
 import { getUserById } from "@/api/registerService"; 
 import { Button } from "antd";
-import { message as antdMessage } from "antd";
-
-
 
 interface Lobby {
   lobbyId: number;
@@ -36,8 +33,6 @@ const getUsername = (): string => {
   }
 };
 
-
-
 const LobbyPage: React.FC = () => {
   const router = useRouter();
   const [error] = useState("");
@@ -49,10 +44,7 @@ const LobbyPage: React.FC = () => {
   const stompClientRef = useRef<Client | null>(null);
   const subscriptionRef = useRef<StompSubscription | null>(null);
   const [players, setPlayers] = useState<Player[]>([]);
-  const [messageApi, contextHolder] = antdMessage.useMessage();
   const [hostLeft, setHostLeft] = useState(false); 
-
-
 
   useEffect(() => {
     if (!pin || !token) return;
