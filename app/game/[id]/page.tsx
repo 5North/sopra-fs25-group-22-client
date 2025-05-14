@@ -71,6 +71,15 @@ export default function GamePage() {
 
   const currentUserId = getCurrentUserId();
 
+  const getSeatIndexByUserId = (uid: number): 0 | 1 | 2 | 3 => {
+    const players = gameState.players || [];
+    const meIndex = players.findIndex(p => p.userId === currentUserId);
+    const seating = meIndex >= 0
+      ? [...players.slice(meIndex), ...players.slice(0, meIndex)]
+      : players;
+    return seating.findIndex(p => p.userId === uid) as 0 | 1 | 2 | 3;
+  };
+
   useEffect(() => {
     // ensure we actually have an array
     if (!gameState?.tableCards) return;
@@ -170,7 +179,7 @@ export default function GamePage() {
             } else if (payload.lobby) {
               console.log("rematchers: ", JSON.stringify(payload.lobby.rematchersIds))
             } else {
-              console.log("Lobby uncategorized message: ", JSON.stringify(payload.lobby))
+              console.log("Lobby uncategorized message: ", JSON.stringify(payload))
             }
           }
         );
@@ -221,6 +230,19 @@ export default function GamePage() {
                   return prev - 1;
                 });
               }, 1000);
+            } else if (payload.userId && Array.isArray(payload.handCards)) { // TODO: Change this to last cards message..
+              const seatIndex = getSeatIndexByUserId(payload.userId);
+              setMoveAnimation({
+                playerId: payload.userId,
+                seatIndex: seatIndex,
+                playedCard: null,
+                capturedCards: payload.handCards,
+              });
+            
+              // Clear animation after short delay
+              setTimeout(() => {
+                setMoveAnimation(null);
+              }, 1500);
             } else {
               console.log("Unknown message from queue: " + JSON.stringify(payload))
             }
@@ -315,7 +337,6 @@ export default function GamePage() {
 
   // Renders the capture options UI.
   const renderCaptureOptions = () => {
-    console.log("render captur user id is: " + currentUserId);
     if (captureOptions.length === 0) return null;
     return (
       <div style={{ backgroundColor: "rgba(0,0,0,0.8)", padding: "1rem", position: "absolute", top: "10%", left: "50%", transform: "translateX(-50%)", borderRadius: "8px", zIndex: 999, color: "#fff" }}>
@@ -426,32 +447,6 @@ export default function GamePage() {
   
   return (
     <div style={{ backgroundColor: "blue", minHeight: "100vh" }}>
-      {/* {time !== null && time > 0 && (
-        <div
-          style={{
-            position: "fixed",
-            top: "20px",
-            left: "50%",
-            transform: "translateX(-50%)",
-            backgroundColor: "#000c",
-            padding: "12px 24px",
-            borderRadius: "16px",
-            color: "#0ff",
-            border: "2px solid #0ff",
-            fontSize: "20px",
-            fontFamily: "monospace",
-            boxShadow: time <= 5
-              ? "0 0 10px red, 0 0 20px red"
-              : "0 0 10px #0ff, 0 0 20px #0ff",
-            animation: time <= 5
-              ? "blink 1s step-start infinite"
-              : "none",
-            zIndex: 1200,
-          }}
-        >
-          ⏳ {time}
-        </div>
-      )} */}
         {time !== null && (
           <div
             style={{
@@ -514,7 +509,7 @@ export default function GamePage() {
           }}
         />
       )}
-      {renderCaptureOptions()}
+      {isMyTurn && renderCaptureOptions()}
       <div style={{ position: "relative", width: "100%", height: "100%" }}>
         <MoveAnimator animation={moveAnimation} />
       </div>

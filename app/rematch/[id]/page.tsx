@@ -7,6 +7,7 @@ import { Client, IMessage, StompSubscription } from "@stomp/stompjs";
 import { getWsDomain } from "@/utils/domain";
 import { getUserById } from "@/api/registerService";
 import { Button, message as antdMessage } from "antd";
+import { UserListElement } from "@/models/GameSession";
 
 interface Lobby {
   lobbyId: number;
@@ -43,19 +44,46 @@ const RematchPage: React.FC = () => {
   const [lobby, setLobby] = useState<Lobby | null>(null);
   const [players, setPlayers] = useState<Player[]>([]);
   const [hostLeft, setHostLeft] = useState(false);
-  const [messageApi, contextHolder] = antdMessage.useMessage();
+  const [rematchFailed, setRematchFailed] = useState(false);
+  const [allUsers, setAllUsers] = useState<UserListElement[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const getUserIdByUsername = (username: string): number | null => {
+    const user = allUsers.find(u => u.username === username);
+    return user ? user.id : null;
+  };
+
+  const getCurrentUserId = (): number | null => {
+    if (typeof window !== "undefined") {
+      const userName = localStorage.getItem("username");
+      if (userName) {
+        return getUserIdByUsername(userName);
+      }
+    }
+    return null;
+  };
+
+  const currentUserId = getCurrentUserId();
 
   useEffect(() => {
     if (!pin || !token) return;
+
+    const noMessageTimeout = setTimeout(() => {
+      console.warn("No message received within timeout. Triggering rematch failure.");
+      setRematchFailed(true);
+    }, 2500);
 
     const client = new Client({
       brokerURL: getWsDomain() + `/lobby?token=${token}`,
       reconnectDelay: 2000,
       onConnect: () => {
         subscriptionRef.current = client.subscribe(`/topic/lobby/${pin}`, async (message: IMessage) => {
+          clearTimeout(noMessageTimeout);
+          setLoading(false);
           const data = JSON.parse(message.body);
 
-          console.log("Lobby message: " + JSON.stringify(data))
+          console.log("Lobby message: " + JSON.stringify(data));
+
           if (data.message?.includes("has been deleted")) {
             setHostLeft(true);
             return;
@@ -68,8 +96,13 @@ const RematchPage: React.FC = () => {
 
           if (data.lobby) {
             console.log("FULL lobby update:", data);
+
+            if (data.lobby.usersIds && data.lobby.usersIds.length < 4) {
+              setRematchFailed(true);
+              return;
+            }
+
             setLobby(data.lobby);
-            console.log("rematcher id: ", data.lobby.rematchersIds)
             const ids = data.lobby.rematchersIds ?? [];
 
             const fetched = await Promise.all(
@@ -82,7 +115,7 @@ const RematchPage: React.FC = () => {
             );
 
             setPlayers(fetched);
-          }
+          } 
         });
       },
       onStompError: (frame) => {
@@ -94,9 +127,9 @@ const RematchPage: React.FC = () => {
     client.activate();
 
     return () => {
+      clearTimeout(noMessageTimeout);
       if (stompClientRef.current) {
         stompClientRef.current.deactivate();
-        // stompClientRef.current = null;
       }
     };
   }, [router, token, pin]);
@@ -131,131 +164,206 @@ const RematchPage: React.FC = () => {
 
   const rematchers = players;
 
-  return (
-    <div
-      className="register-container"
-      style={{
-        position: "relative",
-        color: "#f0f0f0",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        padding: "2rem",
-        height: "100vh",
-      }}
-    >
-      {/* Host Left Popup */}
-      {hostLeft && (
-        <div
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            width: "100vw",
-            height: "100vh",
-            backgroundColor: "rgba(0, 0, 0, 0.85)",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 9999,
-            color: "#f5222d",
-            textAlign: "center",
-            padding: "2rem",
-          }}
-        >
-          <h2
-            style={{
-              backgroundColor: "rgba(0,0,0,0.6)",
-              padding: "1rem 2rem",
-              borderRadius: "0.5rem",
-              border: "1px solid #f5222d",
-              boxShadow: "0 0 8px rgba(245,34,45,0.7)",
-              marginBottom: "2rem",
-            }}
-          >
-            The host left the lobby.
-          </h2>
-          <p style={{ marginBottom: "2rem", color: "#fff", fontSize: "1.2rem" }}>
-            You will be redirected to the homepage.
-          </p>
-          <Button
-            type="primary"
-            onClick={() => router.push("/home")}
-            style={{
-              backgroundColor: "#f5222d",
-              borderColor: "#f5222d",
-              color: "#fff",
-              fontWeight: "bold",
-              borderRadius: "8px",
-              padding: "0.5rem 1.5rem",
-              boxShadow: "0 0 10px rgba(245,34,45,0.6)",
-            }}
-          >
-            Go to Home
-          </Button>
-        </div>
-      )}
-
-      {/* Game Info */}
-      <h2
-        style={{
-          margin: "7rem 0 0.5rem",
-          padding: "0.5rem 1rem",
-          borderRadius: "0.5rem",
-          backgroundColor: "rgba(0,0,0,0.6)",
-          color: "#00e5ff",
-          border: "1px solid #00e5ff",
-          boxShadow: "0 0 8px rgba(0,229,255,0.5)",
-          fontWeight: "normal",
-        }}
-      >
-        Game ID: {lobby?.PIN ?? lobby?.lobbyId} 🔗
-      </h2>
-
-      <p style={{ color: "#fff", marginBottom: "1rem" }}>
-        Rematchers: {rematchers.length}/4
-      </p>
-
+ return (
+  <div
+    className="register-container"
+    style={{
+      position: "relative",
+      color: "#f0f0f0",
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      padding: "2rem",
+      height: "100vh",
+    }}
+  >
+    {/* Host Left Popup */}
+    {hostLeft && (
       <div
         style={{
-          backgroundColor: "rgba(0,0,0,0.4)",
-          border: "1px solid #00e5ff",
-          borderRadius: "0.5rem",
-          padding: "1rem",
-          minWidth: "300px",
+          position: "fixed",
+          top: 0,
+          left: 0,
+          width: "100vw",
+          height: "100vh",
+          backgroundColor: "rgba(0, 0, 0, 0.85)",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          zIndex: 9999,
+          color: "#f5222d",
           textAlign: "center",
-          marginBottom: "2rem",
+          padding: "2rem",
         }}
       >
-        {rematchers.map((p) => (
-          <p key={p.userId} style={{ margin: "0.5rem 0", color: "#fff" }}>
-            {p.username} is ready
-          </p>
-        ))}
-      </div>
-
-      {/* Start Game Button */}
-      {isHost && rematchers.length === 4 && (
-        <Button type="primary" onClick={handleStartGame}>
-          Start Game
+        <h2
+          style={{
+            backgroundColor: "rgba(0,0,0,0.6)",
+            padding: "1rem 2rem",
+            borderRadius: "0.5rem",
+            border: "1px solid #f5222d",
+            boxShadow: "0 0 8px rgba(245,34,45,0.7)",
+            marginBottom: "2rem",
+          }}
+        >
+          The host left the lobby.
+        </h2>
+        <p style={{ marginBottom: "2rem", color: "#fff", fontSize: "1.2rem" }}>
+          You will be redirected to the homepage.
+        </p>
+        <Button
+          type="primary"
+          onClick={handleLeaveLobby}
+          style={{
+            backgroundColor: "#f5222d",
+            borderColor: "#f5222d",
+            color: "#fff",
+            fontWeight: "bold",
+            borderRadius: "8px",
+            padding: "0.5rem 1.5rem",
+            boxShadow: "0 0 10px rgba(245,34,45,0.6)",
+          }}
+        >
+          Go to Home
         </Button>
-      )}
+      </div>
+    )}
 
-      {/* Leave Lobby */}
-      <Button
-        onClick={handleLeaveLobby}
+    {/* Rematch Failed Popup */}
+    {rematchFailed && (
+      <div
         style={{
-          position: "absolute",
-          bottom: "5rem",
-          right: "5rem",
-          borderRadius: "8px",
+          position: "fixed",
+          top: 0,
+          left: 0,
+          width: "100vw",
+          height: "100vh",
+          backgroundColor: "rgba(0, 0, 0, 0.85)",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          zIndex: 9999,
+          color: "#f5222d",
+          textAlign: "center",
+          padding: "2rem",
         }}
       >
-        Leave Lobby
-      </Button>
-    </div>
-  );
+        <h2
+          style={{
+            backgroundColor: "rgba(0,0,0,0.6)",
+            padding: "1rem 2rem",
+            borderRadius: "0.5rem",
+            border: "1px solid #f5222d",
+            boxShadow: "0 0 8px rgba(245,34,45,0.7)",
+            marginBottom: "2rem",
+          }}
+        >
+          Rematch not possible!
+        </h2>
+        <p style={{ marginBottom: "2rem", color: "#fff", fontSize: "1.2rem" }}>
+          Not all users accepted the rematch.
+        </p>
+        <Button
+          type="primary"
+          onClick={handleLeaveLobby}
+          style={{
+            backgroundColor: "#f5222d",
+            borderColor: "#f5222d",
+            color: "#fff",
+            fontWeight: "bold",
+            borderRadius: "8px",
+            padding: "0.5rem 1.5rem",
+            boxShadow: "0 0 10px rgba(245,34,45,0.6)",
+          }}
+        >
+          Go to Home
+        </Button>
+      </div>
+    )}
+
+    {/* Loading while waiting for message */}
+    {loading && !rematchFailed && !hostLeft && (
+      <div
+        style={{
+          marginTop: "7rem",
+          fontSize: "1.25rem",
+          color: "##FFFFFF",
+          textShadow: "0 0 8px rgba(0,229,255,0.4)",
+        }}
+      >
+        Loading lobby info...
+      </div>
+    )}
+
+    {/* Game Info Section */}
+    {!loading && lobby && (
+      <>
+        <h2
+          style={{
+            margin: "7rem 0 0.5rem",
+            padding: "0.5rem 1rem",
+            borderRadius: "0.5rem",
+            backgroundColor: "rgba(0,0,0,0.6)",
+            color: "#00e5ff",
+            border: "1px solid #00e5ff",
+            boxShadow: "0 0 8px rgba(0,229,255,0.5)",
+            fontWeight: "normal",
+          }}
+        >
+          Game ID: {lobby.PIN ?? lobby.lobbyId} 🔗
+        </h2>
+
+        <p style={{ color: "#fff", marginBottom: "1rem" }}>
+          Rematchers: {rematchers.length}/4
+        </p>
+
+        <div
+          style={{
+            backgroundColor: "rgba(0,0,0,0.4)",
+            border: "1px solid #00e5ff",
+            borderRadius: "0.5rem",
+            padding: "1rem",
+            minWidth: "300px",
+            textAlign: "center",
+            marginBottom: "2rem",
+          }}
+        >
+          {rematchers.map((p) => (
+            <p key={p.userId} style={{ margin: "0.5rem 0", color: "#fff" }}>
+              {p.username} is ready
+            </p>
+          ))}
+        </div>
+
+        {isHost && (
+          <Button
+            type="primary"
+            onClick={handleStartGame}
+            disabled={rematchers.length < 4}
+          >
+            Start Game
+          </Button>
+        )}
+      </>
+    )}
+
+    {/* Leave Button */}
+    <Button
+      onClick={handleLeaveLobby}
+      style={{
+        position: "absolute",
+        bottom: "5rem",
+        right: "5rem",
+        borderRadius: "8px",
+      }}
+    >
+      Leave Lobby
+    </Button>
+  </div>
+);
+
 };
 
 export default RematchPage;
