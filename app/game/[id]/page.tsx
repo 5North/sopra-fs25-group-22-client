@@ -167,6 +167,10 @@ export default function GamePage() {
                 players:         data.players,
                 currentPlayerId: data.currentPlayerId,
               }));
+            } else if (payload.lobby) {
+              console.log("rematchers: ", JSON.stringify(payload.lobby.rematchersIds))
+            } else {
+              console.log("Lobby uncategorized message: ", JSON.stringify(payload.lobby))
             }
           }
         );
@@ -200,8 +204,23 @@ export default function GamePage() {
             } else if (payload.suggestion) {
               setSuggestion(payload.suggestion)
             } else if (payload.remainingSeconds) {
-              console.log("⏱ Received timer:", payload.remainingSeconds); 
-              setTimer(payload.remainingSeconds);
+              console.log("⏱ Received timer:", payload.remainingSeconds);
+
+              setTimer(payload.remainingSeconds); // 1. Update time immediately
+
+              if (timerIntervalRef.current) {
+                clearInterval(timerIntervalRef.current);
+              }
+
+              timerIntervalRef.current = setInterval(() => {
+                setTimer(prev => {
+                  if (prev === null || prev <= 1) {
+                    clearInterval(timerIntervalRef.current!);
+                    return null;
+                  }
+                  return prev - 1;
+                });
+              }, 1000);
             } else {
               console.log("Unknown message from queue: " + JSON.stringify(payload))
             }
