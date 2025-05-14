@@ -78,15 +78,8 @@ const GameResultView: React.FC<GameResultViewProps> = ({
   }
 
   const full = result;
-
-  const myTotalWins = categories.reduce(
-    (acc, { my, other }) => ((my(full) ?? 0) > (other(full) ?? 0) ? acc + 1 : acc),
-    0
-  );
-  const otherTotalWins = categories.reduce(
-    (acc, { my, other }) => ((other(full) ?? 0) > (my(full) ?? 0) ? acc + 1 : acc),
-    0
-  );
+  const myTotal   = full.myTotal   ?? 0;
+  const otherTotal = full.otherTotal ?? 0;
 
   return (
     <div className="result-container">
@@ -196,12 +189,12 @@ const GameResultView: React.FC<GameResultViewProps> = ({
                   borderTop: "1px solid rgba(255,255,255,0.6)",
                   paddingTop: "0.5rem",
                   textAlign: "left",
-                  fontWeight: myTotalWins > otherTotalWins ? 800 : 400,
+                  fontWeight: myTotal > otherTotal ? 800 : 400,
                   fontSize: "1.3rem",
                   color: "#fff",
                 }}
               >
-                {myTotalWins}
+                {full.myTotal}
               </div>
               <div
                 style={{
@@ -219,12 +212,12 @@ const GameResultView: React.FC<GameResultViewProps> = ({
                   borderTop: "1px solid rgba(255,255,255,0.6)",
                   paddingTop: "0.5rem",
                   textAlign: "right",
-                  fontWeight: otherTotalWins > myTotalWins ? 800 : 400,
+                  fontWeight: otherTotal > myTotal ? 800 : 400,
                   fontSize: "1.3rem",
                   color: "#fff",
                 }}
               >
-                {otherTotalWins}
+                {full.otherTotal}
               </div>
             </React.Fragment>
           </div>
