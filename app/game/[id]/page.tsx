@@ -47,9 +47,10 @@ export default function GamePage() {
   const [showRoundAnimation, setShowRoundAnimation] = useState(false);
   const [suggestion, setSuggestion] = useState<string | null>(null);
   const [showAIPanel, setShowAIPanel] = useState(false);
+  const [time, setTimer] = useState<number | null>(null)
   const subscriptionRef = useRef<StompSubscription | null>(null);
   const prevEmptyRef = useRef<boolean>(true);
-
+  const timerIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const getUserIdByUsername = (username: string): number | null => {
     const user = allUsers.find(u => u.username === username);
@@ -129,6 +130,25 @@ export default function GamePage() {
             if (payload.success !== undefined && typeof payload.message === "string") {
               console.log("Lobby notification (ignored):", payload);
               return;
+            } else if (payload.remainingSeconds) {
+              console.log("⏱ Received timer:", payload.remainingSeconds); 
+              setTimer(payload.remainingSeconds);
+
+                // Clear previous timer
+              if (timerIntervalRef.current) {
+                clearInterval(timerIntervalRef.current);
+              }
+
+              // Start countdown
+              timerIntervalRef.current = setInterval(() => {
+                setTimer(prev => {
+                  if (prev === null || prev <= 1) {
+                    clearInterval(timerIntervalRef.current!);
+                    return null;
+                  }
+                  return prev - 1;
+                });
+              }, 1000);
             }
 
             // Animatation
@@ -145,6 +165,10 @@ export default function GamePage() {
                 players:         data.players,
                 currentPlayerId: data.currentPlayerId,
               }));
+            } else if (payload.lobby) {
+              console.log("rematchers: ", JSON.stringify(payload.lobby.rematchersIds))
+            } else {
+              console.log("Lobby uncategorized message: ", JSON.stringify(payload))
             }
           }
         );
@@ -171,12 +195,45 @@ export default function GamePage() {
               console.log("Received game result:", resultData);
               setTimeout(() => {
                 setGameResult(resultData);
-              }, 2500);
+              }, 2000);
             } else if (Array.isArray(payload) && payload.length > 0 && Array.isArray(payload[0])) {
               console.log("Received capture options:", payload);
               setCaptureOptions(payload);
             } else if (payload.suggestion) {
               setSuggestion(payload.suggestion)
+            } else if (payload.remainingSeconds) {
+              console.log("⏱ Received timer:", payload.remainingSeconds);
+
+              setTimer(payload.remainingSeconds); // 1. Update time immediately
+
+              if (timerIntervalRef.current) {
+                clearInterval(timerIntervalRef.current);
+              }
+
+              timerIntervalRef.current = setInterval(() => {
+                setTimer(prev => {
+                  if (prev === null || prev <= 1) {
+                    clearInterval(timerIntervalRef.current!);
+                    return null;
+                  }
+                  return prev - 1;
+                });
+              }, 1000);
+            } else if (payload.userId && Array.isArray(payload.handCards)) { // TODO: Change this to last cards message..
+              console.log("not implemented..!")
+              // TODO:
+              // const seatIndex = getSeatIndexByUserId(gameState.players, currentUserId, targetId);
+              // setMoveAnimation({
+              //   playerId: payload.userId,
+              //   seatIndex: seatIndex,
+              //   playedCard: null,
+              //   capturedCards: payload.handCards,
+              // });
+            
+              // // Clear animation after short delay
+              // setTimeout(() => {
+              //   setMoveAnimation(null);
+              // }, 1500);
             } else {
               console.log("Unknown message from queue: " + JSON.stringify(payload))
             }
@@ -223,6 +280,9 @@ export default function GamePage() {
       if (stompClientRef.current) {
         stompClientRef.current.deactivate();
       }
+      if (timerIntervalRef.current) {
+        clearInterval(timerIntervalRef.current);
+      }
     };
   }, [id, token, currentUserId]);
 
@@ -268,7 +328,6 @@ export default function GamePage() {
 
   // Renders the capture options UI.
   const renderCaptureOptions = () => {
-    console.log("render captur user id is: " + currentUserId);
     if (captureOptions.length === 0) return null;
     return (
       <div style={{ backgroundColor: "rgba(0,0,0,0.8)", padding: "1rem", position: "absolute", top: "10%", left: "50%", transform: "translateX(-50%)", borderRadius: "8px", zIndex: 999, color: "#fff" }}>
@@ -324,7 +383,6 @@ export default function GamePage() {
       </div>
     );
   }
-
   
   const unsubscribeFromGame = () => {
     if (subscriptionRef.current) {
@@ -335,7 +393,7 @@ export default function GamePage() {
   };
   
 
-  /*const rematch = () => {
+  const rematch = () => {
     if (!id) return;
     setCaptureOptions([]);
     const payload = JSON.stringify({
@@ -348,12 +406,12 @@ export default function GamePage() {
       destination: `/app/rematch`,
       body: payload,
     });
-  }*/
+  }
 
   if (gameResult) {
     return <GameResultView result={gameResult} onReturnHome={unsubscribeFromGame} 
-    //onRematch={rematch} 
-    //gameId={Number(id)}
+    onRematch={rematch} 
+    gameId={Number(id)}
     />;
   }
 
@@ -380,6 +438,30 @@ export default function GamePage() {
   
   return (
     <div style={{ backgroundColor: "blue", minHeight: "100vh" }}>
+        {time !== null && (
+          <div
+            style={{
+              position: "fixed",
+              top: "20px",
+              left: "20px",
+              backgroundColor: "#111",
+              padding: "10px 20px",
+              borderRadius: "12px",
+              color: "#0ff",
+              fontSize: "22px",
+              fontFamily: "monospace",
+              border: time <= 5 ? "2px solid #0ff" : "none",
+              boxShadow: time <= 5
+                ? "0 0 10px rgba(0, 255, 255, 0.7), 0 0 20px rgba(0, 255, 255, 0.4)"
+                : "none",
+              animation: time <= 5 ? "blink 1s step-start infinite" : "none",
+              zIndex: 1200,
+            }}
+          >
+            ⏳ {time}s
+          </div>
+        )}
+
         {/* Quit button */}
         <Button
         onClick={handleExit}
@@ -418,10 +500,10 @@ export default function GamePage() {
           }}
         />
       )}
-      {renderCaptureOptions()}
-      <MoveAnimator
-        animation={moveAnimation}
-      />
+      {isMyTurn && renderCaptureOptions()}
+      <div style={{ position: "relative", width: "100%", height: "100%" }}>
+        <MoveAnimator animation={moveAnimation} />
+      </div>
       <ScopaGameView
         gameSession={gameState}
         currentUserId={currentUserId || 0}

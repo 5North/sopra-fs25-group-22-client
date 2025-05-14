@@ -33,13 +33,13 @@ const ScopaGameView: React.FC<ScopaGameViewProps> = ({
     seating[3],  // right = last
     ].filter(Boolean) as Player[];
 
-  console.log("game session in scopa view: ", gameSession);
+  // console.log("game session in scopa view: ", gameSession);
 
   
-if (gameSession.players) {
-  console.log("🔹 All player IDs:", gameSession.players.map(p => p.userId));
-  console.log("🔸 Opponent IDs:", opponents.map(p => p.userId));
-}
+// if (gameSession.players) {
+//   console.log("🔹 All player IDs:", gameSession.players.map(p => p.userId));
+//   console.log("🔸 Opponent IDs:", opponents.map(p => p.userId));
+// }
 
   
 const getUsernameById = (id: number) => {
@@ -152,13 +152,23 @@ return (
       )}
     </div>
 
-    {/* Center Table */}
+    {/* Center Table - Non-clickable */}
     {gameSession.tableCards && (
       <div className="table-area">
-        <div style={{ display: "flex", flexWrap: "wrap" }}>
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            pointerEvents: "none", // 🔒 disables clicks
+          }}
+        >
           {gameSession.tableCards.map((card, i) => (
-            <CardComponent key={i} card={card} borderColor="#FFAA00"           // yellow-orange neon
-            glowColor="rgba(255,170,0,0.8)"/>
+            <CardComponent
+              key={i}
+              card={card}
+              borderColor="#FFAA00"
+              glowColor="rgba(255,170,0,0.8)"
+            />
           ))}
         </div>
       </div>

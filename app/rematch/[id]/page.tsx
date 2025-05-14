@@ -1,85 +1,102 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { useParams } from "next/navigation";
-import { Client, IMessage, StompSubscription } from "@stomp/stompjs";
-import { UserListElement } from "@/models/GameSession";
-import { getWsDomain } from "@/utils/domain";
+import React, { useEffect, useRef, useState, useMemo } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import useLocalStorage from "@/hooks/useLocalStorage";
-import { getUsers } from "@/api/registerService";
-import Image from "next/image";
+import { Client, IMessage, StompSubscription } from "@stomp/stompjs";
+import { getWsDomain } from "@/utils/domain";
+import { getUserById } from "@/api/registerService";
+import { Button } from "antd";
 
-export default function RematchPage() {
-  const { id } = useParams();
-  const [allUsers, setAllUsers] = useState<UserListElement[]>([]);
-  const stompClientRef = useRef<Client | null>(null);
+interface Lobby {
+  lobbyId: number;
+  PIN: string | number;
+  hostId: number;
+  rematchersIds: number[] | null;
+}
+
+interface Player {
+  userId: number;
+  username: string;
+}
+
+const getUsername = (): string => {
+  if (typeof window === "undefined") return "";
+  const stored = localStorage.getItem("username") || "";
+  try {
+    return String(JSON.parse(stored));
+  } catch {
+    return stored;
+  }
+};
+
+const RematchPage: React.FC = () => {
+  const router = useRouter();
   const { value: token } = useLocalStorage<string>("token", "");
+  const username = getUsername();
+  const pathname = usePathname();
+  const pin = pathname?.slice(-4) ?? localStorage.getItem("LobbyId");
+
+  const stompClientRef = useRef<Client | null>(null);
   const subscriptionRef = useRef<StompSubscription | null>(null);
 
-  const getUserIdByUsername = (username: string): number | null => {
-    const user = allUsers.find(u => u.username === username);
-    return user ? user.id : null;
-  };
-
-  const getCurrentUserId = (): number | null => {
-    if (typeof window !== "undefined") {
-      const userName = localStorage.getItem("username");
-      if (userName) {
-        return getUserIdByUsername(userName);
-      }
-    }
-    return null;
-  };
-
-  const currentUserId = getCurrentUserId();
+  const [lobby, setLobby] = useState<Lobby | null>(null);
+  const [players, setPlayers] = useState<Player[]>([]);
+  const [hostLeft, setHostLeft] = useState(false);
+  const [rematchFailed, setRematchFailed] = useState(false);
+  const [loading, setLoading] = useState(true);;
 
   useEffect(() => {
-    if (!token) return;
-    const fetchUsers = async () => {
-      try {
-        const response = await getUsers(token);
-        if (!response.ok) {
-          throw new Error("Failed to fetch users");
-        }
-        const users: UserListElement[] = await response.json();
-        console.log("Fetched users:", users);
-        setAllUsers(users);
-      } catch (err) {
-        console.error("Error fetching users:", err);
-      }
-    };
+    if (!pin || !token) return;
 
-    fetchUsers();
-  }, [token]);
+    const noMessageTimeout = setTimeout(() => {
+      console.warn("No message received within timeout. Triggering rematch failure.");
+      setRematchFailed(true);
+    }, 2500);
 
-  useEffect(() => {
-    // Create STOMP client
     const client = new Client({
       brokerURL: getWsDomain() + `/lobby?token=${token}`,
       reconnectDelay: 2000,
-      debug: (msg) => {
-        console.log("[STOMP]", msg);
-      },
       onConnect: () => {
-        console.log("Connected to game WebSocket");
+        subscriptionRef.current = client.subscribe(`/topic/lobby/${pin}`, async (message: IMessage) => {
+          clearTimeout(noMessageTimeout);
+          setLoading(false);
+          const data = JSON.parse(message.body);
 
-        // Subscribe to public game state updates
-        subscriptionRef.current = client.subscribe(`/topic/lobby/${id}`, (message: IMessage) => {
-          try {
-            const payload = JSON.parse(message.body);
-            console.log("==> PUBLIC MESSAGE message received:", payload);
-          } catch (err) {
-            console.error("Error processing game state update", err);
-          }
-        });
+          console.log("Lobby message: " + JSON.stringify(data));
 
-        client.subscribe("/user/queue/reply", (message: IMessage) => {
-          try {
-            const payload = JSON.parse(message.body);
-            console.log("Private message received:", payload);
-          } catch (err) {
-            console.error("Error processing private message:", err);
+          if (data.message?.includes("has been deleted")) {
+            setHostLeft(true);
+            return;
           }
+
+          if (data.success === true && data.message === "Starting game") {
+            router.push(`/game/${pin}`);
+            return;
+          }
+
+          if (data.lobby) {
+            console.log("FULL lobby update:", data);
+
+            if (data.lobby.usersIds && data.lobby.usersIds.length < 4) {
+              setRematchFailed(true);
+              return;
+            }
+
+            setLobby(data.lobby);
+            const ids = data.lobby.rematchersIds ?? [];
+
+            const fetched = await Promise.all(
+              ids.map(async (id: number) => {
+                const res = await getUserById(token, id.toString());
+                if (!res.ok) throw new Error(`User ${id} fetch failed`);
+                const dto = await res.json();
+                return { userId: id, username: dto.username };
+              })
+            );
+
+            setPlayers(fetched);
+          } 
         });
       },
       onStompError: (frame) => {
@@ -91,52 +108,243 @@ export default function RematchPage() {
     client.activate();
 
     return () => {
+      clearTimeout(noMessageTimeout);
       if (stompClientRef.current) {
         stompClientRef.current.deactivate();
       }
     };
-  }, [id, token, currentUserId]);
+  }, [router, token, pin]);
 
-  // const unsubscribeFromGame = () => {
-  //   if (subscriptionRef.current) {
-  //     subscriptionRef.current.unsubscribe();
-  //     console.log(`Unsubscribed from /topic/lobby/${id}`);
-  //     subscriptionRef.current = null;
-  //   }
-  // };
+  const handleStartGame = () => {
+    if (!lobby || !stompClientRef.current) return;
 
-  return (
-    <div className="register-container">
-      {/* Dark overlay */}
-      <div className="overlay" />
+    stompClientRef.current?.publish({
+      destination: `/app/startGame/${String(lobby.lobbyId)}`,
+      body: "",
+    });
 
-      {/* Statue image */}
-      <Image
-        src="/images/waiting.png"
-        alt="Waiting for players"
-        className="waiting-image"
-        width={200}
-        height={400}
-      />
+    router.push(`/game/${lobby.lobbyId}`);
+  };
 
-      <h1 className="waiting-text">
-        Waiting for others to join to start the game...
-      </h1>
+  const handleLeaveLobby = () => {
+    if (subscriptionRef.current) {
+      subscriptionRef.current.unsubscribe();
+      subscriptionRef.current = null;
+    }
+    if (stompClientRef.current) {
+      stompClientRef.current.deactivate();
+      stompClientRef.current = null;
+    }
+    router.push("/home");
+  };
 
-      {/* Leave Lobby Button */}
-      {/* <Button
-            onClick={handleLeaveLobby}
-            style={{
-              position: "absolute",
-              bottom: "5rem",
-              right: "5rem",
-              borderRadius: "8px",
-            }}
-            
+  const isHost = useMemo(() => {
+    const myself = players.find((p) => p.username === username);
+    return lobby && myself?.userId === lobby.hostId;
+  }, [players, lobby, username]);
+
+  const rematchers = players;
+
+ return (
+  <div
+    className="register-container"
+    style={{
+      position: "relative",
+      color: "#f0f0f0",
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      padding: "2rem",
+      height: "100vh",
+    }}
+  >
+    {/* Host Left Popup */}
+    {hostLeft && (
+      <div
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          width: "100vw",
+          height: "100vh",
+          backgroundColor: "rgba(0, 0, 0, 0.85)",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          zIndex: 9999,
+          color: "#f5222d",
+          textAlign: "center",
+          padding: "2rem",
+        }}
+      >
+        <h2
+          style={{
+            backgroundColor: "rgba(0,0,0,0.6)",
+            padding: "1rem 2rem",
+            borderRadius: "0.5rem",
+            border: "1px solid #f5222d",
+            boxShadow: "0 0 8px rgba(245,34,45,0.7)",
+            marginBottom: "2rem",
+          }}
+        >
+          The host left the lobby.
+        </h2>
+        <p style={{ marginBottom: "2rem", color: "#fff", fontSize: "1.2rem" }}>
+          You will be redirected to the homepage.
+        </p>
+        <Button
+          type="primary"
+          onClick={handleLeaveLobby}
+          style={{
+            backgroundColor: "#f5222d",
+            borderColor: "#f5222d",
+            color: "#fff",
+            fontWeight: "bold",
+            borderRadius: "8px",
+            padding: "0.5rem 1.5rem",
+            boxShadow: "0 0 10px rgba(245,34,45,0.6)",
+          }}
+        >
+          Go to Home
+        </Button>
+      </div>
+    )}
+
+    {/* Rematch Failed Popup */}
+    {rematchFailed && (
+      <div
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          width: "100vw",
+          height: "100vh",
+          backgroundColor: "rgba(0, 0, 0, 0.85)",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          zIndex: 9999,
+          color: "#f5222d",
+          textAlign: "center",
+          padding: "2rem",
+        }}
+      >
+        <h2
+          style={{
+            backgroundColor: "rgba(0,0,0,0.6)",
+            padding: "1rem 2rem",
+            borderRadius: "0.5rem",
+            border: "1px solid #f5222d",
+            boxShadow: "0 0 8px rgba(245,34,45,0.7)",
+            marginBottom: "2rem",
+          }}
+        >
+          Rematch not possible!
+        </h2>
+        <p style={{ marginBottom: "2rem", color: "#fff", fontSize: "1.2rem" }}>
+          Not all users accepted the rematch.
+        </p>
+        <Button
+          type="primary"
+          onClick={handleLeaveLobby}
+          style={{
+            backgroundColor: "#f5222d",
+            borderColor: "#f5222d",
+            color: "#fff",
+            fontWeight: "bold",
+            borderRadius: "8px",
+            padding: "0.5rem 1.5rem",
+            boxShadow: "0 0 10px rgba(245,34,45,0.6)",
+          }}
+        >
+          Go to Home
+        </Button>
+      </div>
+    )}
+
+    {/* Loading while waiting for message */}
+    {loading && !rematchFailed && !hostLeft && (
+      <div
+        style={{
+          marginTop: "7rem",
+          fontSize: "1.25rem",
+          color: "##FFFFFF",
+          textShadow: "0 0 8px rgba(0,229,255,0.4)",
+        }}
+      >
+        Loading lobby info...
+      </div>
+    )}
+
+    {/* Game Info Section */}
+    {!loading && lobby && (
+      <>
+        <h2
+          style={{
+            margin: "7rem 0 0.5rem",
+            padding: "0.5rem 1rem",
+            borderRadius: "0.5rem",
+            backgroundColor: "rgba(0,0,0,0.6)",
+            color: "#00e5ff",
+            border: "1px solid #00e5ff",
+            boxShadow: "0 0 8px rgba(0,229,255,0.5)",
+            fontWeight: "normal",
+          }}
+        >
+          Game ID: {lobby.PIN ?? lobby.lobbyId} 🔗
+        </h2>
+
+        <p style={{ color: "#fff", marginBottom: "1rem" }}>
+          Rematchers: {rematchers.length}/4
+        </p>
+
+        <div
+          style={{
+            backgroundColor: "rgba(0,0,0,0.4)",
+            border: "1px solid #00e5ff",
+            borderRadius: "0.5rem",
+            padding: "1rem",
+            minWidth: "300px",
+            textAlign: "center",
+            marginBottom: "2rem",
+          }}
+        >
+          {rematchers.map((p) => (
+            <p key={p.userId} style={{ margin: "0.5rem 0", color: "#fff" }}>
+              {p.username} is ready
+            </p>
+          ))}
+        </div>
+
+        {isHost && (
+          <Button
+            type="primary"
+            onClick={handleStartGame}
+            disabled={rematchers.length < 4}
           >
-            Leave Lobby
-          </Button> */}
-    </div>
-  );
-}
+            Start Game
+          </Button>
+        )}
+      </>
+    )}
 
+    {/* Leave Button */}
+    <Button
+      onClick={handleLeaveLobby}
+      style={{
+        position: "absolute",
+        bottom: "5rem",
+        right: "5rem",
+        borderRadius: "8px",
+      }}
+    >
+      Leave Lobby
+    </Button>
+  </div>
+);
+
+};
+
+export default RematchPage;

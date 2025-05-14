@@ -20,91 +20,86 @@ const seatAnchors = [
   { left: "85%", top: "50%" }, // right
 ];
 
-
 const tableAnchor = { left: "50%", top: "50%" };
 
 export function MoveAnimator({ animation }: MoveAnimatorProps) {
   if (!animation) return null;
 
   const { seatIndex, playedCard, capturedCards } = animation;
-  const from = seatAnchors[seatIndex];
-  const to   = tableAnchor;
 
-  // timings
-  const flyDuration  = 1.0;
-  const holdDuration = 1.2;
-  const exitDuration = 0.8;
+  const from = seatAnchors[seatIndex];
+  const to = tableAnchor;
+
+  const flyDuration = 1.0;
+
+  const showOverlay = playedCard || capturedCards.length > 0;
 
   return (
-    <AnimatePresence>
-      {/* Fly in the played card from "from" → "to" */}
-      {playedCard && (
-        <motion.div
-          key={`play-${playedCard.suit}-${playedCard.value}`}
-          initial={{ ...from, opacity: 0, scale: 0.8 }}
-          animate={{ ...to,   opacity: 1, scale: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: flyDuration, ease: "easeOut" }}
-          style={{
-            position: "fixed",
-            transform: "translate(-50%, -50%)",
-            zIndex: 1000,
-            pointerEvents: "none",
-          }}
-        >
-          <CardComponent card={playedCard} />
-        </motion.div>
-      )}
+    <>
+      {/* Dark overlay behind animation */}
+      <AnimatePresence>
+        {showOverlay && (
+          <motion.div
+            key="overlay"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0.5 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            style={{
+              position: "fixed",
+              top: 0,
+              left: 0,
+              width: "100vw",
+              height: "100vh",
+              backgroundColor: "black",
+              zIndex: 900,
+              pointerEvents: "none",
+            }}
+          />
+        )}
+      </AnimatePresence>
 
-      {/* Show all cards together, scaled up & held */}
-      { (playedCard || capturedCards.length > 0) && (
-        <motion.div
-          key="highlight-group"
-          initial={{ ...to, scale: 1, opacity: 0 }}
-          animate={{ ...to, scale: 1.3, opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{
-            delay: flyDuration,
-            duration: holdDuration,
-            ease: "easeInOut",
-          }}
+      {/* Played card animation */}
+      <AnimatePresence>
+        {playedCard && (
+          <motion.div
+            key={`play-${playedCard.suit}-${playedCard.value}`}
+            initial={{ ...from, opacity: 0, scale: 0.2 }}
+            animate={{ ...to, opacity: 1, scale: 1.2 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: flyDuration, ease: "easeOut" }}
+            style={{
+              position: "fixed",
+              transform: "translate(-50%, -50%)",
+              zIndex: 1500,
+              pointerEvents: "none",
+            }}
+          >
+            <CardComponent card={playedCard} />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Captured cards layout */}
+      {capturedCards.length > 0 && (
+        <div
           style={{
             position: "fixed",
+            top: "50%",
+            left: "50%",
             transform: "translate(-50%, -50%)",
             display: "flex",
+            flexDirection: "row",
             gap: "12px",
-            zIndex: 995,
+            zIndex: 999,
             pointerEvents: "none",
           }}
         >
-          {playedCard && <CardComponent card={playedCard} />}
           {capturedCards.map((c, i) => (
-            <CardComponent key={`hold-${c.suit}-${c.value}-${i}`} card={c} />
+            <CardComponent key={`static-${c.suit}-${c.value}-${i}`} card={c} />
           ))}
-        </motion.div>
+        </div>
       )}
-
-      {/* 3) Fly the captured cards back out to "from" */}
-      {capturedCards.map((c, i) => (
-        <motion.div
-          key={`exit-${c.suit}-${c.value}-${i}`}
-          initial={{ ...to, scale: 1, opacity: 1 }}
-          animate={{ ...from, scale: 0.8, opacity: 0 }}
-          transition={{
-            delay: flyDuration + holdDuration + i * 0.1,
-            duration: exitDuration,
-            ease: "easeIn",
-          }}
-          style={{
-            position: "fixed",
-            transform: "translate(-50%, -50%)",
-            zIndex: 990,
-            pointerEvents: "none",
-          }}
-        >
-          <CardComponent card={c} />
-        </motion.div>
-      ))}
-    </AnimatePresence>
+    </>
   );
 }
