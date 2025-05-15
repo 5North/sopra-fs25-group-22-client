@@ -20,8 +20,8 @@
 
 ## 🧹Scopa for Beginners
 
-This repository only contains the code of the backend. For the frontend implementation, check out this
-[repo](https://github.com/5North/sopra-fs25-group-22-client).
+This repository only contains the code of the frontend. For the backend implementation, check out this
+[repo](https://github.com/5North/sopra-fs25-group-22-server).
 
 ## 📖 Table of Contents
 
@@ -70,7 +70,7 @@ that propose itself as an open source alternative to the usually paywalled or ad
 
 // TODO, see server and Sopra template readme
 
-### 🔨 Build and Develop
+### 🔨 How to Build and Develop
 
 
 ### 🪲 How to debug
@@ -78,7 +78,6 @@ that propose itself as an open source alternative to the usually paywalled or ad
 
 ### ✅  How to test
 
-Have a look here: https://www.baeldung.com/spring-boot-testing
 
 ### 💾 How to Deploy and Release
 
