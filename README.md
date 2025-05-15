@@ -113,6 +113,8 @@ Code releases are done at the end of each sprint by manually creating a GitHub r
 We would like to thank our tutor []() for his support and guidance during this course, as well as all the teaching and
 tutoring team of the Sopra course.
 
+// TODO credit images used (ML model) and other material used
+
 <h2 id="license">📜 License</h2>
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
