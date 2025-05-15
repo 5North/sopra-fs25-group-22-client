@@ -19,10 +19,12 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## 🧹Scopa for Beginners
+
 This repository only contains the code of the backend. For the frontend implementation, check out this
 [repo](https://github.com/5North/sopra-fs25-group-22-client).
 
 ## 📖 Table of Contents
+
 * [🗒️ Introduction](#introduction)
 * [💡 Technologies](#technologies)
 * [⚙️ High-Level Components](#high-level-components)
@@ -34,6 +36,7 @@ This repository only contains the code of the backend. For the frontend implemen
 * [📜 License](#license)
 
 <h2 id="introduction">🗒️ Introduction</h2>
+
 🧹**Scopa for Beginners**🧹 aims to bring the beloved traditional italian cards game [Scopa](https://en.wikipedia.org/wiki/Scopa)
 to an international audience by creating an accessible digital version of the 2 versus 2 variant. The goal of this project is to create a user and
 beginner-friendly application client-server to allow both newcomers and hardcore fans of the game to conveniently play
@@ -74,9 +77,11 @@ that propose itself as an open source alternative to the usually paywalled or ad
 
 
 ### ✅  How to test
+
 Have a look here: https://www.baeldung.com/spring-boot-testing
 
 ### 💾 How to Deploy and Release
+
 New contributions pushed to the main branch are continuously integrated and continuously deployed to Vercel using
 GitHub actions.
 
@@ -97,16 +102,19 @@ Code releases are done at the end of each sprint by manually creating a GitHub r
 <h2 id="authors--acknowledgments">🖋️ Authors & Acknowledgements</h2>
 
 ### Authors
+
 * [5North](https://github.com/5North)
 * [Stefano Benzoni](https://github.com/sbenzo99)
 * [Seyda Gündüz](https://github.com/Seydi89)
 * [Shellmy Chakkaith](https://github.com/shellmychakkaith)
 
 ### Acknowledgements
+
 We would like to thank our tutor []() for his support and guidance during this course, as well as all the teaching and
 tutoring team of the Sopra course.
 
 <h2 id="license">📜 License</h2>
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 This work is licensed under the MIT License - see the LICENSE.md file for details.
