@@ -30,7 +30,7 @@ This repository only contains the code of the backend. For the frontend implemen
 * [🛠️ Launch & Deployment](#launch--deployment)
 * [🏞️ Illustrations](#illustrations)
 * [🚀 Roadmap](#roadmap)
-* [🖋️ Authors & Acknowledgments](#authors--acknowledgements)
+* [🖋️ Authors & Acknowledgments](#authors--acknowledgments)
 * [📜 License](#license)
 
 <h2 id="introduction">🗒️ Introduction</h2>
@@ -94,7 +94,7 @@ Code releases are done at the end of each sprint by manually creating a GitHub r
 - Add language localization (IT, DE, FR ...)
 - Integrate Spring Security in the backend to improve users data security (e.g. passwords)
 
-<h2 id="authors--aknowledgments">🖋️ Authors & Acknowledgements</h2>
+<h2 id="authors--acknowledgments">🖋️ Authors & Acknowledgements</h2>
 
 ### Authors
 * [5North](https://github.com/5North)
