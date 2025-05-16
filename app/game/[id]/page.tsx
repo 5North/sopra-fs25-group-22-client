@@ -356,6 +356,12 @@ export default function GamePage() {
     setCaptureOptions([]);
   }, [gameState.currentPlayerId]);
 
+  useEffect(() => {
+    if (time !== null && time <= 1 && showAIPanel) {
+      setShowAIPanel(false);
+    }
+  }, [time, showAIPanel]);
+
   // Renders the capture options UI.
   const renderCaptureOptions = () => {
     console.log("-------render capture")
