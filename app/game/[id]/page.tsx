@@ -52,6 +52,9 @@ export default function GamePage() {
   const prevEmptyRef = useRef<boolean>(true);
   const timerIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const lastSeatIndexRef = useRef<number | null>(null);
+  const [finalCaptureMessage, setFinalCaptureMessage] = useState<string | null>(null);
+  const gameResultRef = useRef<GameResultDTO | null>(null);
+  const finalCaptureShownRef = useRef(false);
 
   const router = useRouter();
 
@@ -187,25 +190,21 @@ export default function GamePage() {
             //   console.log("rematchers: ", JSON.stringify(payload.lobby.rematchersIds))
             // } 
             } else if (payload.userId && payload.cards) {
-              console.log("Last card render", JSON.stringify(payload));
-            
-              let seatIndex = getSeatIndexByUserId(payload.userId);
-            
-              // fallback to last known seat index if not found
-              if (seatIndex === -1 && lastSeatIndexRef.current !== null) {
-                console.log("Using fallback seat index:", lastSeatIndexRef.current);
-                seatIndex = lastSeatIndexRef.current;
-              }
-            
-              setMoveAnimation({
-                playerId: payload.userId,
-                seatIndex: seatIndex as 0 | 1 | 2 | 3,
-                playedCard: null,
-                capturedCards: payload.cards,
-              });
+              const user = allUsers.find(u => u.id === payload.userId);
+              const username = user?.username || `User ${payload.userId}`;
+              console.log("@@@@@@@@@@LAST CARDS MESSAGE", payload)
+              setFinalCaptureMessage(`Last cards go to: ${username}`);
+              finalCaptureShownRef.current = true;
             
               setTimeout(() => {
-                setMoveAnimation(null);
+                setFinalCaptureMessage(null);
+                finalCaptureShownRef.current = false;
+            
+                // If result already arrived, now show it
+                if (gameResultRef.current) {
+                  setGameResult(gameResultRef.current);
+                  gameResultRef.current = null;
+                }
               }, 3000);
             } else {
               console.log("Lobby uncategorized message: ", JSON.stringify(payload))
@@ -232,33 +231,29 @@ export default function GamePage() {
               }));
             } else if (payload.outcome) {
               const resultData: GameResultDTO = JSON.parse(message.body);
-              console.log("Received game result:", resultData);
-              setTimeout(() => {
+
+              if (finalCaptureShownRef.current) {
+                gameResultRef.current = resultData;
+              } else {
                 setGameResult(resultData);
-              }, 3000);
+              }
             } else if (Array.isArray(payload) && payload.length > 0 && Array.isArray(payload[0])) {
               console.log(">>>>>>>>>>>><<<<<<<<<<<<<<<<<<Received capture options:", payload);
               setCaptureOptions(payload);
             } else if (payload.suggestion) {
               setSuggestion(payload.suggestion)
-            } else if (payload.remainingSeconds) {
-              console.log("⏱ Received timer:", payload.remainingSeconds);
-
-              setTimer(payload.remainingSeconds); // 1. Update time immediately
-
-              if (timerIntervalRef.current) {
-                clearInterval(timerIntervalRef.current);
-              }
-
-              timerIntervalRef.current = setInterval(() => {
-                setTimer(prev => {
-                  if (prev === null || prev <= 1) {
-                    clearInterval(timerIntervalRef.current!);
-                    return null;
-                  }
-                  return prev - 1;
-                });
-              }, 1000);
+            } else if (payload.userId && payload.cards) {
+              console.log("Received final capture for user", payload.userId);
+            
+              const user = allUsers.find(u => u.id === payload.userId);
+              const username = user?.username || `User ${payload.userId}`;
+            
+              setFinalCaptureMessage(`Last cards go to: ${username}`);
+            
+              // Hide the message after a delay
+              setTimeout(() => {
+                setFinalCaptureMessage(null);
+              }, 3000); 
             } else {
               console.log("Unknown message from queue: " + JSON.stringify(payload))
             }
@@ -577,6 +572,28 @@ export default function GamePage() {
             zIndex: 998,
           }}
         />
+      )}
+      {finalCaptureMessage && (
+        <div
+          style={{
+            position: "fixed",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            backgroundColor: "rgba(0,0,0,0.8)",
+            padding: "1.25rem 2rem",
+            borderRadius: "12px",
+            color: "#0ff",
+            border: "2px solid #0ff",
+            fontSize: "1.5rem",
+            fontFamily: "monospace",
+            boxShadow: "0 0 12px rgba(0,255,255,0.6), 0 0 24px rgba(0,255,255,0.3)",
+            zIndex: 1300,
+            animation: "fadeIn 0.5s ease-in-out",
+          }}
+        >
+          {finalCaptureMessage}
+        </div>
       )}
       {isMyTurn && renderCaptureOptions()}
       <div style={{ position: "relative", width: "100%", height: "100%" }}>
