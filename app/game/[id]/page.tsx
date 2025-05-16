@@ -144,7 +144,6 @@ export default function GamePage() {
           `/topic/lobby/${id}`,
           (message: IMessage) => {
             const payload = JSON.parse(message.body);
-
             // Ignore pure notification
             if (payload.success !== undefined && typeof payload.message === "string") {
               console.log("Lobby notification (ignored):", payload);
@@ -238,7 +237,7 @@ export default function GamePage() {
                 setGameResult(resultData);
               }, 3000);
             } else if (Array.isArray(payload) && payload.length > 0 && Array.isArray(payload[0])) {
-              console.log("Received capture options:", payload);
+              console.log(">>>>>>>>>>>><<<<<<<<<<<<<<<<<<Received capture options:", payload);
               setCaptureOptions(payload);
             } else if (payload.suggestion) {
               setSuggestion(payload.suggestion)
@@ -353,8 +352,13 @@ export default function GamePage() {
   };
 
   useEffect(() => {
-    setCaptureOptions([]);
-  }, [gameState.currentPlayerId]);
+    if (!gameState || !currentUserId) return;
+  
+    if (gameState.currentPlayerId !== currentUserId) {
+      setCaptureOptions([]);
+    }
+  }, [gameState?.currentPlayerId, currentUserId]);
+  
 
   useEffect(() => {
     if (time !== null && time <= 1 && showAIPanel) {
