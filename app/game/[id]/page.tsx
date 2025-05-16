@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { Client, IMessage, StompSubscription } from "@stomp/stompjs";
 import ScopaGameView from "@/components/ScopaGameView";
 import GameResultView from "@/components/GameResultView";
@@ -51,6 +51,9 @@ export default function GamePage() {
   const subscriptionRef = useRef<StompSubscription | null>(null);
   const prevEmptyRef = useRef<boolean>(true);
   const timerIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const lastSeatIndexRef = useRef<number | null>(null);
+
+  const router = useRouter();
 
   const getUserIdByUsername = (username: string): number | null => {
     const user = allUsers.find(u => u.username === username);
@@ -68,6 +71,22 @@ export default function GamePage() {
   };
 
   const currentUserId = getCurrentUserId();
+
+  const getSeatIndexByUserId = (targetUserId: number): number => {
+    const players = gameState?.players || [];
+    const meIndex = players.findIndex(p => p.userId === currentUserId);
+  
+    if (meIndex === -1) return -1;
+  
+    const seating = [...players.slice(meIndex), ...players.slice(0, meIndex)];
+    const seatIndex = seating.findIndex(p => p.userId === targetUserId);
+  
+    if (seatIndex !== -1) {
+      lastSeatIndexRef.current = seatIndex;
+    }
+  
+    return seatIndex;
+  };
 
   useEffect(() => {
     // ensure we actually have an array
@@ -165,8 +184,30 @@ export default function GamePage() {
                 players:         data.players,
                 currentPlayerId: data.currentPlayerId,
               }));
-            } else if (payload.lobby) {
-              console.log("rematchers: ", JSON.stringify(payload.lobby.rematchersIds))
+            // } else if (payload.lobby) {
+            //   console.log("rematchers: ", JSON.stringify(payload.lobby.rematchersIds))
+            // } 
+            } else if (payload.userId && payload.cards) {
+              console.log("Last card render", JSON.stringify(payload));
+            
+              let seatIndex = getSeatIndexByUserId(payload.userId);
+            
+              // fallback to last known seat index if not found
+              if (seatIndex === -1 && lastSeatIndexRef.current !== null) {
+                console.log("Using fallback seat index:", lastSeatIndexRef.current);
+                seatIndex = lastSeatIndexRef.current;
+              }
+            
+              setMoveAnimation({
+                playerId: payload.userId,
+                seatIndex: seatIndex as 0 | 1 | 2 | 3,
+                playedCard: null,
+                capturedCards: payload.cards,
+              });
+            
+              setTimeout(() => {
+                setMoveAnimation(null);
+              }, 3000);
             } else {
               console.log("Lobby uncategorized message: ", JSON.stringify(payload))
             }
@@ -195,7 +236,7 @@ export default function GamePage() {
               console.log("Received game result:", resultData);
               setTimeout(() => {
                 setGameResult(resultData);
-              }, 2000);
+              }, 3000);
             } else if (Array.isArray(payload) && payload.length > 0 && Array.isArray(payload[0])) {
               console.log("Received capture options:", payload);
               setCaptureOptions(payload);
@@ -219,21 +260,6 @@ export default function GamePage() {
                   return prev - 1;
                 });
               }, 1000);
-            } else if (payload.userId && Array.isArray(payload.handCards)) { // TODO: Change this to last cards message..
-              console.log("not implemented..!")
-              // TODO:
-              // const seatIndex = getSeatIndexByUserId(gameState.players, currentUserId, targetId);
-              // setMoveAnimation({
-              //   playerId: payload.userId,
-              //   seatIndex: seatIndex,
-              //   playedCard: null,
-              //   capturedCards: payload.handCards,
-              // });
-            
-              // // Clear animation after short delay
-              // setTimeout(() => {
-              //   setMoveAnimation(null);
-              // }, 1500);
             } else {
               console.log("Unknown message from queue: " + JSON.stringify(payload))
             }
@@ -326,8 +352,13 @@ export default function GamePage() {
     console.log("user id is in capture 2: " + currentUserId);
   };
 
+  useEffect(() => {
+    setCaptureOptions([]);
+  }, [gameState.currentPlayerId]);
+
   // Renders the capture options UI.
   const renderCaptureOptions = () => {
+    console.log("-------render capture")
     if (captureOptions.length === 0) return null;
     return (
       <div style={{ backgroundColor: "rgba(0,0,0,0.8)", padding: "1rem", position: "absolute", top: "10%", left: "50%", transform: "translateX(-50%)", borderRadius: "8px", zIndex: 999, color: "#fff" }}>
@@ -345,31 +376,22 @@ export default function GamePage() {
     );
   };
 
-
   useEffect(() => {
     if (!moveState) return;
-    const players = gameState?.players || [];
-
-    const meIndex = players.findIndex(p => p.userId === currentUserId);
-    const seating = meIndex >= 0
-      ? [...players.slice(meIndex), ...players.slice(0, meIndex)]
-      : players;
-
-    const activeSeatIndex = seating.findIndex(
-      p => p.userId === moveState.playerId
-    );
-
+  
+    const seatIndex = getSeatIndexByUserId(moveState.playerId);
+  
     setMoveAnimation({
       playerId: moveState.playerId,
-      seatIndex: activeSeatIndex as 0 | 1 | 2 | 3,
+      seatIndex: seatIndex as 0 | 1 | 2 | 3,
       playedCard: moveState?.playedCard || null,
       capturedCards: moveState?.pickedCards || [],
     });
-
+  
     const timeout = setTimeout(() => {
       setMoveAnimation(null);
     }, 1500);
-
+  
     return () => clearTimeout(timeout);
   }, [moveState, currentUserId, gameState?.players]);
 
@@ -407,6 +429,51 @@ export default function GamePage() {
       body: payload,
     });
   }
+  
+  if (!token) {
+    return (
+      <div
+        style={{
+          backgroundImage: 'url("/images/background.jpg")', // Replace with your actual image path
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+          minHeight: "100vh",
+          width: "100%",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+          textAlign: "center",
+          padding: "2rem",
+          color: "#fff",
+        }}
+      >
+        <h2 style={{ fontSize: "2.5rem", marginBottom: "1rem", textShadow: "0 0 10px #000" }}>
+          Unauthorized Access
+        </h2>
+        <p style={{ fontSize: "1.2rem", marginBottom: "2rem", textShadow: "0 0 6px #000" }}>
+          You must be logged in to access this game.
+        </p>
+        <Button
+          type="primary"
+          onClick={() => router.push("/login")}
+          style={{
+            backgroundColor: "#0ff",
+            color: "#000",
+            border: "none",
+            borderRadius: "8px",
+            padding: "0.75rem 1.5rem",
+            fontWeight: "bold",
+            fontSize: "1rem",
+            boxShadow: "0 0 8px rgba(0, 255, 255, 0.7), 0 0 16px rgba(0, 255, 255, 0.4)",
+          }}
+        >
+          Go to Login
+        </Button>
+      </div>
+    );
+  }
 
   if (gameResult) {
     return <GameResultView result={gameResult} onReturnHome={unsubscribeFromGame} 
@@ -435,6 +502,7 @@ export default function GamePage() {
     console.log("User is quitting the game");
     quitGame();
   };
+  
   
   return (
     <div style={{ backgroundColor: "blue", minHeight: "100vh" }}>
@@ -577,13 +645,25 @@ export default function GamePage() {
             zIndex: 1000,
           }}
         >
-          {suggestion ? (
-          suggestion.split(";").map((line, idx) => (
-            <div key={idx}>{line.trim()}</div>
-      ))
-    ) : (
-      <div><em>Waiting for suggestion...</em></div>
-    )}
+      {suggestion ? (
+        <>
+          <div style={{ fontWeight: "bold", marginBottom: "8px" }}>
+            Suggested moves from the AI:
+          </div>
+          <ul style={{ paddingLeft: "20px", margin: 0 }}>
+            {suggestion
+              .split(";")
+              .map((line, idx) => (
+                <li key={idx} style={{ marginBottom: "6px" }}>
+                  {line.trim()}
+                </li>
+              ))}
+          </ul>
+        </>
+      ) : (
+        <div><em>Waiting for suggestion...</em></div>
+      )}
+
         </div>
       )}
     </div>

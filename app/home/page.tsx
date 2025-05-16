@@ -138,6 +138,50 @@ const Home: React.FC = () => {
     }  
   };
   
+  if (!token) {
+    return (
+      <div
+        style={{
+          backgroundImage: 'url("/images/background.jpg")', // Replace with your actual image path
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+          minHeight: "100vh",
+          width: "100%",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+          textAlign: "center",
+          padding: "2rem",
+          color: "#fff",
+        }}
+      >
+        <h2 style={{ fontSize: "2.5rem", marginBottom: "1rem", textShadow: "0 0 10px #000" }}>
+          Unauthorized Access
+        </h2>
+        <p style={{ fontSize: "1.2rem", marginBottom: "2rem", textShadow: "0 0 6px #000" }}>
+          You must be logged in to access this game.
+        </p>
+        <Button
+          type="primary"
+          onClick={() => router.push("/login")}
+          style={{
+            backgroundColor: "#0ff",
+            color: "#000",
+            border: "none",
+            borderRadius: "8px",
+            padding: "0.75rem 1.5rem",
+            fontWeight: "bold",
+            fontSize: "1rem",
+            boxShadow: "0 0 8px rgba(0, 255, 255, 0.7), 0 0 16px rgba(0, 255, 255, 0.4)",
+          }}
+        >
+          Go to Login
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <div className="register-container" style={{ color: "white" }}>
@@ -166,10 +210,17 @@ const Home: React.FC = () => {
         {/* Left: welcome + stats */}
         <div style={{ flex: 1, maxWidth: "300px",margin: '0 auto', padding: '0.5rem', backgroundColor: 'rgba(0, 0, 0, 0.8)',
             borderRadius: '8px',}}>
-          <h2 style={{ fontSize: "1.5rem", margin: 0 , paddingTop: "0.5rem",  lineHeight: 3,}}>
-            Welcome back, <strong style={{ color: "#FFA726" }}>{username}</strong>!
-          </h2>
-          <p>Here are your current stats:</p>
+        <h2
+          style={{
+            fontSize: "1.5rem",
+            margin: 0,
+            paddingTop: "0.5rem",
+            lineHeight: 1.2, // tighter line spacing for just this line
+          }}
+        >
+          Welcome back, <strong style={{ color: "#FFA726" }}>{username}</strong>!
+        </h2>
+          <p style={{ marginTop: "2rem" }}>Here are your current stats:</p>
           <ul style={{ listStyle: "none", paddingTop: "0.7rem", fontSize: "1.1rem" }}>
             <li> Wins: {stats.winCount} </li>
             <li>Losses: {stats.lossCount}</li>

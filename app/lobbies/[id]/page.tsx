@@ -171,6 +171,51 @@ const LobbyPage: React.FC = () => {
     return players.find(p => p.userId === firstId)?.username || "";
   }, [lobby, players]);
 
+  if (!token) {
+    return (
+      <div
+        style={{
+          backgroundImage: 'url("/images/background.jpg")', // Replace with your actual image path
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+          minHeight: "100vh",
+          width: "100%",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+          textAlign: "center",
+          padding: "2rem",
+          color: "#fff",
+        }}
+      >
+        <h2 style={{ fontSize: "2.5rem", marginBottom: "1rem", textShadow: "0 0 10px #000" }}>
+          Unauthorized Access
+        </h2>
+        <p style={{ fontSize: "1.2rem", marginBottom: "2rem", textShadow: "0 0 6px #000" }}>
+          You must be logged in to access this game.
+        </p>
+        <Button
+          type="primary"
+          onClick={() => router.push("/login")}
+          style={{
+            backgroundColor: "#0ff",
+            color: "#000",
+            border: "none",
+            borderRadius: "8px",
+            padding: "0.75rem 1.5rem",
+            fontWeight: "bold",
+            fontSize: "1rem",
+            boxShadow: "0 0 8px rgba(0, 255, 255, 0.7), 0 0 16px rgba(0, 255, 255, 0.4)",
+          }}
+        >
+          Go to Login
+        </Button>
+      </div>
+    );
+  }
+
   if (error) {
     return (
       <div className="register-container">
