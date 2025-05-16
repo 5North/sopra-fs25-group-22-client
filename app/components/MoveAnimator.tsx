@@ -81,7 +81,7 @@ export function MoveAnimator({ animation }: MoveAnimatorProps) {
       </AnimatePresence>
 
       {/* Captured cards layout */}
-      {capturedCards.length > 0 && (
+      {playedCard && capturedCards.length > 0 && (
         <div
           style={{
             position: "fixed",
@@ -100,6 +100,30 @@ export function MoveAnimator({ animation }: MoveAnimatorProps) {
           ))}
         </div>
       )}
+      
+      <AnimatePresence>
+        {!playedCard && capturedCards.length > 0 && (
+          <motion.div
+            key="captured-fly"
+            initial={{ ...from, opacity: 0, scale: 0.6 }}
+            animate={{ ...to, opacity: 1, scale: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: flyDuration }}
+            style={{
+              position: "fixed",
+              transform: "translate(-50%, -50%)",
+              display: "flex",
+              gap: "12px",
+              zIndex: 1500,
+              pointerEvents: "none",
+            }}
+          >
+            {capturedCards.map((card, i) => (
+              <CardComponent key={`cap-${card.suit}-${card.value}-${i}`} card={card} />
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 }

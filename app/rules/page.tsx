@@ -14,6 +14,7 @@ const ScopaInstructions: React.FC = () => {
   const router = useRouter();
   const headerColor = '#0ff';
   
+  
   return (
     <>
     <div className="register-container" 

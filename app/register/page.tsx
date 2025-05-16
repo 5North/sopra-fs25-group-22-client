@@ -84,13 +84,17 @@ const Register: React.FC = () => {
         // layout="horizontal"
         layout="vertical"
       >
-        <Form.Item
-          name="username"
-          label="Username"
-          rules={[{ required: true, message: "Please enter your username!" }]}
-        >
-          <Input placeholder="Enter username" />
-        </Form.Item>
+      <Form.Item
+        name="username"
+        label="Username"
+        rules={[
+          { required: true, message: "Please enter your username!" },
+          { max: 15, message: "Username must be less than 15 characters." },
+        ]}
+      >
+        <Input placeholder="Enter username" maxLength={15} />
+      </Form.Item>
+
         <Form.Item
           name="password"
           label="Password"
