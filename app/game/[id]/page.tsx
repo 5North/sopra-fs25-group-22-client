@@ -629,7 +629,7 @@ export default function GamePage() {
       </div>
 
       {/* Suggestion Panel */}
-      {showAIPanel && (
+      {showAIPanel && isMyTurn && (
         <div
           style={{
             position: "fixed",
