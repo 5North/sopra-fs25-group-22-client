@@ -242,7 +242,25 @@ export default function GamePage() {
               setCaptureOptions(payload);
             } else if (payload.suggestion) {
               setSuggestion(payload.suggestion)
-            } else if (payload.userId && payload.cards) {
+            } else if (payload.remainingSeconds) {
+              console.log("⏱ Received timer:", payload.remainingSeconds);
+
+              setTimer(payload.remainingSeconds); // 1. Update time immediately
+
+              if (timerIntervalRef.current) {
+                clearInterval(timerIntervalRef.current);
+              }
+
+              timerIntervalRef.current = setInterval(() => {
+                setTimer(prev => {
+                  if (prev === null || prev <= 1) {
+                    clearInterval(timerIntervalRef.current!);
+                    return null;
+                  }
+                  return prev - 1;
+                });
+              }, 1000);}
+            else if (payload.userId && payload.cards) {
               console.log("Received final capture for user", payload.userId);
             
               const user = allUsers.find(u => u.id === payload.userId);
