@@ -26,6 +26,7 @@ const Home: React.FC = () => {
   const { clear: clearUsername } = useLocalStorage<string>("username", "");
   const { value: username } = useLocalStorage<string>("username", "");
   const { value: userIdStr } = useLocalStorage<string>("userId", "");
+  const { clear: clearUserIdStr } = useLocalStorage<string>("userId", "");
   const userId = Number(userIdStr);
   const [stats, setStats] = useState<
     Pick<UserStats, "winCount" | "lossCount" | "tieCount">
@@ -129,7 +130,7 @@ const Home: React.FC = () => {
 
       clearToken();
       clearUsername();
-      router.push("/login");
+      clearUserIdStr();
     } catch (error) {
       if (error instanceof Error) {
         alert(`Oopps.. Something went wrong!` + error);
@@ -148,7 +149,7 @@ const Home: React.FC = () => {
     return (
       <div
         style={{
-          backgroundImage: 'url("/images/background.jpg")', // Replace with your actual image path
+          // backgroundImage: 'url("/images/background.jpg")', // Replace with your actual image path
           backgroundSize: "cover",
           backgroundPosition: "center",
           backgroundRepeat: "no-repeat",
