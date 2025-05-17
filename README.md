@@ -1,387 +1,219 @@
-# Getting Started
+<p align="center">
+  <img src="public/images/readme.png" alt="Project preview" />
+</p>
 
-### MacOS, Linux and WSL
 
-If you are using MacOS, Linux or WSL(Windows-Subsystem-Linux), you can skip
-directly to the
-[installation part](https://github.com/HASEL-UZH/sopra-fs25-template-client?tab=readme-ov-file#installation)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=5North_sopra-fs25-group-22-server&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=5North_sopra-fs25-group-22-server)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=5North_sopra-fs25-group-22-server&metric=coverage)](https://sonarcloud.io/summary/new_code?id=5North_sopra-fs25-group-22-server)
+![CI/CD](https://img.shields.io/github/actions/workflow/status/5north/sopra-fs25-group-22-server/main.yml?label=CI%2FCD)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-### Windows
+## 🧹Scopa for Beginners
 
-If you are using Windows, you first need to install
-WSL(Windows-Subsystem-Linux). You might need to reboot your computer for the
-installation, therefore, save and close all your other work and programs
+This repository only contains the code of the frontend. For the backend implementation, check out this 
+[repo](https://github.com/5North/sopra-fs25-group-22-server).
 
-1. Download the following [powershell script](./windows.ps1)\
-   ![downloadWindowsScript](https://github.com/user-attachments/assets/1ed16c0d-ed8a-42d5-a5d7-7bab1ac277ab)
+## 📖 Table of Contents
 
----
-2. Open a new powershell terminal **with admin privileges** and run the following command and follow the instructions. Make sure that you open the powershell terminal at the path where you have downloaded the powershell script, otherwise the command will not work because it can not find the script. You can list currently accessible files in the powershell terminal with ```dir``` and you can use ```cd``` to navigate between directories
-   ```shell
-   C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -ExecutionPolicy Bypass -File .\windows.ps1
-   ```
----
+* [🗒️ Introduction](#introduction)
+* [💡 Technologies](#technologies)
+* [⚙️ High-Level Components](#high-level-components)
+    * [Rest](#rest)
+    * [Websocket](#websocket)
+    * [Database](#database)
+    * [Service](#service)
+    * [Game Logic](#game-logic)
+    * [Ai Assistance](#ai-assistance)
+* [🛠️ Launch & Deployment](#launch--deployment)
+* [🚀 Roadmap](#roadmap)
+* [🖋️ Authors & Acknowledgments](#authors--acknowledgments)
+* [📜 License](#license)
 
-3. If you experience any issues, try re-running the script a couple of times. If
-   the installation remains unsuccessful, follow this
-   [youtube tutorial](https://youtu.be/GIYOoMDfmkM) or post your question in the
-   OLAT forum
+<h2 id="introduction">🗒️ Introduction</h2>
 
----
-4. After successful installation, you can open WSL/Ubuntu. You will need to choose a username and password, although no characters will be shown on the screen when typing the password but the system recognizes your input, no worries :) After these four steps your setup should look similar to this
-![initialUbuntuScreen](https://github.com/user-attachments/assets/a2b1511f-943b-468e-a726-b7a9dc46ea2c)
-<br>
-<br>
-<br>
-# Installation
-1. Open a new MacOS, Linux or WSL(Windows-Subsystem-Linux) terminal. Make sure you have git installed, you can check that by running
-   ```shell
-   git --version
-   ```
-   The output should be something similar to ```git version X.XX.X```, if not, try to install git in one of the following ways
-   #### MacOS
-   ```shell
-   brew install --formulae git
-   ```
-   #### Linux/WSL
-   ```shell
-   sudo apt-get install git
-   ```
-   If you are not using Ubuntu, you will need to install git with your package manager of choice
----
+🧹**Scopa for Beginners**🧹 aims to bring the beloved traditional italian cards game [Scopa](https://en.wikipedia.org/wiki/Scopa) 
+to an international audience by creating an accessible digital version of the 2 versus 2 variant. The goal of this project is to create a user and 
+beginner-friendly application client-server to allow both newcomers and hardcore fans of the game to conveniently play 
+Scopa in their browser. To make it easier for beginners to learn the rules and achieve some flow, an integrated LLM 
+assistant can suggest some possible options to play if help requested by the player. Real time communication via Websockets
+allows to play this timeless classic with your friends without noticeable hiccups on a simple and no-fuss application,
+that propose itself as an open source alternative to the usually paywalled or ads-filled commercial versions. 
 
-2. Clone the repository with git using the following command
-   ```shell
-   git clone https://github.com/YOUR_USERNAME/YOUR-CLIENT-REPO
-   ```
+<h2 id="technologies">💡 Technologies</h2>
 
----
-3. Navigate to the cloned directory in the terminal, in example with ```cd sopra-fs25-student-client```
----
+* [Typescript](https://www.typescriptlang.org/) - Static typing and compiles to plain JavaScript
+* [CSS](https://sass-lang.com/) - stylesheet language used to describe the presentation of HTML and XML documents.
+* [React](https://react.dev/) - JavaScript library for building declarative, component-based user interfaces.
+* [STOMP](https://stomp-js.github.io/stomp-websocket/) - Text oriented protocol over WebSocket
+* [SonarQube](https://www.sonarsource.com/products/sonarqube/) - open-source platform for continuous inspection of code quality.
+* [Figma](https://www.figma.com/) - browser-based tool for interface design and prototyping with real-time collaboration.
 
-4. Inside the repository folder (with `ls` you can list files) there is a bash
-   script _setup.sh_ that will install everything you need, according to the
-   system you are using. Run the following command and follow the instructions
-   ```shell
-   source setup.sh
-   ```
 
-The screenshot below shows an example of how this looks
-![sourceScript](https://github.com/user-attachments/assets/2560320a-93ec-4086-994d-f3a0eed53c7b)
+<h2 id="high-level-components">⚙️ High-level components</h2>
 
-The installation script _setup.sh_ can take a few minutes, please be patient and
-do not abort the process. If you encounter any issues, please close the terminal
-and open a new one and try to run the command again
+### Registration, Login and Home
 
-<br>
-<br>
-<br>
+The first page displayed when visiting our deployed [Website] (https://sopra-fs25-group-22-client.vercel.app), allows to [register as a user] (https://github.com/5North/sopra-fs25-group-22-client/blob/main/app/register/page.tsx), or [log in](https://github.com/5North/sopra-fs25-group-22-client/blob/main/app/login/page.tsx) if an account was already created. 
 
-# Troubleshooting the installation
+In the [homepage](https://github.com/5North/sopra-fs25-group-22-client/blob/main/app/home/page.tsx), the users see their own statistics (wins, losses and ties), as well as the options to start a game, join an existing lobby, view the ranking over all registered users and the Rules. 
 
-If the four steps above did not work for you and re-running the setup.sh script
-a couple of times did not help, try running the following steps manually
+### Lobby
+When a users starts a game, they get redirected to the [lobbypage] (https://github.com/5North/sopra-fs25-group-22-client/blob/main/app/lobbies/%5Bid%5D/page.tsx), where a Game ID consisting of 4 digits is displayed and is to be shared with other users, to play Scopa together. 
 
-1. Open a new MacOS, Linux or WSL(Windows-Subsystem-Linux) terminal and navigate
-   to the repository with `cd`. Then ensure that curl is installed
-   ```shell
-   curl --version
-   ```
-   The output should be something similar to `curl X.X.X`, if not, try to
-   install curl in one of the following ways
-   #### MacOS
-   ```shell
-   brew install --formulae curl
-   ```
-   #### Linux/WSL
-   ```shell
-   sudo apt-get install curl
-   ```
-   If you are not using Ubuntu, you will need to install curl with your package
-   manager of choice
+A [joining] (https://github.com/5North/sopra-fs25-group-22-client/blob/main/app/join/page.tsx) user can enter the Game ID via 'Join a Game'.
+All players in the same lobby can see who enters and leaves the lobby, as well as who which 2 players are in the same team.
 
----
-2. Download Determinate Nix
-   ```shell
-   curl --proto '=https' --tlsv1.2 -ssf --progress-bar -L https://install.determinate.systems/nix -o install-nix.sh
-   ```
----
+The Host can only start a game, when there are 4 players in the lobby.
 
-3. Install Determinate Nix
-   ```shell
-   sh install-nix.sh install --determinate --no-confirm --verbose
-   ```
+### Game
+After the Host starts the game, all players from the lobby get redirected to the [game] (https://github.com/5North/sopra-fs25-group-22-client/blob/main/app/game/%5Bid%5D/page.tsx). 
 
----
-4. Install direnv using nix
-   ```shell
-   nix profile install nixpkgs#direnv
-   ```
-   If you encounter a permission error, try running with sudo
-   ```shell
-   sudo nix profile install nixpkgs#direnv
-   ```
----
+In the [gameview](https://github.com/5North/sopra-fs25-group-22-client/blob/main/app/components/ScopaGameView.tsx) each players is only able to see their own cards on the bottom, and the cards on the table. When hovering over these cards, the value and suit of the card is displayed. The cards of the other players are upside down. 
 
-5. Find out what shell you are using
-   ```shell
-   echo $SHELL
-   ```
+Team mates are displayed to the opposite of each other.
 
----
-6. Hook direnv into your shell according to [this guide](https://github.com/direnv/direnv/blob/master/docs/hook.md)
----
+A neon green dot next to a players name, signals to all players whose turn it is. 
 
-7. Allow direnv to access the repository
-   ```shell
-   direnv allow
-   ```
+On the top to the right an AI button is visible, which can only be clicked by the player, if its their turn. This allos the player to get suggestions on what next move to play.
 
-If all troubleshooting steps above still did not work for you, try the following
-as a **last resort**: Open a new terminal and navigate to the client repository
-with `cd`. Run the command. Close the terminal again and do this for each of the
-six commands above, running each one in its own terminal, one after the other.
+A timer counting down from 30 seconds, shows how long the current player has, to make his play. If the user does not click on any card, a random card of their deck is choosen and played.
 
-<br>
-<br>
-<br>
+Whenever a players does scopa (clears the table), an animation is displayed to all users. In addition, the counter next to the players who did scopa, adds +1.
 
-# Available commands after successful installation
+Each user can quit the game at any time and leave the game. 
 
-With the installation steps above your system now has all necessary tools for
-developing and running the sopra frontend application. Amongst others, two
-javascript runtimes have been installed for running the app:
+### Game Result
+After a game has ended, the [results] (https://github.com/5North/sopra-fs25-group-22-client/blob/main/app/components/GameResultView.tsx) are displayed to each user with the breakdown of their team and the opponent teams breakdown according to the scoring rules. 
 
-- [NodeJS](https://nodejs.org)
-- [Deno](https://deno.com)
+The players have the option to either leave the lobby and 'Return to Home', which will redirect the user to the homepage.
 
-Runtimes is what your system needs to compile
-[typescript](https://www.typescriptlang.org) code (used in this project) to
-javascript and execute the application. You can use either runtime for this
-project, according to your preference. Both come with an included package
-manager, `npm` for nodejs and `deno` for deno. Thereby, the
-[package.json](./package.json) file defines possible commands that can be
-executed (using either `deno` or `npm`). The following commands are available in
-this repository:
+If a player wants a [rematch] (https://github.com/5North/sopra-fs25-group-22-client/blob/main/app/rematch/%5Bid%5D/page.tsx), they get redirect to the rematch page. Players who choose to have a rematch, are able to see other players, who have aso choosen to have a reamtch. 
+Again, if there are 4 players, the host can start a new game.
 
-1. **Running the development server** - This will start the application in
-   development mode, meaning that changes to the code are instantly visible live
-   on [http://localhost:3000](http://localhost:3000) in the browser
-   ```bash
-   deno task dev
-   ```
-2. **Building a production-ready application** - This will create an optimized
-   production build that is faster and takes up less space. It is a static
-   build, meaning that changes to the code will only be included when the
-   command is run again
-   ```bash
-   deno task build
-   ```
-3. **Running the production application** - This will start the optimized
-   production build and display it on
-   [http://localhost:3000](http://localhost:3000) in the browser. This command
-   can only be run _after_ a production build has been created with the command
-   above and will not preview live code changes
-   ```bash
-   deno task start
-   ```
-4. **Linting the entire codebase** - This command allows to check the entire
-   codebase for mistakes, errors and warnings
-   ```bash
-   deno task lint
-   ```
-5. **Formatting the entire codebase** - This command will ensure that proper
-   indentation, spacing and further styling is applied to the code. This ensures
-   that the code looks uniform and the same across your team members, it is best
-   to run this command _every time before pushing changes to your repository_!
-   ```bash
-   deno task fmt
-   ```
+### Rules
+User are able to view the [rules] (https://github.com/5North/sopra-fs25-group-22-client/blob/main/app/rules/page.tsx) of Scopa, to better understand on how to play the game. 
+The rulespage include, game setup, turn flow, capture rules and scenarios, scoring rules, end-of-game process and finally a display of Napoletane cards.
 
-All of the above mentioned commands can also be run using the nodejs runtime by
-substituting `deno task` with `npm run`, i.e
 
-```bash
-npm run dev
-```
+<h2 id="launch--deployment">🛠️ Launch & Deployment</h2>
 
-<br>
-<br>
-<br>
+### Prerequisites and Installation
+For your local development environment, you will need Node.js.\
+We urge you to install the exact version **v20.11.0** which comes with the npm package manager. You can download it [here](https://nodejs.org/download/release/v20.11.0/).\
+If you are confused about which download to choose, feel free to use these direct links:
 
-# Docker
+- **MacOS:** [node-v20.11.0.pkg](https://nodejs.org/download/release/v20.11.0/node-v20.11.0.pkg)
+- **Windows 32-bit:** [node-v20.11.0-x86.msi](https://nodejs.org/download/release/v20.11.0/node-v20.11.0-x86.msi)
+- **Windows 64-bit:** [node-v20.11.0-x64.msi](https://nodejs.org/download/release/v20.11.0/node-v20.11.0-x64.msi)
+- **Linux:** [node-v20.11.0.tar.xz](https://nodejs.org/dist/v20.11.0/node-v20.11.0-linux-x64.tar.xz) (use this [installation guide](https://github.com/nodejs/help/wiki/Installation#how-to-install-nodejs-via-binary-archive-on-linux) if you are new to Linux)
 
-### Introduction
-This year, for the first time, Docker will be used to ease the process of deployment.\
-Docker is a tool that uses containers as isolated environments, ensuring that the application runs consistently and uniformly across different devices.\
-Everything in this repository is already set up to minimize your effort for deployment.\
-All changes to the main branch will automatically be pushed to dockerhub and optimized for production.
+If you happen to have a package manager the following commands can be used:
 
-### Setup
-1. **One** member of the team should create an account on [dockerhub](https://hub.docker.com/), _incorporating the group number into the account name_, for example, `SoPra_group_XX`.\
-2. This account then creates a repository on dockerhub with the _same name as the group's Github repository name_.\
-3. Finally, the person's account details need to be added as [secrets](https://docs.github.com/en/actions/security-guides/using-secrets-in-github-actions#creating-secrets-for-a-repository) to the group's repository:
-    - dockerhub_username (the username of the dockerhub account from step 1, for example, `SoPra_group_XX`)
-    - dockerhub_password (a generated PAT([personal access token](https://docs.docker.com/docker-hub/access-tokens/)) of the account with read and write access)
-    - dockerhub_repo_name (the name of the dockerhub repository from step 2)
+- **Homebrew:** `brew install node@20.11.0`
+- **Chocolatey:** `choco install nodejs-lts --version=20.11.0`
 
-### Pull and run
-Once the image is created and has been successfully pushed to dockerhub, the image can be run on any machine.\
-Ensure that [Docker](https://www.docker.com/) is installed on the machine you wish to run the container.\
-First, pull (download) the image with the following command, replacing your username and repository name accordingly.
+After the installation, update the npm package manager to **10.4.0** by running ```npm install -g npm@10.4.0```\
+You can ensure the correct version of node and npm by running ```node -v``` and ```npm --version```, which should give you **v20.11.0** and **10.4.0** respectively.\
+Before you start your application for the first time, run this command to install all other dependencies, including React:
 
-```docker pull <dockerhub_username>/<dockerhub_repo_name>```
+```npm install```
 
-Then, run the image in a container with the following command, again replacing _<dockerhub_username>_ and _<dockerhub_repo_name>_ accordingly.
+Next, you can start the app with:
 
-```docker run -p 3000:3000 <dockerhub_username>/<dockerhub_repo_name>```
+```npm run dev```
 
-<br>
-<br>
-<br>
+Now you can open [http://localhost:3000](http://localhost:3000) to view it in the browser.\
+Notice that the page will reload if you make any edits. You will also see any lint errors in the console (use a Chrome-based browser).\
+The client will send HTTP requests to the server which can be found [here](https://github.com/HASEL-UZH/sopra-fs24-template-server).\
+In order for these requests to work, you need to install and start the server as well.
 
-# Installing additional software by modifying [flake.nix](./flake.nix)
+#### Testing
+Testing is optional, and you can run the tests with `npm run test`\
+This launches the test runner in an interactive watch mode.\
+See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
-As this project uses Determinate Nix for managing development software,
-installing additional tools you might need is straightforward. You only need to
-adjust the section `nativeBuildInputs = with pkgs;` in the
-[nix flake](./flake.nix) with the package you would like to install. For
-example, if you want to use docker (the [Dockerfile](./Dockerfile) and
-[.dockerignore](./.dockerignore) are already included in this repo) you can
-simply add:
+> For macOS user running into a 'fsevents' error: https://github.com/jest-community/vscode-jest/issues/423
 
-```nix
-nativeBuildInputs = with pkgs;
-  [
-    nodejs
-    git
-    deno
-    watchman
-    docker ### <- added docker here
-  ]
-  ++ lib.optionals stdenv.isDarwin [
-    xcodes
-  ]
-  ++ lib.optionals (system == "aarch64-linux") [
-    qemu
-  ];
-```
+#### Build
+Finally, `npm run build` builds the app for production to the `build` folder.<br>
+It correctly bundles React in production mode and optimizes the build for the best performance:\
+The build is minified, and the filenames include hashes.<br>
 
-and add the package path to the `shellHook''` section
+See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
-```nix
-        devShells.default = pkgs.mkShell {
-          inherit nativeBuildInputs;
+<h2 id="illustrations">Illustrations</h2>
 
-          shellHook = ''
-            export HOST_PROJECT_PATH="$(pwd)"
-            export COMPOSE_PROJECT_NAME=sopra-fs25-template-client
-            
-            export PATH="${pkgs.nodejs}/bin:$PATH"
-            export PATH="${pkgs.git}/bin:$PATH"
-            export PATH="${pkgs.deno}/bin:$PATH"
-            export PATH="${pkgs.watchman}/bin:$PATH"
-            export PATH="${pkgs.docker}/bin:$PATH" ### <- added docker path here
-            
-            ### rest of code ###
-        };
-```
+<p align="center">
+  <img src="public/images/register-login.png" alt="Register-and-Login" />
+</p>
 
-and finally do `direnv reload` in your terminal inside the repository folder. If
-you need a specific version of a package, you can override it in the `overlays`
-section
+This is the first page that appears when following the the [link](https://sopra-fs25-group-22-client.vercel.app)
 
-```nix
-overlays = [
-  (self: super: {
-    nodejs = super.nodejs_23; ### <- changed to nodejs 23
-  })
-];
-```
+<p align="center">
+  <img src="public/images/home.png" alt="Home" />
+</p>
 
-<br>
-<br>
-<br>
+After successfully registering or logginf into an account the homepage is displayed.
 
-# Miscellaneous
+<p align="center">
+  <img src="public/images/start-game.png" alt="Starting game" />
+</p>
 
-This project uses
-[`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts)
-to automatically optimize and load [Geist](https://vercel.com/font), a new font
-family for Vercel.
+After creating a game, the game ID and the joined players are displayed.
 
-## Learn More
+<p align="center">
+  <img src="public/images/join.png" alt="Joining Game" />
+</p>
 
-To learn more about Next.js, take a look at the following resources:
+The players can enter the game ID to join an existing lobby
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js
-  features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+<p align="center">
+  <img src="public/images/game.png" alt="Game" />
+</p>
 
-You can check out
-[the Next.js GitHub repository](https://github.com/vercel/next.js) - your
-feedback and contributions are welcome!
+After the host starts the game, all players get redirected to the game.
 
-## Deploy on Vercel
+<p align="center">
+  <img src="public/images/gameresult.png" alt="Gameresult" />
+</p>
 
-The easiest way to deploy your Next.js app is to use the
-[Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme)
-from the creators of Next.js.
+When the game has ended, the breakdown of the game is displayed.
 
-Check out our
-[Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying)
-for more details.
+<p align="center">
+  <img src="public/images/rules.png" alt="Rules" />
+</p>
 
-## Windows users
+For Beginners to understand on how to play the game, all the rules and information can be viewed here.
 
-Please ensure that the repository folder is inside the WSL2 filesystem
-(otherwise, the disk IO performance will be horrible). If you followed the
-tutorial closely, this is already the case. If for whatever reason you deviated
-from the instructions, please take the time now to ensure the repo is on the WSL
-filesystem. You can do this either by
 
-1. _Cloning the repository again with git in a WSL/Ubuntu terminal using the
-   following command and deleting the repository on the windows filesystem_
-   ```shell
-   git clone https://github.com/HASEL-UZH/sopra-fs25-template-client
-   ```
-2. _Using the Windows explorer to move the repository from the windows
-   filesystem to WSL filesystem_ In the left overview of all folders and drives
-   there should be a new filesystem called Linux (also check in the network
-   tab). Open the Linux drive and open the folder named "home", followed by your
-   username. Copy the whole repository folder from your current location to the
-   Linux folder /home/your-username (note that the folder will initially be
-   empty). Finally, delete the folder from your current location such that you
-   only have the folder inside the Linux filesystem.
-3. _Using the command line in WSL to move the repo_ Open a new Ubuntu / WSL2
-   terminal window. This will automatically open your home folder of the Linux
-   file system. You then need to locate where the repository / folder that you
-   have downloaded resides. You can use the `cp -ar` command to copy the folder
-   from the Windows drive to the Linux filesystem. The command takes the
-   following arguments: cp **source_file** _target_file_. Thus we need to
-   specify **source_file** the folder we want to copy from Windows filesystem
-   and the _target_file_ where to copy the folder to in the Linux filesystem. As
-   visible in this screenshot
-   ![copyFolderToUbuntu](https://github.com/user-attachments/assets/d483e495-e3af-4e85-929c-61dce1a39e10)
-   the repository folder resides under the C drive in /mnt/c/. If your file is
-   not on your C drive, the folder path will be something like /mnt/d/. In the
-   screenshot, the downloaded repository folder is in the Downloads folder of
-   the current user on the C drive, thus the path for **source_file** is
-   `/mnt/c/Users/immol/Downloads`. The terminal in the screenshot is currently
-   in the home directory, indicated by ~ in the path in blue. As we want to copy
-   the folder to the home folder (/home/your-username) we can specify the
-   current directory (.) as the _target_file_, thus the dot at the end of the
-   command. If you happen to not be in the home folder, you can also run the
-   command with explicitly copying to the home folder as such:
-   ```bash
-   cp -ar /mnt/c/your-path /home/your-username
-   ```
-   Else you can run
-   ```bash
-   cp -ar /mnt/c/your-path .
-   ```
-   with . indicating to copy to the current path (in this case your home
-   folder). You can check if the repository was successfully copied over using
-   `ls` to list folders and files, as visible in the screenshot. You can then
-   delete the downloaded folder / repository from the Windows filesystem in the
-   explorer.
+<h2 id="roadmap">🚀 Roadmap</h2>
+
+- Implement a 1 versus 1 game mode
+- Add the option to choose teams in the 2 versus 2 game.
+- Add more encouragement messages
+- Add language localization (IT, DE, FR ...)
+- Implement to choose from different card decks
+- Smoother movement of cards while playing
+
+<h2 id="authors--acknowledgments">🖋️ Authors & Acknowledgements</h2>
+
+### Authors
+
+* [5North](https://github.com/5North)
+* [Stefano Benzoni](https://github.com/sbenzo99)
+* [Seyda Gündüz](https://github.com/Seydi89)
+* [Shellmy Chakkaith](https://github.com/shellmychakkaith)
+
+### Acknowledgements
+
+We would like to thank our tutor []() for his support and guidance during this course, as well as all the teaching and 
+tutoring team of the Sopra course.
+
+<h2 id="license">📜 License</h2>
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+This work is licensed under the MIT License - see the LICENSE.md file for details.
+
+The project is based on the [sopra-fs25-template-client](https://github.com/HASEL-UZH/sopra-fs25-template-client)
+, which is licensed under the Apache 2.0 license - see the LICENSE.Apache-2.0 file for the original notice.
