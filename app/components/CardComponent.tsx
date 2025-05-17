@@ -1,9 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import Image from 'next/image';
-
-
+import Image from "next/image";
 
 interface CardProps {
   card: { suit: string; value: number };
@@ -27,18 +25,14 @@ function valueMap(v: number): string {
   throw new Error("Unknown card value: " + v);
 }
 
-
 const CardComponent: React.FC<CardProps> = ({ card, onClick }) => {
-
   const [hovered, setHovered] = useState(false);
-
 
   const id = `${valueMap(card.value)}_${suitMap[card.suit]}`;
   const src = `/cards/${id}.svg`;
   const altText = `${card.value} of ${card.suit}`;
 
   return (
-
     <div
       onClick={onClick}
       style={cardStyle}
@@ -62,18 +56,16 @@ const CardComponent: React.FC<CardProps> = ({ card, onClick }) => {
           objectPosition: "center",
           // Match panel styling:
           backgroundColor: "#fff",
-          padding: "0.25rem",       // inner padding like panel
-          borderRadius: "4px",      // rounded corners
+          padding: "0.25rem", // inner padding like panel
+          borderRadius: "4px", // rounded corners
           filter: "contrast(1) saturate(1)",
         }}
       />
     </div>
-
   );
 };
 
 const cardStyle: React.CSSProperties = {
-
   position: "relative",
   width: "60px",
   height: "90px",
@@ -85,7 +77,6 @@ const cardStyle: React.CSSProperties = {
   boxShadow: "0 0 8px 2px rgba(255,165,0,0.8)",
   textAlign: "center",
   cursor: "pointer",
-
 };
 
 const tooltipStyle: React.CSSProperties = {
@@ -100,12 +91,10 @@ const tooltipStyle: React.CSSProperties = {
   borderRadius: "8px",
   fontSize: "12px",
   whiteSpace: "nowrap",
-  boxShadow: "0 0 3px rgba(133, 251, 255, 0.6), 0 0 6px rgba(133, 251, 255, 0.4)", // Softer glow
+  boxShadow:
+    "0 0 3px rgba(133, 251, 255, 0.6), 0 0 6px rgba(133, 251, 255, 0.4)", // Softer glow
   zIndex: 1000,
   pointerEvents: "none",
 };
-
-
-
 
 export default CardComponent;

@@ -4,7 +4,7 @@ export const login = async (values: object): Promise<Response> => {
   return postValuesToPath("/login", values);
 };
 
-export const createUser = async (values: object):Promise<Response> => {
+export const createUser = async (values: object): Promise<Response> => {
   return postValuesToPath("/users", values);
 };
 
@@ -13,22 +13,25 @@ export const getUsers = async (token: string): Promise<Response> => {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
-      "Token": token,            
+      "Token": token,
     },
   });
 };
 
-export const logoutUser = async (token: string):Promise<Response> => {
+export const logoutUser = async (token: string): Promise<Response> => {
   return fetch(getApiDomain() + "/logout", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "Token": token
+      "Token": token,
     },
   });
 };
 
-export const createLobby = async (token: string, lobbyData: object): Promise<Response> => {
+export const createLobby = async (
+  token: string,
+  lobbyData: object,
+): Promise<Response> => {
   return fetch(getApiDomain() + "/lobbies", {
     method: "POST",
     headers: {
@@ -42,7 +45,7 @@ export const createLobby = async (token: string, lobbyData: object): Promise<Res
 export const joinLobby = async (
   token: string,
   lobbyPIN: string,
-  joinData: object //in case needed
+  joinData: object, //in case needed
 ): Promise<Response> => {
   return fetch(getApiDomain() + `/lobbies/${lobbyPIN}/join`, {
     method: "POST",
@@ -52,9 +55,12 @@ export const joinLobby = async (
     },
     body: JSON.stringify(joinData),
   });
-}
+};
 
-export const postValuesToPath = async (path: string, values: object):Promise<Response> => {
+export const postValuesToPath = async (
+  path: string,
+  values: object,
+): Promise<Response> => {
   return fetch(getApiDomain() + path, {
     method: "POST",
     headers: {
@@ -66,7 +72,7 @@ export const postValuesToPath = async (path: string, values: object):Promise<Res
 
 export const getUserById = async (
   token: string,
-  userId: string
+  userId: string,
 ): Promise<Response> => {
   return fetch(`${getApiDomain()}/users/${userId}`, {
     method: "GET",

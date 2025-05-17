@@ -1,4 +1,4 @@
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import CardComponent from "./CardComponent";
 import { Card } from "@/models/GameSession";
 
@@ -100,7 +100,7 @@ export function MoveAnimator({ animation }: MoveAnimatorProps) {
           ))}
         </div>
       )}
-      
+
       <AnimatePresence>
         {!playedCard && capturedCards.length > 0 && (
           <motion.div
@@ -119,7 +119,10 @@ export function MoveAnimator({ animation }: MoveAnimatorProps) {
             }}
           >
             {capturedCards.map((card, i) => (
-              <CardComponent key={`cap-${card.suit}-${card.value}-${i}`} card={card} />
+              <CardComponent
+                key={`cap-${card.suit}-${card.value}-${i}`}
+                card={card}
+              />
             ))}
           </motion.div>
         )}
