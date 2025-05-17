@@ -13,5 +13,5 @@ export function getApiDomain(): string {
 }
 
 export function getWsDomain(): string {
-  return getApiDomain().replace("http", "ws")
+  return getApiDomain().replace("http", "ws");
 }

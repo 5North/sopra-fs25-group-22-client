@@ -30,11 +30,31 @@ interface Category {
 }
 
 const categories: Category[] = [
-  { key: "Carte", my: (r) => r.myCarteResult, other: (r) => r.otherCarteResult },
-  { key: "Denari", my: (r) => r.myDenariResult, other: (r) => r.otherDenariResult },
-  { key: "Primiera", my: (r) => r.myPrimieraResult, other: (r) => r.otherPrimieraResult },
-  { key: "Settebello", my: (r) => r.mySettebelloResult, other: (r) => r.otherSettebelloResult },
-  { key: "Scopa", my: (r) => r.myScopaResult, other: (r) => r.otherScopaResult },
+  {
+    key: "Carte",
+    my: (r) => r.myCarteResult,
+    other: (r) => r.otherCarteResult,
+  },
+  {
+    key: "Denari",
+    my: (r) => r.myDenariResult,
+    other: (r) => r.otherDenariResult,
+  },
+  {
+    key: "Primiera",
+    my: (r) => r.myPrimieraResult,
+    other: (r) => r.otherPrimieraResult,
+  },
+  {
+    key: "Settebello",
+    my: (r) => r.mySettebelloResult,
+    other: (r) => r.otherSettebelloResult,
+  },
+  {
+    key: "Scopa",
+    my: (r) => r.myScopaResult,
+    other: (r) => r.otherScopaResult,
+  },
 ];
 
 const GameResultView: React.FC<GameResultViewProps> = ({
@@ -78,7 +98,7 @@ const GameResultView: React.FC<GameResultViewProps> = ({
   }
 
   const full = result;
-  const myTotal   = full.myTotal   ?? 0;
+  const myTotal = full.myTotal ?? 0;
   const otherTotal = full.otherTotal ?? 0;
 
   return (
@@ -169,7 +189,9 @@ const GameResultView: React.FC<GameResultViewProps> = ({
                   >
                     {myVal}
                   </div>
-                  <div style={{ textAlign: "center", color: "#fff" }}>{key}</div>
+                  <div style={{ textAlign: "center", color: "#fff" }}>
+                    {key}
+                  </div>
                   <div
                     style={{
                       textAlign: "right",
@@ -222,7 +244,13 @@ const GameResultView: React.FC<GameResultViewProps> = ({
             </React.Fragment>
           </div>
 
-          <div style={{ display: "flex", gap: "1rem", justifyContent: "space-between" }}>
+          <div
+            style={{
+              display: "flex",
+              gap: "1rem",
+              justifyContent: "space-between",
+            }}
+          >
             <Button
               style={{ flex: 1 }}
               onClick={() => {
