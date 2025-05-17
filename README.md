@@ -18,12 +18,11 @@ This repository only contains the code of the frontend. For the backend implemen
 * [🗒️ Introduction](#introduction)
 * [💡 Technologies](#technologies)
 * [⚙️ High-Level Components](#high-level-components)
-    * [Rest](#rest)
-    * [Websocket](#websocket)
-    * [Database](#database)
-    * [Service](#service)
-    * [Game Logic](#game-logic)
-    * [Ai Assistance](#ai-assistance)
+    * [Registration, Login & home](#registration-login--home )
+    * [Lobby](#lobby)
+    * [Game](#game)
+    * [Game Result](#game-result)
+    * [Rules](#rules)
 * [🛠️ Launch & Deployment](#launch--deployment)
 * [🚀 Roadmap](#roadmap)
 * [🖋️ Authors & Acknowledgments](#authors--acknowledgments)
@@ -51,7 +50,7 @@ that propose itself as an open source alternative to the usually paywalled or ad
 
 <h2 id="high-level-components">⚙️ High-level components</h2>
 
-### Registration, Login and Home
+### Registration, Login & Home
 
 The first page displayed when visiting our deployed [Website] (https://sopra-fs25-group-22-client.vercel.app), allows to [register as a user] (https://github.com/5North/sopra-fs25-group-22-client/blob/main/app/register/page.tsx), or [log in](https://github.com/5North/sopra-fs25-group-22-client/blob/main/app/login/page.tsx) if an account was already created. 
 
