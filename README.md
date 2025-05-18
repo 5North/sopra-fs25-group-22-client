@@ -55,7 +55,7 @@ that propose itself as an open source alternative to the usually paywalled or ad
 
 ### Registration, Login & Home
 
-The first page displayed when visiting our deployed [Website] (https://sopra-fs25-group-22-client.vercel.app), allows to [register as a user] (https://github.com/5North/sopra-fs25-group-22-client/blob/main/app/register/page.tsx), or [log in](https://github.com/5North/sopra-fs25-group-22-client/blob/main/app/login/page.tsx) if an account was already created. 
+The first page displayed when visiting our deployed [Website](https://sopra-fs25-group-22-client.vercel.app), allows to [register as a user](https://github.com/5North/sopra-fs25-group-22-client/blob/main/app/register/page.tsx), or [log in](https://github.com/5North/sopra-fs25-group-22-client/blob/main/app/login/page.tsx) if an account was already created. 
 
 In the [homepage](https://github.com/5North/sopra-fs25-group-22-client/blob/main/app/home/page.tsx), the users see their own statistics (wins, losses and ties), as well as the options to start a game, join an existing lobby, view the ranking over all registered users (Scoreboard) and the Rules. 
 
@@ -68,7 +68,7 @@ All players in the same lobby can see who enters and leaves the lobby, as well a
 Only the host can start a game, when there are 4 players in the lobby.
 
 ### Game
-After the Host starts the game, all players from the lobby get redirected to the [game] (https://github.com/5North/sopra-fs25-group-22-client/blob/main/app/game/%5Bid%5D/page.tsx). 
+After the Host starts the game, all players from the lobby get redirected to the [game](https://github.com/5North/sopra-fs25-group-22-client/blob/main/app/game/%5Bid%5D/page.tsx). 
 
 In the [gameview](https://github.com/5North/sopra-fs25-group-22-client/blob/main/app/components/ScopaGameView.tsx) each players is only able to see their own cards on the bottom, and the cards on the table. When hovering over these cards, the value and suit of the card is displayed. The cards of the other players are upside down. 
 
