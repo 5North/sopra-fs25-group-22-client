@@ -40,11 +40,14 @@ that propose itself as an open source alternative to the usually paywalled or ad
 
 <h2 id="technologies">💡 Technologies</h2>
 
-* [Typescript](https://www.typescriptlang.org/) - Static typing and compiles to plain JavaScript
+* [Typescript](https://www.typescriptlang.org/) - TypeScript is JavaScript with syntax for types.
 * [CSS](https://sass-lang.com/) - stylesheet language used to describe the presentation of HTML and XML documents.
-* [React](https://react.dev/) - JavaScript library for building declarative, component-based user interfaces.
-* [STOMP](https://stomp-js.github.io/stomp-websocket/) - Text oriented protocol over WebSocket
-* [SonarQube](https://www.sonarsource.com/products/sonarqube/) - open-source platform for continuous inspection of code quality.
+* [Next.js](https://nextjs.org/) - A React framework for building fast, scalable web applications with server-side rendering and static site generation.
+* [stompjs](https://stomp-js.github.io/) - A JavaScript client for the STOMP protocol over WebSocket.
+* [Ant Design](https://ant.design/) – A comprehensive UI component library for building elegant and responsive web interfaces.
+* [Vercel](https://vercel.com/) – Cloud platform for deploying and hosting modern web applications, optimized for Next.js.
+* [npm](https://www.npmjs.com/) - Package manager for JavaScript, used to manage project dependencies and publish reusable code.
+* [ESLint](https://eslint.org/) - A static code analysis tool for identifying and fixing problems in JavaScript and TypeScript code.
 * [Figma](https://www.figma.com/) - browser-based tool for interface design and prototyping with real-time collaboration.
 
 
@@ -54,7 +57,7 @@ that propose itself as an open source alternative to the usually paywalled or ad
 
 The first page displayed when visiting our deployed [Website] (https://sopra-fs25-group-22-client.vercel.app), allows to [register as a user] (https://github.com/5North/sopra-fs25-group-22-client/blob/main/app/register/page.tsx), or [log in](https://github.com/5North/sopra-fs25-group-22-client/blob/main/app/login/page.tsx) if an account was already created. 
 
-In the [homepage](https://github.com/5North/sopra-fs25-group-22-client/blob/main/app/home/page.tsx), the users see their own statistics (wins, losses and ties), as well as the options to start a game, join an existing lobby, view the ranking over all registered users and the Rules. 
+In the [homepage](https://github.com/5North/sopra-fs25-group-22-client/blob/main/app/home/page.tsx), the users see their own statistics (wins, losses and ties), as well as the options to start a game, join an existing lobby, view the ranking over all registered users (Scoreboard) and the Rules. 
 
 ### Lobby
 When a users starts a game, they get redirected to the [lobbypage] (https://github.com/5North/sopra-fs25-group-22-client/blob/main/app/lobbies/%5Bid%5D/page.tsx), where a Game ID consisting of 4 digits is displayed and is to be shared with other users, to play Scopa together. 
@@ -62,7 +65,7 @@ When a users starts a game, they get redirected to the [lobbypage] (https://gith
 A [joining] (https://github.com/5North/sopra-fs25-group-22-client/blob/main/app/join/page.tsx) user can enter the Game ID via 'Join a Game'.
 All players in the same lobby can see who enters and leaves the lobby, as well as who which 2 players are in the same team.
 
-The Host can only start a game, when there are 4 players in the lobby.
+Only the host can start a game, when there are 4 players in the lobby.
 
 ### Game
 After the Host starts the game, all players from the lobby get redirected to the [game] (https://github.com/5North/sopra-fs25-group-22-client/blob/main/app/game/%5Bid%5D/page.tsx). 
@@ -73,38 +76,35 @@ Team mates are displayed to the opposite of each other.
 
 A neon green dot next to a players name, signals to all players whose turn it is. 
 
-On the top to the right an AI button is visible, which can only be clicked by the player, if its their turn. This allos the player to get suggestions on what next move to play.
+On the top to the right an AI button is visible, which can only be clicked by the player, if its their turn. This allows the player to get suggestions on what to play as the next move.
 
 A timer counting down from 30 seconds, shows how long the current player has, to make his play. If the user does not click on any card, a random card of their deck is choosen and played.
 
 Whenever a players does scopa (clears the table), an animation is displayed to all users. In addition, the counter next to the players who did scopa, adds +1.
 
-Each user can quit the game at any time and leave the game. 
+Each user can quit the game at any time. When a user quits the game, game ends in a forfeit. 
 
 ### Game Result
-After a game has ended, the [results] (https://github.com/5North/sopra-fs25-group-22-client/blob/main/app/components/GameResultView.tsx) are displayed to each user with the breakdown of their team and the opponent teams breakdown according to the scoring rules. 
+After a game has ended, the [results] (https://github.com/5North/sopra-fs25-group-22-client/blob/main/app/components/GameResultView.tsx) are displayed to each user, including a breakdown of their team and the opponent's team according to the scoring rules. 
 
-The players have the option to either leave the lobby and 'Return to Home', which will redirect the user to the homepage.
+The players have the option to either leave the lobby or 'Return to Home', which will redirect the user to the homepage.
 
 If a player wants a [rematch] (https://github.com/5North/sopra-fs25-group-22-client/blob/main/app/rematch/%5Bid%5D/page.tsx), they get redirect to the rematch page. Players who choose to have a rematch, are able to see other players, who have aso choosen to have a reamtch. 
 Again, if there are 4 players, the host can start a new game.
 
 ### Rules
-User are able to view the [rules] (https://github.com/5North/sopra-fs25-group-22-client/blob/main/app/rules/page.tsx) of Scopa, to better understand on how to play the game. 
+Users are able to view the [rules] (https://github.com/5North/sopra-fs25-group-22-client/blob/main/app/rules/page.tsx) of Scopa, to better understand how to play the game. 
 The rulespage include, game setup, turn flow, capture rules and scenarios, scoring rules, end-of-game process and finally a display of Napoletane cards.
 
+### Scoreboard
+Users are able to view the [scoreboard] (https://github.com/5North/sopra-fs25-group-22-client/blob/main/app/scoreboard/page.tsx) of Scopa, to overall scores of all users are listed. 
 
 <h2 id="launch--deployment">🛠️ Launch & Deployment</h2>
 
 ### Prerequisites and Installation
 For your local development environment, you will need Node.js.\
-We urge you to install the exact version **v20.11.0** which comes with the npm package manager. You can download it [here](https://nodejs.org/download/release/v20.11.0/).\
-If you are confused about which download to choose, feel free to use these direct links:
-
-- **MacOS:** [node-v20.11.0.pkg](https://nodejs.org/download/release/v20.11.0/node-v20.11.0.pkg)
-- **Windows 32-bit:** [node-v20.11.0-x86.msi](https://nodejs.org/download/release/v20.11.0/node-v20.11.0-x86.msi)
-- **Windows 64-bit:** [node-v20.11.0-x64.msi](https://nodejs.org/download/release/v20.11.0/node-v20.11.0-x64.msi)
-- **Linux:** [node-v20.11.0.tar.xz](https://nodejs.org/dist/v20.11.0/node-v20.11.0-linux-x64.tar.xz) (use this [installation guide](https://github.com/nodejs/help/wiki/Installation#how-to-install-nodejs-via-binary-archive-on-linux) if you are new to Linux)
+You can download it [here](https://nodejs.org/download/release/v20.11.0/).\
+npm comes bundled with Node.js.
 
 If you happen to have a package manager the following commands can be used:
 
@@ -117,28 +117,12 @@ Before you start your application for the first time, run this command to instal
 
 ```npm install```
 
-Next, you can start the app with:
+Next, you can start the (Scopa) app with:
 
 ```npm run dev```
 
-Now you can open [http://localhost:3000](http://localhost:3000) to view it in the browser.\
+Now you can open [http://localhost:3000](http://localhost:3000) to view Scopa in the browser.\
 Notice that the page will reload if you make any edits. You will also see any lint errors in the console (use a Chrome-based browser).\
-The client will send HTTP requests to the server which can be found [here](https://github.com/HASEL-UZH/sopra-fs24-template-server).\
-In order for these requests to work, you need to install and start the server as well.
-
-#### Testing
-Testing is optional, and you can run the tests with `npm run test`\
-This launches the test runner in an interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-> For macOS user running into a 'fsevents' error: https://github.com/jest-community/vscode-jest/issues/423
-
-#### Build
-Finally, `npm run build` builds the app for production to the `build` folder.<br>
-It correctly bundles React in production mode and optimizes the build for the best performance:\
-The build is minified, and the filenames include hashes.<br>
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
 <h2 id="illustrations">Illustrations</h2>
 
