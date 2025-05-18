@@ -61,9 +61,9 @@ The first page displayed when visiting our deployed [Website](https://sopra-fs25
 In the [homepage](https://github.com/5North/sopra-fs25-group-22-client/blob/main/app/home/page.tsx), the users see their own statistics (wins, losses and ties), as well as the options to start a game, join an existing lobby, view the ranking over all registered users (Scoreboard) and the Rules. 
 
 ### Lobby
-When a users starts a game, they get redirected to the [lobbypage] (https://github.com/5North/sopra-fs25-group-22-client/blob/main/app/lobbies/%5Bid%5D/page.tsx), where a Game ID consisting of 4 digits is displayed and is to be shared with other users, to play Scopa together. 
+When a users starts a game, they get redirected to the [lobbypage](https://github.com/5North/sopra-fs25-group-22-client/blob/main/app/lobbies/%5Bid%5D/page.tsx), where a Game ID consisting of 4 digits is displayed and is to be shared with other users, to play Scopa together. 
 
-A [joining] (https://github.com/5North/sopra-fs25-group-22-client/blob/main/app/join/page.tsx) user can enter the Game ID via 'Join a Game'.
+A [joining](https://github.com/5North/sopra-fs25-group-22-client/blob/main/app/join/page.tsx) user can enter the Game ID via 'Join a Game'.
 All players in the same lobby can see who enters and leaves the lobby, as well as who which 2 players are in the same team.
 
 Only the host can start a game, when there are 4 players in the lobby.
@@ -86,19 +86,19 @@ Whenever a players does scopa (clears the table), an animation is displayed to a
 Each user can quit the game at any time. When a user quits the game, game ends in a forfeit. 
 
 ### Game Result
-After a game has ended, the [results] (https://github.com/5North/sopra-fs25-group-22-client/blob/main/app/components/GameResultView.tsx) are displayed to each user, including a breakdown of their team and the opponent's team according to the scoring rules. 
+After a game has ended, the [results](https://github.com/5North/sopra-fs25-group-22-client/blob/main/app/components/GameResultView.tsx) are displayed to each user, including a breakdown of their team and the opponent's team according to the scoring rules. 
 
 The players have the option to either leave the lobby or 'Return to Home', which will redirect the user to the homepage.
 
-If a player wants a [rematch] (https://github.com/5North/sopra-fs25-group-22-client/blob/main/app/rematch/%5Bid%5D/page.tsx), they get redirect to the rematch page. Players who choose to have a rematch, are able to see other players, who have aso choosen to have a reamtch. 
+If a player wants a [rematch](https://github.com/5North/sopra-fs25-group-22-client/blob/main/app/rematch/%5Bid%5D/page.tsx), they get redirect to the rematch page. Players who choose to have a rematch, are able to see other players, who have aso choosen to have a reamtch. 
 Again, if there are 4 players, the host can start a new game.
 
 ### Rules
-Users are able to view the [rules] (https://github.com/5North/sopra-fs25-group-22-client/blob/main/app/rules/page.tsx) of Scopa, to better understand how to play the game. 
+Users are able to view the [rules](https://github.com/5North/sopra-fs25-group-22-client/blob/main/app/rules/page.tsx) of Scopa, to better understand how to play the game. 
 The rulespage include, game setup, turn flow, capture rules and scenarios, scoring rules, end-of-game process and finally a display of Napoletane cards.
 
 ### Scoreboard
-Users are able to view the [scoreboard] (https://github.com/5North/sopra-fs25-group-22-client/blob/main/app/scoreboard/page.tsx) of Scopa, to overall scores of all users are listed. 
+Users are able to view the [scoreboard](https://github.com/5North/sopra-fs25-group-22-client/blob/main/app/scoreboard/page.tsx) of Scopa, to overall scores of all users are listed. 
 
 <h2 id="launch--deployment">🛠️ Launch & Deployment</h2>
 
