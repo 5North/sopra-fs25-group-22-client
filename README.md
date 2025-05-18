@@ -23,6 +23,7 @@ This repository only contains the code of the frontend. For the backend implemen
     * [Game](#game)
     * [Game Result](#game-result)
     * [Rules](#rules)
+    * [Scoreboard](#scoreboard)
 * [🛠️ Launch & Deployment](#launch--deployment)
 * [🚀 Roadmap](#roadmap)
 * [🖋️ Authors & Acknowledgments](#authors--acknowledgments)
