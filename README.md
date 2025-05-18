@@ -137,10 +137,10 @@ This is the first page that appears when following the the [link](https://sopra-
   <img src="public/images/home.png" alt="Home" />
 </p>
 
-After successfully registering or logginf into an account the homepage is displayed.
+After successfully registering or logging into an account the homepage is displayed.
 
 <p align="center">
-  <img src="public/images/start-game.png" alt="Starting game" />
+  <img src="public/images/start_game.png" alt="Starting game" />
 </p>
 
 After creating a game, the game ID and the joined players are displayed.
