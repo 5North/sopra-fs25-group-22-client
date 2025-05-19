@@ -131,6 +131,7 @@ const Home: React.FC = () => {
       clearToken();
       clearUsername();
       clearUserIdStr();
+      router.push("/login")
     } catch (error) {
       if (error instanceof Error) {
         alert(`Oopps.. Something went wrong!` + error);
