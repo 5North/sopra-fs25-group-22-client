@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation"; // use NextJS router for navigation
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { Button, Form, Input } from "antd";
 import { useState } from "react";
-import { login, getUsers } from "@/api/registerService";
+import { getUsers, login } from "@/api/registerService";
 
 interface FormFieldProps {
   username: string;
@@ -15,68 +15,69 @@ const Login: React.FC = () => {
   const router = useRouter();
   const [form] = Form.useForm();
   const {
-    set: setToken, 
+    set: setToken,
     // clear: clearToken, // is commented out because we do not need to clear the token when logging in
   } = useLocalStorage<string>("token", ""); // note that the key we are selecting is "token" and the default value we are setting is an empty string
-  const[error, setError] = useState("")
+  const [error, setError] = useState("");
 
   const handleLogin = async (values: FormFieldProps) => {
     try {
       const response = await login(values);
-    console.log("🚀 LOGIN RESPONSE PAYLOAD:", response);
+      console.log("🚀 LOGIN RESPONSE PAYLOAD:", response);
 
-    if (!response.ok) {
-      if (response.status === 403) {
-        setError("Invalid username or password!");
-      } else {
-        throw new Error(`Unexpected error: ${response.status}`);
+      if (!response.ok) {
+        if (response.status === 403) {
+          setError("Invalid username or password!");
+        } else {
+          throw new Error(`Unexpected error: ${response.status}`);
+        }
+        return;
       }
-      return;
-    }
 
-    const token = response.headers.get("Token");
+      const token = response.headers.get("Token");
 
-    if (!token) {
-      throw new Error("No token returned from server.");
-    }
+      if (!token) {
+        throw new Error("No token returned from server.");
+      }
 
-    setToken(token); 
-    localStorage.setItem("username", values.username); 
-    setError("");
+      setToken(token);
+      localStorage.setItem("username", values.username);
+      setError("");
 
-    const usersRes = await getUsers(token);
-    if (!usersRes.ok) {
-      throw new Error(`Failed to fetch users: ${usersRes.status}`);
-    }
-    const users: { id: number; username: string }[] = await usersRes.json();
+      const usersRes = await getUsers(token);
+      if (!usersRes.ok) {
+        throw new Error(`Failed to fetch users: ${usersRes.status}`);
+      }
+      const users: { id: number; username: string }[] = await usersRes.json();
 
-    //Find the logged-in user by username
-    const me = users.find(u => u.username === values.username);
-    if (!me) {
-      throw new Error("Logged-in user not found in users list");
-    }
+      //Find the logged-in user by username
+      const me = users.find((u) => u.username === values.username);
+      if (!me) {
+        throw new Error("Logged-in user not found in users list");
+      }
 
-    // Store their ID (and username) for later pages
-    localStorage.setItem("userId", String(me.id));
-    localStorage.setItem("username", me.username);
+      // Store their ID (and username) for later pages
+      localStorage.setItem("userId", String(me.id));
+      localStorage.setItem("username", me.username);
 
-    router.push("/home");
-  } catch (error) {
-    if (error instanceof Error) {
-      if (error.message.includes("403")) {
-        setError("Invalid username or password!");
+      router.push("/home");
+    } catch (error) {
+      if (error instanceof Error) {
+        if (error.message.includes("403")) {
+          setError("Invalid username or password!");
+        } else {
+          alert("Something went wrong" + error);
+          console.error(
+            `An unknown error occurred during login.\n${error.message} ${
+              JSON.stringify(values)
+            }`,
+          );
+        }
       } else {
-        alert("Something went wrong" + error);
-        console.error(`An unknown error occurred during login.\n${error.message} ${JSON.stringify(values)}`);  
+        console.error("An unknown error occurred during login");
       }
     }
-    else {
-      console.error("An unknown error occurred during login");
-    }
-  }
-};
-
-    
+  };
 
   return (
     <div className="register-container">
@@ -104,16 +105,19 @@ const Login: React.FC = () => {
             <Input.Password placeholder="Enter password" />
           </Form.Item>
           <Form.Item>
-          {error && <p style={{ color: "red" }}>{error}</p>}
+            {error && <p style={{ color: "red" }}>{error}</p>}
             <Button type="primary" htmlType="submit" className="custom-button">
-            Login
+              Login
             </Button>
           </Form.Item>
         </Form>
         <div className="auth-link">
-          <Button type="link" onClick={() => router.push("/register")}
-          className="register-button-text"
-          > New here? Register
+          <Button
+            type="link"
+            onClick={() => router.push("/register")}
+            className="register-button-text"
+          >
+            New here? Register
           </Button>
         </div>
       </div>

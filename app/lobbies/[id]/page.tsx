@@ -3,9 +3,9 @@
 import React, { useEffect, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import useLocalStorage from "@/hooks/useLocalStorage";
-import { Client,IMessage, StompSubscription } from "@stomp/stompjs";
+import { Client, IMessage, StompSubscription } from "@stomp/stompjs";
 import { getWsDomain } from "@/utils/domain";
-import { getUserById } from "@/api/registerService"; 
+import { getUserById } from "@/api/registerService";
 import { Button } from "antd";
 
 interface Lobby {
@@ -14,13 +14,12 @@ interface Lobby {
   hostId: number;
   usersIds: number[];
   rematchersIds: number[] | null;
-  players: Player []
+  players: Player[];
 }
 
 interface Player {
   userId: number;
   username: string;
-
 }
 
 const getUsername = (): string => {
@@ -38,34 +37,34 @@ const LobbyPage: React.FC = () => {
   const [error] = useState("");
   const { value: token } = useLocalStorage<string>("token", "");
   const username = getUsername();
-  const [lobby, setLobby]     = useState<Omit<Lobby,"players"> | null>(null);
+  const [lobby, setLobby] = useState<Omit<Lobby, "players"> | null>(null);
   const pathname = usePathname();
   const pin = pathname?.slice(-4) ?? localStorage.getItem("LobbyId");
   const stompClientRef = useRef<Client | null>(null);
   const subscriptionRef = useRef<StompSubscription | null>(null);
   const [players, setPlayers] = useState<Player[]>([]);
-  const [hostLeft, setHostLeft] = useState(false); 
+  const [hostLeft, setHostLeft] = useState(false);
 
   useEffect(() => {
     if (!pin || !token) return;
-  
+
     const client = new Client({
       brokerURL: getWsDomain() + `/lobby?token=${token}`,
       reconnectDelay: 2000,
       onConnect: () => {
         console.log("STOMP connected, subscribing to", pin);
-  
-    
-  
+
         // Subscribe to lobby updates
-        subscriptionRef.current = client.subscribe(`/topic/lobby/${pin}`,(message: IMessage) => {
+        subscriptionRef.current = client.subscribe(
+          `/topic/lobby/${pin}`,
+          (message: IMessage) => {
             const data = JSON.parse(message.body);
             console.log("Received lobby update:", data);
 
             if (data.success === true && data.message === "Starting game") {
               console.log("Starting game, redirecting to /game/", pin);
               router.push(`/game/${pin}`);
-              return;  
+              return;
             }
 
             if (data.lobby) {
@@ -79,42 +78,38 @@ const LobbyPage: React.FC = () => {
                       if (!res.ok) throw new Error(`User ${id} failed`);
                       const dto = await res.json();
                       return { userId: id, username: dto.username };
-                    })
+                    }),
                   );
                   setPlayers(fetched);
-
                 } catch (err) {
                   console.error("Failed to load player names:", err);
                 }
-              })
-              ();
+              })();
             }
 
-             // lobby deleted by host
-             // Inside your WebSocket or effect handler
-             if (data.message?.includes("has been deleted")) {
-               setHostLeft(true);
-               return;
-             }
-  
-          }
+            // lobby deleted by host
+            // Inside your WebSocket or effect handler
+            if (data.message?.includes("has been deleted")) {
+              setHostLeft(true);
+              return;
+            }
+          },
         );
       },
       onStompError: (frame) => {
         console.error("STOMP error:", frame.headers["message"]);
       },
     });
-  
+
     stompClientRef.current = client;
     client.activate();
 
-      return () => {
-        if (stompClientRef.current) {
-          stompClientRef.current.deactivate();
-          stompClientRef.current = null;
-        }
-      };
-    
+    return () => {
+      if (stompClientRef.current) {
+        stompClientRef.current.deactivate();
+        stompClientRef.current = null;
+      }
+    };
   }, [router, token, pin]);
 
   const handleBack = () => {
@@ -124,20 +119,20 @@ const LobbyPage: React.FC = () => {
   const handleStartGame = () => {
     if (!lobby || !stompClientRef.current) return;
 
-    console.log("handle start game called..")
-    if(!stompClientRef.current) {
+    console.log("handle start game called..");
+    if (!stompClientRef.current) {
       console.log("STOMP REF NOT EXISTING!!!");
     }
 
     // Tell the server to start
     stompClientRef.current?.publish({
       destination: `/app/startGame/${String(lobby.lobbyId)}`,
-      body: '',
+      body: "",
     });
-  
+
     router.push(`/game/${lobby.lobbyId}`);
   };
-  
+
   useEffect(() => {
     if (!token || !lobby?.usersIds?.length) {
       setPlayers([]);
@@ -154,7 +149,7 @@ const LobbyPage: React.FC = () => {
             }
             const dto = await res.json();
             return { userId: id, username: dto.username };
-          })
+          }),
         );
         setPlayers(fetched);
       } catch (err) {
@@ -165,11 +160,69 @@ const LobbyPage: React.FC = () => {
     loadPlayers();
   }, [token, lobby?.usersIds]);
 
-   const hostUsername = React.useMemo(() => {
+  const hostUsername = React.useMemo(() => {
     if (!lobby || players.length === 0) return "";
     const firstId = lobby.usersIds[0];
-    return players.find(p => p.userId === firstId)?.username || "";
+    return players.find((p) => p.userId === firstId)?.username || "";
   }, [lobby, players]);
+
+  if (!token) {
+    return (
+      <div
+        style={{
+          backgroundImage: 'url("/images/background.jpg")', // Replace with your actual image path
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+          minHeight: "100vh",
+          width: "100%",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+          textAlign: "center",
+          padding: "2rem",
+          color: "#fff",
+        }}
+      >
+        <h2
+          style={{
+            fontSize: "2.5rem",
+            marginBottom: "1rem",
+            textShadow: "0 0 10px #000",
+          }}
+        >
+          Unauthorized Access
+        </h2>
+        <p
+          style={{
+            fontSize: "1.2rem",
+            marginBottom: "2rem",
+            textShadow: "0 0 6px #000",
+          }}
+        >
+          You must be logged in to access this game.
+        </p>
+        <Button
+          type="primary"
+          onClick={() => router.push("/login")}
+          style={{
+            backgroundColor: "#0ff",
+            color: "#000",
+            border: "none",
+            borderRadius: "8px",
+            padding: "0.75rem 1.5rem",
+            fontWeight: "bold",
+            fontSize: "1rem",
+            boxShadow:
+              "0 0 8px rgba(0, 255, 255, 0.7), 0 0 16px rgba(0, 255, 255, 0.4)",
+          }}
+        >
+          Go to Login
+        </Button>
+      </div>
+    );
+  }
 
   if (error) {
     return (
@@ -193,7 +246,6 @@ const LobbyPage: React.FC = () => {
     );
   }
 
-
   const handleLeaveLobby = () => {
     if (subscriptionRef.current) {
       subscriptionRef.current.unsubscribe();
@@ -206,9 +258,8 @@ const LobbyPage: React.FC = () => {
       stompClientRef.current = null;
     }
 
-    router.push("/home"); 
+    router.push("/home");
   };
-
 
   return (
     <div
@@ -255,7 +306,9 @@ const LobbyPage: React.FC = () => {
           >
             The host left the lobby.
           </h2>
-          <p style={{ marginBottom: "2rem", color: "#fff", fontSize: "1.2rem" }}>
+          <p
+            style={{ marginBottom: "2rem", color: "#fff", fontSize: "1.2rem" }}
+          >
             You will be redirected to the homepage.
           </p>
           <Button

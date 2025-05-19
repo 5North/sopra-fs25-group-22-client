@@ -50,4 +50,3 @@ export default function useLocalStorage<T>(
 
   return { value, set, clear };
 }
-

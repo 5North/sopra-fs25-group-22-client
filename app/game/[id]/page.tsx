@@ -1,13 +1,18 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { Client, IMessage, StompSubscription } from "@stomp/stompjs";
 import ScopaGameView from "@/components/ScopaGameView";
 import GameResultView from "@/components/GameResultView";
 import { MoveAnimator } from "@/components/MoveAnimator";
 import type { MoveAnimationData } from "@/components/MoveAnimator";
-import { GameSessionState, Card, TablePrivateState, UserListElement } from "@/models/GameSession";
+import {
+  Card,
+  GameSessionState,
+  TablePrivateState,
+  UserListElement,
+} from "@/models/GameSession";
 import { GameResultDTO } from "@/models/GameResult";
 import { getWsDomain } from "@/utils/domain";
 import useLocalStorage from "@/hooks/useLocalStorage";
@@ -16,29 +21,31 @@ import CardComponent from "@/components/CardComponent";
 import Image from "next/image";
 import { Button } from "antd";
 
-
-
 const initialGameState: GameSessionState = {
-  gameId: 0,          // 
+  gameId: 0, //
   tableCards: [],
   players: [],
   currentPlayerId: 0,
 };
 
 interface MoveState {
-  playerId: number
-  pickedCards: Card[],
-  playedCard: Card
+  playerId: number;
+  pickedCards: Card[];
+  playedCard: Card;
 }
 
 export default function GamePage() {
   const hasPublishedRef = useRef(false);
   const { id } = useParams();
-  const [gameState, setGameState] = useState<GameSessionState>(initialGameState);
+  const [gameState, setGameState] = useState<GameSessionState>(
+    initialGameState,
+  );
   const [error, setError] = useState<string | null>(null);
   const [captureOptions, setCaptureOptions] = useState<Card[][]>([]);
   const [myHand, setMyHand] = useState<Card[]>([]);
-  const [moveAnimation, setMoveAnimation] = useState<MoveAnimationData | null>(null);
+  const [moveAnimation, setMoveAnimation] = useState<MoveAnimationData | null>(
+    null,
+  );
   const [gameResult, setGameResult] = useState<GameResultDTO | null>(null);
   const [allUsers, setAllUsers] = useState<UserListElement[]>([]);
   const stompClientRef = useRef<Client | null>(null);
@@ -47,13 +54,21 @@ export default function GamePage() {
   const [showRoundAnimation, setShowRoundAnimation] = useState(false);
   const [suggestion, setSuggestion] = useState<string | null>(null);
   const [showAIPanel, setShowAIPanel] = useState(false);
-  const [time, setTimer] = useState<number | null>(null)
+  const [time, setTimer] = useState<number | null>(null);
   const subscriptionRef = useRef<StompSubscription | null>(null);
   const prevEmptyRef = useRef<boolean>(true);
   const timerIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const lastSeatIndexRef = useRef<number | null>(null);
+  const [finalCaptureMessage, setFinalCaptureMessage] = useState<string | null>(
+    null,
+  );
+  const gameResultRef = useRef<GameResultDTO | null>(null);
+  const finalCaptureShownRef = useRef(false);
+
+  const router = useRouter();
 
   const getUserIdByUsername = (username: string): number | null => {
-    const user = allUsers.find(u => u.username === username);
+    const user = allUsers.find((u) => u.username === username);
     return user ? user.id : null;
   };
 
@@ -69,13 +84,29 @@ export default function GamePage() {
 
   const currentUserId = getCurrentUserId();
 
+  const getSeatIndexByUserId = (targetUserId: number): number => {
+    const players = gameState?.players || [];
+    const meIndex = players.findIndex((p) => p.userId === currentUserId);
+
+    if (meIndex === -1) return -1;
+
+    const seating = [...players.slice(meIndex), ...players.slice(0, meIndex)];
+    const seatIndex = seating.findIndex((p) => p.userId === targetUserId);
+
+    if (seatIndex !== -1) {
+      lastSeatIndexRef.current = seatIndex;
+    }
+
+    return seatIndex;
+  };
+
   useEffect(() => {
     // ensure we actually have an array
     if (!gameState?.tableCards) return;
 
     const isTableEmpty = gameState.tableCards.length === 0;
-    const someoneHasCards =
-      gameState.players?.some(p => p.handSize > 0) ?? false;
+    const someoneHasCards = gameState.players?.some((p) => p.handSize > 0) ??
+      false;
 
     if (!prevEmptyRef.current && isTableEmpty && someoneHasCards) {
       setShowRoundAnimation(true);
@@ -83,8 +114,6 @@ export default function GamePage() {
     }
     prevEmptyRef.current = isTableEmpty;
   }, [gameState?.tableCards, gameState?.players]);
-  
-
 
   useEffect(() => {
     if (!token) return;
@@ -120,28 +149,30 @@ export default function GamePage() {
       onConnect: () => {
         console.log("Connected to game WebSocket");
 
-       // Subscribe to public game state updates
+        // Subscribe to public game state updates
         subscriptionRef.current = client.subscribe(
           `/topic/lobby/${id}`,
           (message: IMessage) => {
             const payload = JSON.parse(message.body);
-
             // Ignore pure notification
-            if (payload.success !== undefined && typeof payload.message === "string") {
+            if (
+              payload.success !== undefined &&
+              typeof payload.message === "string"
+            ) {
               console.log("Lobby notification (ignored):", payload);
               return;
             } else if (payload.remainingSeconds) {
-              console.log("⏱ Received timer:", payload.remainingSeconds); 
+              console.log("⏱ Received timer:", payload.remainingSeconds);
               setTimer(payload.remainingSeconds);
 
-                // Clear previous timer
+              // Clear previous timer
               if (timerIntervalRef.current) {
                 clearInterval(timerIntervalRef.current);
               }
 
               // Start countdown
               timerIntervalRef.current = setInterval(() => {
-                setTimer(prev => {
+                setTimer((prev) => {
                   if (prev === null || prev <= 1) {
                     clearInterval(timerIntervalRef.current!);
                     return null;
@@ -155,22 +186,42 @@ export default function GamePage() {
             if (payload.pickedCards) {
               const move: MoveState = payload;
               setMoveState(move);
-            }
-            // Update board
+            } // Update board
             else if (Array.isArray(payload.tableCards)) {
               const data: GameSessionState = payload;
-              setGameState(prev => ({
+              setGameState((prev) => ({
                 ...prev,
-                tableCards:      data.tableCards,
-                players:         data.players,
+                tableCards: data.tableCards,
+                players: data.players,
                 currentPlayerId: data.currentPlayerId,
               }));
-            } else if (payload.lobby) {
-              console.log("rematchers: ", JSON.stringify(payload.lobby.rematchersIds))
+              // } else if (payload.lobby) {
+              //   console.log("rematchers: ", JSON.stringify(payload.lobby.rematchersIds))
+              // }
+            } else if (payload.userId && payload.cards) {
+              const user = allUsers.find((u) => u.id === payload.userId);
+              const username = user?.username || `User ${payload.userId}`;
+              console.log("@@@@@@@@@@LAST CARDS MESSAGE", payload);
+              setFinalCaptureMessage(`Last cards go to: ${username}`);
+              finalCaptureShownRef.current = true;
+
+              setTimeout(() => {
+                setFinalCaptureMessage(null);
+                finalCaptureShownRef.current = false;
+
+                // If result already arrived, now show it
+                if (gameResultRef.current) {
+                  setGameResult(gameResultRef.current);
+                  gameResultRef.current = null;
+                }
+              }, 3000);
             } else {
-              console.log("Lobby uncategorized message: ", JSON.stringify(payload))
+              console.log(
+                "Lobby uncategorized message: ",
+                JSON.stringify(payload),
+              );
             }
-          }
+          },
         );
 
         // subscription to private queue
@@ -184,7 +235,7 @@ export default function GamePage() {
               setMyHand(data.handCards);
             } else if (payload.tableCards) {
               console.log("🔔 initial public state (via queue):", payload);
-              setGameState(prev => ({
+              setGameState((prev) => ({
                 ...prev,
                 tableCards: payload.tableCards,
                 players: payload.players,
@@ -192,15 +243,23 @@ export default function GamePage() {
               }));
             } else if (payload.outcome) {
               const resultData: GameResultDTO = JSON.parse(message.body);
-              console.log("Received game result:", resultData);
-              setTimeout(() => {
+
+              if (finalCaptureShownRef.current) {
+                gameResultRef.current = resultData;
+              } else {
                 setGameResult(resultData);
-              }, 2000);
-            } else if (Array.isArray(payload) && payload.length > 0 && Array.isArray(payload[0])) {
-              console.log("Received capture options:", payload);
+              }
+            } else if (
+              Array.isArray(payload) && payload.length > 0 &&
+              Array.isArray(payload[0])
+            ) {
+              console.log(
+                ">>>>>>>>>>>><<<<<<<<<<<<<<<<<<Received capture options:",
+                payload,
+              );
               setCaptureOptions(payload);
             } else if (payload.suggestion) {
-              setSuggestion(payload.suggestion)
+              setSuggestion(payload.suggestion);
             } else if (payload.remainingSeconds) {
               console.log("⏱ Received timer:", payload.remainingSeconds);
 
@@ -211,7 +270,7 @@ export default function GamePage() {
               }
 
               timerIntervalRef.current = setInterval(() => {
-                setTimer(prev => {
+                setTimer((prev) => {
                   if (prev === null || prev <= 1) {
                     clearInterval(timerIntervalRef.current!);
                     return null;
@@ -219,25 +278,23 @@ export default function GamePage() {
                   return prev - 1;
                 });
               }, 1000);
-            } else if (payload.userId && Array.isArray(payload.handCards)) { // TODO: Change this to last cards message..
-              console.log("not implemented..!")
-              // TODO:
-              // const seatIndex = getSeatIndexByUserId(gameState.players, currentUserId, targetId);
-              // setMoveAnimation({
-              //   playerId: payload.userId,
-              //   seatIndex: seatIndex,
-              //   playedCard: null,
-              //   capturedCards: payload.handCards,
-              // });
-            
-              // // Clear animation after short delay
-              // setTimeout(() => {
-              //   setMoveAnimation(null);
-              // }, 1500);
-            } else {
-              console.log("Unknown message from queue: " + JSON.stringify(payload))
-            }
+            } else if (payload.userId && payload.cards) {
+              console.log("Received final capture for user", payload.userId);
 
+              const user = allUsers.find((u) => u.id === payload.userId);
+              const username = user?.username || `User ${payload.userId}`;
+
+              setFinalCaptureMessage(`Last cards go to: ${username}`);
+
+              // Hide the message after a delay
+              setTimeout(() => {
+                setFinalCaptureMessage(null);
+              }, 3000);
+            } else {
+              console.log(
+                "Unknown message from queue: " + JSON.stringify(payload),
+              );
+            }
           } catch (err) {
             console.error("Error processing private message:", err);
           }
@@ -247,7 +304,7 @@ export default function GamePage() {
           console.log(`path is... /app/updateGame/${id}`);
           client.publish({
             destination: `/app/updateGame/${id}`,
-            body: '',
+            body: "",
             headers: { userId: `${currentUserId}` },
           });
           hasPublishedRef.current = true;
@@ -288,7 +345,7 @@ export default function GamePage() {
 
   //  Handler for playing a card (without capture options)
   const handleCardClick = (card: Card) => {
-    setShowAIPanel(false)
+    setShowAIPanel(false);
     if (!id) return;
     // payload for a card play without capture options
     const payload = JSON.stringify({
@@ -326,16 +383,51 @@ export default function GamePage() {
     console.log("user id is in capture 2: " + currentUserId);
   };
 
+  useEffect(() => {
+    if (!gameState || !currentUserId) return;
+
+    if (gameState.currentPlayerId !== currentUserId) {
+      setCaptureOptions([]);
+    }
+  }, [gameState?.currentPlayerId, currentUserId]);
+
+  useEffect(() => {
+    if (time !== null && time <= 1 && showAIPanel) {
+      setShowAIPanel(false);
+    }
+  }, [time, showAIPanel]);
+
   // Renders the capture options UI.
   const renderCaptureOptions = () => {
+    console.log("-------render capture");
     if (captureOptions.length === 0) return null;
     return (
-      <div style={{ backgroundColor: "rgba(0,0,0,0.8)", padding: "1rem", position: "absolute", top: "10%", left: "50%", transform: "translateX(-50%)", borderRadius: "8px", zIndex: 999, color: "#fff" }}>
+      <div
+        style={{
+          backgroundColor: "rgba(0,0,0,0.8)",
+          padding: "1rem",
+          position: "absolute",
+          top: "10%",
+          left: "50%",
+          transform: "translateX(-50%)",
+          borderRadius: "8px",
+          zIndex: 999,
+          color: "#fff",
+        }}
+      >
         <h3 style={{ color: "#fff" }}>Choose your capture option:</h3>
         {captureOptions.map((option, idx) => (
-          <div key={idx}
-            style={{ display: "flex", cursor: "pointer", marginBottom: "0.5rem", border: "1px solid #fff", padding: "0.5rem" }}
-            onClick={() => handleCaptureOptionClick(option)}>
+          <div
+            key={idx}
+            style={{
+              display: "flex",
+              cursor: "pointer",
+              marginBottom: "0.5rem",
+              border: "1px solid #fff",
+              padding: "0.5rem",
+            }}
+            onClick={() => handleCaptureOptionClick(option)}
+          >
             {option.map((card, cardIdx) => (
               <CardComponent card={card} key={cardIdx} />
             ))}
@@ -345,23 +437,14 @@ export default function GamePage() {
     );
   };
 
-
   useEffect(() => {
     if (!moveState) return;
-    const players = gameState?.players || [];
 
-    const meIndex = players.findIndex(p => p.userId === currentUserId);
-    const seating = meIndex >= 0
-      ? [...players.slice(meIndex), ...players.slice(0, meIndex)]
-      : players;
-
-    const activeSeatIndex = seating.findIndex(
-      p => p.userId === moveState.playerId
-    );
+    const seatIndex = getSeatIndexByUserId(moveState.playerId);
 
     setMoveAnimation({
       playerId: moveState.playerId,
-      seatIndex: activeSeatIndex as 0 | 1 | 2 | 3,
+      seatIndex: seatIndex as 0 | 1 | 2 | 3,
       playedCard: moveState?.playedCard || null,
       capturedCards: moveState?.pickedCards || [],
     });
@@ -373,8 +456,6 @@ export default function GamePage() {
     return () => clearTimeout(timeout);
   }, [moveState, currentUserId, gameState?.players]);
 
-
-
   if (error) {
     return (
       <div style={{ color: "#fff", textAlign: "center", padding: "2rem" }}>
@@ -383,7 +464,7 @@ export default function GamePage() {
       </div>
     );
   }
-  
+
   const unsubscribeFromGame = () => {
     if (subscriptionRef.current) {
       subscriptionRef.current.unsubscribe();
@@ -391,7 +472,6 @@ export default function GamePage() {
       subscriptionRef.current = null;
     }
   };
-  
 
   const rematch = () => {
     if (!id) return;
@@ -399,20 +479,82 @@ export default function GamePage() {
     const payload = JSON.stringify({
       gameId: id,
       userId: currentUserId,
-      confirmRematch: true
+      confirmRematch: true,
     });
     console.log("Publishing capture option payload:", payload);
     stompClientRef.current?.publish({
       destination: `/app/rematch`,
       body: payload,
     });
+  };
+
+  if (!token) {
+    return (
+      <div
+        style={{
+          backgroundImage: 'url("/images/background.jpg")', // Replace with your actual image path
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+          minHeight: "100vh",
+          width: "100%",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+          textAlign: "center",
+          padding: "2rem",
+          color: "#fff",
+        }}
+      >
+        <h2
+          style={{
+            fontSize: "2.5rem",
+            marginBottom: "1rem",
+            textShadow: "0 0 10px #000",
+          }}
+        >
+          Unauthorized Access
+        </h2>
+        <p
+          style={{
+            fontSize: "1.2rem",
+            marginBottom: "2rem",
+            textShadow: "0 0 6px #000",
+          }}
+        >
+          You must be logged in to access this game.
+        </p>
+        <Button
+          type="primary"
+          onClick={() => router.push("/login")}
+          style={{
+            backgroundColor: "#0ff",
+            color: "#000",
+            border: "none",
+            borderRadius: "8px",
+            padding: "0.75rem 1.5rem",
+            fontWeight: "bold",
+            fontSize: "1rem",
+            boxShadow:
+              "0 0 8px rgba(0, 255, 255, 0.7), 0 0 16px rgba(0, 255, 255, 0.4)",
+          }}
+        >
+          Go to Login
+        </Button>
+      </div>
+    );
   }
 
   if (gameResult) {
-    return <GameResultView result={gameResult} onReturnHome={unsubscribeFromGame} 
-    onRematch={rematch} 
-    gameId={Number(id)}
-    />;
+    return (
+      <GameResultView
+        result={gameResult}
+        onReturnHome={unsubscribeFromGame}
+        onRematch={rematch}
+        gameId={Number(id)}
+      />
+    );
   }
 
   const isMyTurn = currentUserId === gameState?.currentPlayerId;
@@ -435,57 +577,62 @@ export default function GamePage() {
     console.log("User is quitting the game");
     quitGame();
   };
-  
+
   return (
     <div style={{ backgroundColor: "blue", minHeight: "100vh" }}>
-        {time !== null && (
-          <div
-            style={{
-              position: "fixed",
-              top: "20px",
-              left: "20px",
-              backgroundColor: "#111",
-              padding: "10px 20px",
-              borderRadius: "12px",
-              color: "#0ff",
-              fontSize: "22px",
-              fontFamily: "monospace",
-              border: time <= 5 ? "2px solid #0ff" : "none",
-              boxShadow: time <= 5
-                ? "0 0 10px rgba(0, 255, 255, 0.7), 0 0 20px rgba(0, 255, 255, 0.4)"
-                : "none",
-              animation: time <= 5 ? "blink 1s step-start infinite" : "none",
-              zIndex: 1200,
-            }}
-          >
-            ⏳ {time}s
-          </div>
-        )}
+      {time !== null && (
+        <div
+          style={{
+            position: "fixed",
+            top: "20px",
+            left: "20px",
+            backgroundColor: "#111",
+            padding: "10px 20px",
+            borderRadius: "12px",
+            color: "#0ff",
+            fontSize: "22px",
+            fontFamily: "monospace",
+            border: time <= 5 ? "2px solid #0ff" : "none",
+            boxShadow: time <= 5
+              ? "0 0 10px rgba(0, 255, 255, 0.7), 0 0 20px rgba(0, 255, 255, 0.4)"
+              : "none",
+            animation: time <= 5 ? "blink 1s step-start infinite" : "none",
+            zIndex: 1200,
+          }}
+        >
+          ⏳ {time}s
+        </div>
+      )}
 
-        {/* Quit button */}
-        <Button
+      {/* Quit button */}
+      <Button
         onClick={handleExit}
         style={{
           position: "absolute",
           bottom: "3.5rem",
           right: "5.5rem",
           borderRadius: "8px",
-          zIndex:999
+          zIndex: 999,
         }}
       >
         Quit Game
-        </Button>
+      </Button>
 
-       {showRoundAnimation && (
+      {showRoundAnimation && (
         <>
           <div className="shuffle-overlay" />
           <div className="round-animation">
-            <Image src="/images/scopa.png" alt="New Round" width={400} height={600}
+            <Image
+              src="/images/scopa.png"
+              alt="New Round"
+              width={400}
+              height={600}
               className="scopa-image"
-              style={{ objectFit: "contain" }} />
+              style={{ objectFit: "contain" }}
+            />
           </div>
         </>
-      )} 
+      )}
       {/* Render game view with the current state and card click handler */}
       {captureOptions.length > 0 && (
         <div
@@ -499,6 +646,29 @@ export default function GamePage() {
             zIndex: 998,
           }}
         />
+      )}
+      {finalCaptureMessage && (
+        <div
+          style={{
+            position: "fixed",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            backgroundColor: "rgba(0,0,0,0.8)",
+            padding: "1.25rem 2rem",
+            borderRadius: "12px",
+            color: "#0ff",
+            border: "2px solid #0ff",
+            fontSize: "1.5rem",
+            fontFamily: "monospace",
+            boxShadow:
+              "0 0 12px rgba(0,255,255,0.6), 0 0 24px rgba(0,255,255,0.3)",
+            zIndex: 1300,
+            animation: "fadeIn 0.5s ease-in-out",
+          }}
+        >
+          {finalCaptureMessage}
+        </div>
       )}
       {isMyTurn && renderCaptureOptions()}
       <div style={{ position: "relative", width: "100%", height: "100%" }}>
@@ -535,7 +705,7 @@ export default function GamePage() {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-        
+
           boxShadow: isMyTurn
             ? "0 0 8px rgb(133, 251, 255), 0 0 16px #0ff"
             : "none",
@@ -552,7 +722,7 @@ export default function GamePage() {
           width={120}
           height={120}
           style={{
-            position:"absolute",
+            position: "absolute",
             borderRadius: "50%",
             objectFit: "cover",
             filter: isMyTurn ? "none" : "grayscale(100%)",
@@ -561,7 +731,7 @@ export default function GamePage() {
       </div>
 
       {/* Suggestion Panel */}
-      {showAIPanel && (
+      {showAIPanel && isMyTurn && (
         <div
           style={{
             position: "fixed",
@@ -573,21 +743,35 @@ export default function GamePage() {
             color: "#0ff",
             border: "2px solid #0ff",
             borderRadius: "12px",
-            boxShadow: "0 0 8px rgb(133, 251, 255), 0 0 16px rgb(133, 251, 255)",
+            boxShadow:
+              "0 0 8px rgb(133, 251, 255), 0 0 16px rgb(133, 251, 255)",
             zIndex: 1000,
           }}
         >
-          {suggestion ? (
-          suggestion.split(";").map((line, idx) => (
-            <div key={idx}>{line.trim()}</div>
-      ))
-    ) : (
-      <div><em>Waiting for suggestion...</em></div>
-    )}
+          {suggestion
+            ? (
+              <>
+                <div style={{ fontWeight: "bold", marginBottom: "8px" }}>
+                  Suggested moves from the AI:
+                </div>
+                <ul style={{ paddingLeft: "20px", margin: 0 }}>
+                  {suggestion
+                    .split(";")
+                    .map((line, idx) => (
+                      <li key={idx} style={{ marginBottom: "6px" }}>
+                        {line.trim()}
+                      </li>
+                    ))}
+                </ul>
+              </>
+            )
+            : (
+              <div>
+                <em>Waiting for suggestion...</em>
+              </div>
+            )}
         </div>
       )}
     </div>
-
   );
 }
-

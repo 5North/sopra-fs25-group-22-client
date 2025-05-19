@@ -51,19 +51,23 @@ const Register: React.FC = () => {
         throw new Error(`Failed to fetch users: ${usersRes.status}`);
       }
       const users: { id: number; username: string }[] = await usersRes.json();
-      const me = users.find(u => u.username === values.username);
+      const me = users.find((u) => u.username === values.username);
       if (!me) {
         throw new Error("Logged-in user not found in users list");
       }
 
       localStorage.setItem("userId", String(me.id));
       localStorage.setItem("username", me.username);
-    
+
       router.push("/home");
     } catch (error) {
       if (error instanceof Error) {
         alert(`Oopps.. Something went wrong!` + error);
-        console.error(`Something went wrong during the registration:\n${error.message} ${JSON.stringify(values)}`);
+        console.error(
+          `Something went wrong during the registration:\n${error.message} ${
+            JSON.stringify(values)
+          }`,
+        );
       } else {
         console.error("An unknown error occurred during user registration.");
       }
@@ -87,10 +91,14 @@ const Register: React.FC = () => {
         <Form.Item
           name="username"
           label="Username"
-          rules={[{ required: true, message: "Please enter your username!" }]}
+          rules={[
+            { required: true, message: "Please enter your username!" },
+            { max: 15, message: "Username must be less than 15 characters." },
+          ]}
         >
-          <Input placeholder="Enter username" />
+          <Input placeholder="Enter username" maxLength={15} />
         </Form.Item>
+
         <Form.Item
           name="password"
           label="Password"
@@ -100,17 +108,25 @@ const Register: React.FC = () => {
         </Form.Item>
         <Form.Item>
           {error && <p style={{ color: "red" }}>{error}</p>}
-          <Button type="primary" htmlType="submit" className="custom-button" loading={loading}>
+          <Button
+            type="primary"
+            htmlType="submit"
+            className="custom-button"
+            loading={loading}
+          >
             Register
           </Button>
         </Form.Item>
       </Form>
       <div className="auth-link">
-          <Button type="link" onClick={() => router.push("/login")}
+        <Button
+          type="link"
+          onClick={() => router.push("/login")}
           className="register-button-text"
-          > Already have an Account? Login
-          </Button>
-        </div>
+        >
+          Already have an Account? Login
+        </Button>
+      </div>
     </div>
   );
 };
