@@ -295,6 +295,11 @@ export default function GamePage() {
               setTimeout(() => {
                 setFinalCaptureMessage(null);
               }, 3000);
+            } else if (payload.message){
+                if (payload.message.startsWith("Error updating game: Game with id") && payload.message.endsWith("does not exist"))
+                {
+                  console.log("Exiting empty game");
+                  router.push("/home")}
             } else {
               console.log(
                 "Unknown message from queue: " + JSON.stringify(payload),
