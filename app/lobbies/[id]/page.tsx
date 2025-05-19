@@ -34,6 +34,7 @@ const getUsername = (): string => {
 
 const LobbyPage: React.FC = () => {
   const router = useRouter();
+  const [hydrated, setHydrated] = useState(false);
   const [error] = useState("");
   const { value: token } = useLocalStorage<string>("token", "");
   const username = getUsername();
@@ -44,6 +45,10 @@ const LobbyPage: React.FC = () => {
   const subscriptionRef = useRef<StompSubscription | null>(null);
   const [players, setPlayers] = useState<Player[]>([]);
   const [hostLeft, setHostLeft] = useState(false);
+
+    useEffect(() => {
+        setHydrated(true)
+    }, []);
 
   useEffect(() => {
     if (!pin || !token) return;
@@ -165,6 +170,10 @@ const LobbyPage: React.FC = () => {
     const firstId = lobby.usersIds[0];
     return players.find((p) => p.userId === firstId)?.username || "";
   }, [lobby, players]);
+
+    if(!hydrated) {
+        return ;
+    }
 
   if (!token) {
     return (

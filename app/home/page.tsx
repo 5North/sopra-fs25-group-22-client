@@ -18,6 +18,7 @@ interface UserStats {
 
 const Home: React.FC = () => {
   const router = useRouter();
+  const [hydrated, setHydrated] = useState(false);
   const [form] = Form.useForm();
   const { clear: clearToken, value: token } = useLocalStorage<string>(
     "token",
@@ -37,6 +38,10 @@ const Home: React.FC = () => {
   });
   const [messageApi, contextHolder] = message.useMessage();
   let response: Response;
+
+    useEffect(() => {
+        setHydrated(true)
+    }, []);
 
   // Create lobby
   const handleStartGame = async () => {
@@ -116,7 +121,6 @@ const Home: React.FC = () => {
         console.error("Error fetching stats:", err);
       }
     };
-
     loadStats();
   }, [token, userId, userIdStr]);
 
@@ -127,7 +131,7 @@ const Home: React.FC = () => {
       if (!response.ok) {
         throw new Error(`Unexpected error: ${response.status}`);
       }
-
+      setHydrated(false);
       clearToken();
       clearUsername();
       clearUserIdStr();
@@ -145,6 +149,10 @@ const Home: React.FC = () => {
       }
     }
   };
+
+  if(!hydrated) {
+      return ;
+  }
 
   if (!token) {
     return (

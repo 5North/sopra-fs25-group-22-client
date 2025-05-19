@@ -11,6 +11,7 @@ import { message } from "antd";
 
 const JoinGamePage: React.FC = () => {
   const router = useRouter();
+  const [hydrated, setHydrated] = useState(false);
   const { value: userIdStr } = useLocalStorage<string>("userId", "");
   const [digits, setDigits] = useState(["", "", "", ""]);
   const isFull = false;
@@ -38,6 +39,10 @@ const JoinGamePage: React.FC = () => {
       inputsRef.current[index - 1]?.focus();
     }
   };
+
+    useEffect(() => {
+        setHydrated(true)
+    }, []);
 
   // Cleanup: if client exists, deactivate STOMP connection on unmount
   useEffect(() => {
@@ -152,6 +157,10 @@ const JoinGamePage: React.FC = () => {
     color: "#fff",
     padding: "2rem",
   };
+
+    if(!hydrated) {
+        return ;
+    }
 
   if (!token) {
     return (

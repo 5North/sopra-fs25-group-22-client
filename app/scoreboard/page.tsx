@@ -16,6 +16,7 @@ interface UserGetDTO {
 
 export default function ScoreboardPage() {
   const [players, setPlayers] = useState<UserGetDTO[]>([]);
+  const [hydrated, setHydrated] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const rawToken = typeof window !== "undefined"
@@ -27,6 +28,10 @@ export default function ScoreboardPage() {
   const token = rawToken ? rawToken.replace(/^"|"$/g, "") : null;
   const currentUserId = rawUserId ? Number(rawUserId) : null;
   const router = useRouter();
+
+    useEffect(() => {
+        setHydrated(true)
+    }, []);
 
   useEffect(() => {
     const raw = localStorage.getItem("token");
@@ -74,6 +79,10 @@ export default function ScoreboardPage() {
       }
     })();
   }, [token]);
+
+    if(!hydrated) {
+        return ;
+    }
 
   if (!token) {
     return (

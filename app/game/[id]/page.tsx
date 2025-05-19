@@ -36,6 +36,7 @@ interface MoveState {
 
 export default function GamePage() {
   const hasPublishedRef = useRef(false);
+  const [hydrated, setHydrated] = useState(false);
   const { id } = useParams();
   const [gameState, setGameState] = useState<GameSessionState>(
     initialGameState,
@@ -99,6 +100,10 @@ export default function GamePage() {
 
     return seatIndex;
   };
+
+  useEffect(() => {
+    setHydrated(true)
+  }, []);
 
   useEffect(() => {
     // ensure we actually have an array
@@ -290,6 +295,11 @@ export default function GamePage() {
               setTimeout(() => {
                 setFinalCaptureMessage(null);
               }, 3000);
+            } else if (payload.message){
+                if (payload.message.startsWith("Error updating game: Game with id") && payload.message.endsWith("does not exist"))
+                {
+                  console.log("Exiting empty game");
+                  router.push("/home")}
             } else {
               console.log(
                 "Unknown message from queue: " + JSON.stringify(payload),
@@ -487,6 +497,10 @@ export default function GamePage() {
       body: payload,
     });
   };
+
+  if(!hydrated) {
+    return ;
+  }
 
   if (!token) {
     return (
